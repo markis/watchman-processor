@@ -1,9 +1,8 @@
 const fs = require('fs');
 const HOME_FOLDER = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 const CONF_FILE = HOME_FOLDER + '/.watchman-processor.config.js';
-const EXAMPLE_CONF_FILE = process.cwd() + '/example.watchman-processor.config.js';
+const EXAMPLE_CONF_FILE = process.cwd() + '/example/watchman-processor.config.js';
 
-console.log(process.argv[2]);
 if (process.argv[2] === 'init') {
   var reader = fs.createReadStream(EXAMPLE_CONF_FILE);
   reader.on("error", function(err) {
