@@ -1,6 +1,6 @@
 # Watchman-Processor
 
-File syncronizer with a simplistic dashboard for Facebook's watchman file watching service
+File synchronizer with a simplistic dashboard for Facebook's watchman file watching service
 
 ![Screencapture GIF](https://i.imgur.com/1p0i8d6.gif)
 
