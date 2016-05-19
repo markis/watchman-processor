@@ -1,6 +1,6 @@
 {
   "name": "watchman-processor",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Processor for the watchman application",
   "main": "index.js",
   "bin": "./.bin/watchman-processor",
