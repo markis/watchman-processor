@@ -1,4 +1,4 @@
-const Promise = require('promise');
+var Promise = require('promise');
 
 function WatchmanSync(config, watchmanClient, terminal, sync) {
   this.config = config;
@@ -13,7 +13,7 @@ WatchmanSync.prototype.start = function start() {
 };
 
 WatchmanSync.prototype.onCapabilityCheck = function onCapabilityCheck(error) {
-  const terminal = this.terminal;
+  var terminal = this.terminal;
   if (error) {
     terminal.error(error);
     return;
@@ -34,11 +34,11 @@ WatchmanSync.prototype.onCapabilityCheck = function onCapabilityCheck(error) {
 };
 
 WatchmanSync.prototype.onSubscription = function onSubscription(resp) {
-  const terminal = this.terminal;
-  const subscription = (resp && resp.subscription) || '';
-  const files = resp.files;
+  var terminal = this.terminal;
+  var subscription = (resp && resp.subscription) || '';
+  var files = resp.files;
 
-  const subConfig = this.config.subscriptions[subscription];
+  var subConfig = this.config.subscriptions[subscription];
   this.terminal.setState(subConfig, 'running');
   if (subConfig) {
     if (subConfig.type === 'rsync') {
@@ -56,8 +56,8 @@ WatchmanSync.prototype.onSubscription = function onSubscription(resp) {
 };
 
 WatchmanSync.prototype.subscribe = function subscribe(folder, name, relativePath, expression) {
-  const terminal = this.terminal;
-  const client = this.client;
+  var terminal = this.terminal;
+  var client = this.client;
   if (typeof expression === 'undefined') {
     expression = ['allof', ['type', 'f']];
   }

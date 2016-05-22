@@ -1,5 +1,8 @@
 # Watchman-Processor
 
+[![Dependency Status](https://david-dm.org/markistaylor/watchman-processor.svg)](https://david-dm.org/markistaylor/watchman-processor)
+[![Code Climate](https://codeclimate.com/github/markistaylor/watchman-processor/badges/gpa.svg)](https://codeclimate.com/github/markistaylor/watchman-processor)
+
 File synchronizer with a simplistic dashboard for Facebook's watchman file watching service
 
 ![Screencapture GIF](https://i.imgur.com/1p0i8d6.gif)

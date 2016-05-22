@@ -1,5 +1,5 @@
-const chalk = require('chalk');
-const emoji = require('node-emoji');
+var chalk = require('chalk');
+var emoji = require('node-emoji');
 
 function Terminal(config, _chalk, _emoji) {
   this.config = config;
@@ -71,17 +71,27 @@ Terminal.prototype.render = function render() {
     if (subscription) {
       var state = subscription.state;
       if (state === 'good') {
-        process.stdout.write(this.chalk.bgGreen.black(this.emojify(':thumbsup:  ' + name + ' ')));
+        this.log(':thumbsup:  ' + name + ' ', 'Green');
       } else if (state === 'running') {
-        process.stdout.write(this.chalk.bgYellow.black(this.emojify(':running:  ' + name + ' ')));
+        this.log(':running:  ' + name + ' ', 'Yellow');
       } else if (state === 'error') {
-        process.stdout.write(this.chalk.bgRed.black(this.emojify(':skull_and_crossbones:  ' + name + ' ')));
+        this.log(':skull_and_crossbones:  ' + name + ' ', 'Red');
       } else {
-        process.stdout.write(this.chalk.bgWhite.black(this.emojify(':hourglass:  ' + name + ' ')));
+        this.log(':hourglass:  ' + name + ' ');
       }
     }
   }
-  console.log(this.chalk.bgBlack.white(' '));
+  this.log('\n');
+};
+
+Terminal.prototype.log = function log(msg, color) {
+  msg = this.emojify(msg);
+  if (this.chalk['bg' + color]) {
+    msg = this.chalk['bg' + color].black(msg); 
+  } else {
+    msg = this.chalk.bgWhite.black(msg);
+  }
+  process.stdout.write(msg);
 };
 
 module.exports = Terminal;

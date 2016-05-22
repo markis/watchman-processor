@@ -1,6 +1,6 @@
 const path = require('path');
 
-const HOME_FOLDER = process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
+const HOME_FOLDER = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
 const WATCH_EXPRESSION = ['allof', ['type', 'f'],
   ['not', ['dirname', '.git']],
   ['not', ['dirname', '.idea']]

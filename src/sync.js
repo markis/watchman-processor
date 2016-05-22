@@ -1,5 +1,5 @@
-const exec = require('child_process').exec;
-const Promise = require('promise');
+var exec = require('child_process').exec;
+var Promise = require('promise');
 
 
 function Sync(config, terminal) {
@@ -28,36 +28,36 @@ Sync.prototype.syncFiles = function syncFiles(subConfig, src, dest, files) {
 };
 
 Sync.prototype._syncAllFiles = function _syncAllFiles(subConfig, src, dest) {
-  const terminal = this.terminal;
-  const rsyncCmd = this.rsyncCmd;
-  const excludes = " --exclude '.idea' --exclude '.git' --exclude '.sass-cache'";
+  var terminal = this.terminal;
+  var rsyncCmd = this.rsyncCmd;
+  var excludes = " --exclude '.idea' --exclude '.git' --exclude '.sass-cache'";
 
   return new Promise(function(resolve, reject) {
-    const cmd = [rsyncCmd, '-avz --stats --delete', src, dest, excludes].join(' ');
+    var cmd = [rsyncCmd, '-avz --stats --delete', src, dest, excludes].join(' ');
     terminal.debug(cmd);
     exec(cmd, null, getExecCallback(resolve, reject));
   });
 };
 
 Sync.prototype._syncSpecificFiles = function _syncSpecificFiles(subConfig, src, dest, files) {
-  const terminal = this.terminal;
-  const rsyncCmd = this.rsyncCmd;
-  const excludes = "--exclude '*'";
+  var terminal = this.terminal;
+  var rsyncCmd = this.rsyncCmd;
+  var excludes = "--exclude '*'";
 
   files =  getUniqueFileFolders(files).concat(files);
 
-  const includes = " --include '" + files.join("' --include '") + "'";
+  var includes = " --include '" + files.join("' --include '") + "'";
 
   return new Promise(function(resolve, reject) {
-    const cmd = [rsyncCmd, '-avz --stats --delete', includes, excludes, src, dest].join(' ');
+    var cmd = [rsyncCmd, '-avz --stats --delete', includes, excludes, src, dest].join(' ');
     terminal.debug(cmd);
     exec(cmd, null, getExecCallback(resolve, reject));
   });
 };
 
 function getUniqueFileFolders(files) {
-  const folders = [];
-  const length = files.length;
+  var folders = [];
+  var length = files.length;
   for (var i = 0, folderParts, folderPartsSum, file; i < length; i++) {
     file = files[i];
     folderParts = file.split('/');
