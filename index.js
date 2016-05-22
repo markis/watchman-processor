@@ -1,15 +1,15 @@
-const config = require('./src/init');
+var config = require('./src/init');
 if (config) {
-  const watchman = require('fb-watchman');
-  const Terminal = require('./src/terminal');
-  const Sync = require('./src/sync');
-  const WatchmanSync = require('./src/watchman');
+  var watchman = require('fb-watchman');
+  var Terminal = require('./src/terminal');
+  var Sync = require('./src/sync');
+  var WatchmanSync = require('./src/watchman');
 
-  const client = new watchman.Client();
-  const terminal = new Terminal(config);
-  const sync = new Sync(config, terminal);
+  var client = new watchman.Client();
+  var terminal = new Terminal(config);
+  var sync = new Sync(config, terminal);
 
-  const watchmanSync = new WatchmanSync(config, client, terminal, sync);
+  var watchmanSync = new WatchmanSync(config, client, terminal, sync);
   watchmanSync.start();
 
   module.exports = watchmanSync;

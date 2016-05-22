@@ -1,21 +1,23 @@
 var exec = require('child_process').exec;
 var Promise = require('promise');
 
-
-function Sync(config, terminal) {
+function Sync(config, terminal, _exec) {
   this.config = config;
   this.terminal = terminal;
+  this.exec = _exec || exec; 
   this.rsyncCmd = this.config.rsyncCmd || 'rsync';
   this.maxFileLength = this.config.maxFileLength || 100;
 }
 
 Sync.prototype.syncFiles = function syncFiles(subConfig, src, dest, files) {
   files = files || [];
-  files = files.map(function(file) { return file.name });
+  files = files.map(function(file) {
+    return file.name;
+  });
   files = files.filter(function(file) {
     return file.indexOf('.sass-cache/') === -1 &&
       file.indexOf('.git/') === -1 &&
-      file.indexOf('.idea/') === -1
+      file.indexOf('.idea/') === -1;
   });
 
   // if there are too many files, it might just be better to let rsync figure out what
@@ -30,7 +32,8 @@ Sync.prototype.syncFiles = function syncFiles(subConfig, src, dest, files) {
 Sync.prototype._syncAllFiles = function _syncAllFiles(subConfig, src, dest) {
   var terminal = this.terminal;
   var rsyncCmd = this.rsyncCmd;
-  var excludes = " --exclude '.idea' --exclude '.git' --exclude '.sass-cache'";
+  var exec = this.exec;
+  var excludes = ' --exclude \'.idea\' --exclude \'.git\' --exclude \'.sass-cache\'';
 
   return new Promise(function(resolve, reject) {
     var cmd = [rsyncCmd, '-avz --stats --delete', src, dest, excludes].join(' ');
@@ -42,11 +45,12 @@ Sync.prototype._syncAllFiles = function _syncAllFiles(subConfig, src, dest) {
 Sync.prototype._syncSpecificFiles = function _syncSpecificFiles(subConfig, src, dest, files) {
   var terminal = this.terminal;
   var rsyncCmd = this.rsyncCmd;
-  var excludes = "--exclude '*'";
+  var exec = this.exec;
+  var excludes = '--exclude \'*\'';
 
   files =  getUniqueFileFolders(files).concat(files);
 
-  var includes = " --include '" + files.join("' --include '") + "'";
+  var includes = ' --include \'' + files.join('\' --include \'') + '\'';
 
   return new Promise(function(resolve, reject) {
     var cmd = [rsyncCmd, '-avz --stats --delete', includes, excludes, src, dest].join(' ');

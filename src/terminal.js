@@ -1,18 +1,24 @@
 var chalk = require('chalk');
 var emoji = require('node-emoji');
 
-function Terminal(config, _chalk, _emoji) {
+function Terminal(config, _stdOutWrite, _stdErrWrite, _chalk, _emoji) {
   this.config = config;
-  if (!config.debug) {
+  if (!config || !config.debug) {
     this.debug = function noop() {};
   }
-  
+
+  this.error = _stdErrWrite || function(msg) {
+    process.stderr.write(msg);
+  };
+  this.write = _stdOutWrite || function(msg) { 
+    process.stdout.write(msg); 
+  };
   this.chalk = _chalk || chalk;
   this.emoji = _emoji || emoji;
 }
 
 Terminal.prototype.error = function error(err) {
-  console.error(this.chalk.red(err));
+  this.error(this.chalk.red(err));
 };
 
 Terminal.prototype.start = function start() {
@@ -24,25 +30,25 @@ Terminal.prototype.start = function start() {
 };
 
 Terminal.prototype.clear = function clear() {
-  process.stdout.write('\x1b[H\x1b[J');
+  this.write('\x1b[H\x1b[J');
 };
 
 Terminal.prototype.enableFullScreen = function enableFullScreen() {
-  process.stdout.write('\x1b[?1049h');
+  this.write('\x1b[?1049h');
   this.clear();
 };
 
 Terminal.prototype.hideCursor = function hideCursor() {
-  process.stdout.write('\x1B[?25l'); // Hide terminal cursor
+  this.write('\x1B[?25l'); // Hide terminal cursor
 };
 
-Terminal.prototype.showCursor = function showCursor() {
-  process.stdout.write('\x1B[?25h'); // Show terminal cursor
-};
+// Terminal.prototype.showCursor = function showCursor() {
+//   this.write('\x1B[?25h'); // Show terminal cursor
+// };
 
 Terminal.prototype.debug = function debug(msg) {
   if (this.config.debug && msg) {
-    process.stdout.write(this.chalk.white(msg + '\n'));
+    this.write(this.chalk.white(msg + '\n'));
   }
 };
 
@@ -91,7 +97,7 @@ Terminal.prototype.log = function log(msg, color) {
   } else {
     msg = this.chalk.bgWhite.black(msg);
   }
-  process.stdout.write(msg);
+  this.write(msg);
 };
 
 module.exports = Terminal;
