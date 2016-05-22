@@ -2,11 +2,10 @@ var exec = require('child_process').exec;
 var Promise = require('promise');
 
 function Sync(config, terminal, _exec) {
-  this.config = config;
   this.terminal = terminal;
   this.exec = _exec || exec; 
-  this.rsyncCmd = this.config.rsyncCmd || 'rsync';
-  this.maxFileLength = this.config.maxFileLength || 100;
+  this.rsyncCmd = config && config.rsyncCmd || 'rsync';
+  this.maxFileLength = config && config.maxFileLength || 100;
 }
 
 Sync.prototype.syncFiles = function syncFiles(subConfig, src, dest, files) {
