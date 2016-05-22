@@ -2,6 +2,7 @@
 
 [![Dependency Status](https://david-dm.org/markistaylor/watchman-processor.svg)](https://david-dm.org/markistaylor/watchman-processor)
 [![Code Climate](https://codeclimate.com/github/markistaylor/watchman-processor/badges/gpa.svg)](https://codeclimate.com/github/markistaylor/watchman-processor)
+[![Build Status](https://travis-ci.org/markistaylor/watchman-processor.svg?branch=master)](https://travis-ci.org/markistaylor/watchman-processor)
 
 File synchronizer with a simplistic dashboard for Facebook's watchman file watching service
 
