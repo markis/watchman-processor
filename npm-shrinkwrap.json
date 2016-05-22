@@ -162,7 +162,7 @@
     "concat-map": {
       "version": "0.0.1",
       "from": "concat-map@0.0.1",
-      "resolved": "http://npm1.sv2.trulia.com/concat-map/-/concat-map-0.0.1.tgz"
+      "resolved": "https://registry.npmjs.org/concat-map/-/concat-map-0.0.1.tgz"
     },
     "console-browserify": {
       "version": "1.1.0",
@@ -1133,7 +1133,7 @@
     "path-browserify": {
       "version": "0.0.0",
       "from": "path-browserify@0.0.0",
-      "resolved": "http://npm1.sv2.trulia.com/path-browserify/-/path-browserify-0.0.0.tgz"
+      "resolved": "https://registry.npmjs.org/path-browserify/-/path-browserify-0.0.0.tgz"
     },
     "path-is-absolute": {
       "version": "1.0.0",
@@ -1178,7 +1178,7 @@
     "querystring": {
       "version": "0.2.0",
       "from": "querystring@0.2.0",
-      "resolved": "http://npm1.sv2.trulia.com/querystring/-/querystring-0.2.0.tgz"
+      "resolved": "https://registry.npmjs.org/querystring/-/querystring-0.2.0.tgz"
     },
     "querystring-es3": {
       "version": "0.2.1",
