@@ -2,6 +2,7 @@
   "name": "watchman-processor",
   "version": "0.0.3",
   "description": "Processor for the watchman application",
+  "author": "Markis Taylor <m@rkis.cc>",
   "main": "index.js",
   "bin": "./.bin/watchman-processor",
   "preferGlobal": true,
@@ -16,6 +17,5 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": "https://github.com/markistaylor/watchman-processor.git",
-  "author": "",
   "license": "ISC"
 }
