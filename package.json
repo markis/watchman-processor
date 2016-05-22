@@ -1,6 +1,6 @@
 {
   "name": "watchman-processor",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Processor for the watchman application",
   "author": "Markis Taylor <m@rkis.cc>",
   "main": "index.js",
