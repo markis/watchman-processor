@@ -7,12 +7,8 @@ function Terminal(config, _stdOutWrite, _stdErrWrite, _chalk, _emoji) {
     this.debug = function noop() {};
   }
 
-  this.error = _stdErrWrite || function(msg) {
-    process.stderr.write(msg);
-  };
-  this.write = _stdOutWrite || function(msg) { 
-    process.stdout.write(msg); 
-  };
+  this.error = _stdErrWrite || stdErrWrite;
+  this.write = _stdOutWrite || stdOutWrite;
   this.chalk = _chalk || chalk;
   this.emoji = _emoji || emoji;
 }
@@ -23,7 +19,7 @@ Terminal.prototype.error = function error(err) {
 
 Terminal.prototype.start = function start() {
   this.debug('starting');
-  if (!this.config.debug) {
+  if (!this.config || !this.config.debug) {
     this.enableFullScreen();
     this.hideCursor();
   }
@@ -99,5 +95,13 @@ Terminal.prototype.log = function log(msg, color) {
   }
   this.write(msg);
 };
+
+function stdErrWrite(msg) {
+  process.stderr.write(msg);
+}
+
+function stdOutWrite(msg) {
+  process.stdout.write(msg);
+}
 
 module.exports = Terminal;

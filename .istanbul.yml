@@ -1,5 +1,7 @@
+verbose: false
 instrumentation:
   root: src
-  extensions:
-    - .js
-  es-modules: true
+  excludes: ['**/coverage/**', '**/example/**']
+  compact: true
+  default-excludes: true
+  include-all-sources: false

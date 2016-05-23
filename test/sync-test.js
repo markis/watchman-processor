@@ -4,9 +4,6 @@ var sinon = require('sinon');
 
 var Sync = require('../src/sync');
 
-var describe = mocha.describe,
-  it = mocha.it;
-
 chai.should();
 var mockTerminal = {
   debug: sinon.stub()
@@ -23,12 +20,12 @@ var config = {
 
 
 describe('Sync', function () {
-  
+
   it('Expect sync to construct with no parameters', function() {
     //Setup and Execute
     var sync = new Sync();
   });
-  
+
   it('Expect sync to rsync specific files', function () {
 
     //Setup
