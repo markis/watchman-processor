@@ -5,7 +5,7 @@
     "outDir": "built/",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "sourceMap": false
   },
   "files": [
@@ -13,6 +13,8 @@
     "lib/fb-watchman.d.ts",
     "lib/config.d.ts",
     "lib/node.d.ts",
+    "lib/emojify.d.ts",
+    "lib/chalk.d.ts",
     "src/index.ts",
     "src/config.ts",
     "src/sync.ts",

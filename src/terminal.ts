@@ -1,22 +1,22 @@
-import {Config, SubConfig} from '../lib/config';
+import { Config, SubConfig } from '../lib/config';
 
 export interface Terminal {
-  start();
-  error(err: string | Error);
-  debug(msg: string);
-  setState(configEntry: SubConfig, state: string, statusMessage?: string)
-  render();
+  start(): void;
+  error(err: string | Error): void;
+  debug(msg: string): void;
+  setState(configEntry: SubConfig, state: string, statusMessage?: string): void;
+  render(): void;
 }
 
 export default class TerminalImpl implements Terminal {
-  private _config;
-  private _error;
-  private _write;
-  private _chalk;
-  private _emoji;
+  private _config: Config;
+  private _error: (msg: string | Error) => void;
+  private _write: (msg: string) => void;
+  private _chalk: Chalk;
+  private _emoji: Emoji;
   
-  constructor(config: Config, stdOutWrite, stdErrWrite, chalk: any, emoji: any) {
-    this._config = config || {};
+  constructor(config: Config, stdOutWrite: (msg: string) => void, stdErrWrite: (msg: string) => void, chalk: Chalk, emoji: Emoji) {
+    this._config = config || {} as Config;
     this._error = stdErrWrite;
     this._write = stdOutWrite;
     this._chalk = chalk;
@@ -24,7 +24,8 @@ export default class TerminalImpl implements Terminal {
   }
   
   error(err: string | Error) {
-    this.error(this._chalk.red(err));
+    const msg = err.toString();
+    this._error(this._chalk.red(msg));
   }
   
   start() {
@@ -48,24 +49,26 @@ export default class TerminalImpl implements Terminal {
   }
   
   render() {
-    if (this._config && this._config.debug) {
+    if (this._config.debug) {
       return;
     }
     this._clear();
-    var subscriptions = Object.keys(this._config.subscriptions);
+    const chalk = this._chalk,
+      subscriptions = Object.keys(this._config.subscriptions);
+    
     for (var i = 0; i < subscriptions.length; i++) {
       var name = subscriptions[i],
         subscription = this._config.subscriptions[name];
       if (subscription) {
         var state = subscription.state;
         if (state === 'good') {
-          this._log(':thumbsup:  ' + name + ' ', 'Green');
+          this._log(':thumbsup:  ' + name + ' ', chalk.bgGreen);
         } else if (state === 'running') {
-          this._log(':running:  ' + name + ' ', 'Yellow');
+          this._log(':running:  ' + name + ' ', chalk.bgYellow);
         } else if (state === 'error') {
-          this._log(':skull_and_crossbones:  ' + name + ' ', 'Red');
+          this._log(':skull_and_crossbones:  ' + name + ' ', chalk.bgRed);
         } else {
-          this._log(':hourglass:  ' + name + ' ');
+          this._log(':hourglass:  ' + name + ' ', chalk.bgWhite);
         }
       }
     }
@@ -92,13 +95,9 @@ export default class TerminalImpl implements Terminal {
     return msg;
   }
   
-  private _log(msg: string, color?: string) {
+  private _log(msg: string, chalkColor: ChalkColors = this._chalk.bgWhite) {
     msg = this._emojify(msg);
-    if (this._chalk['bg' + color]) {
-      msg = this._chalk['bg' + color].black(msg); 
-    } else {
-      msg = this._chalk.bgWhite.black(msg);
-    }
+    msg = chalkColor.black(msg);
     this._write(msg);
   }
 }

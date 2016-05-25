@@ -3,12 +3,12 @@ import { SubConfig, Config } from '../lib/config';
 import { SubscriptionResponseFile } from '../lib/fb-watchman';
 
 export interface Sync {
-  syncFiles(subConfig: SubConfig, files: SubscriptionResponseFile[]);
+  syncFiles(subConfig: SubConfig, files: SubscriptionResponseFile[]): Promise<string>;
 }
 
 export default class SyncImpl implements Sync {
   private terminal: Terminal;
-  private exec;
+  private exec: (command: string, options?: any, callback?: (error: string, stdout: string, stderr: string) => void) => void;
   private rsyncCmd: string;
   private maxFileLength: number;
   
@@ -22,7 +22,7 @@ export default class SyncImpl implements Sync {
     this.maxFileLength = config && config.maxFileLength || 100;
   }
   
-  syncFiles(subConfig: SubConfig, fbFiles: SubscriptionResponseFile[] = []) {
+  syncFiles(subConfig: SubConfig, fbFiles: SubscriptionResponseFile[] = []): Promise<string> {
     const files: string[] = fbFiles.map(function(file) {
       return file.name;
     }).filter(function(file) {
@@ -40,7 +40,7 @@ export default class SyncImpl implements Sync {
     }
   }
   
-  private _syncAllFiles(subConfig: SubConfig) {
+  private _syncAllFiles(subConfig: SubConfig): Promise<string> {
     const terminal = this.terminal;
     const rsyncCmd = this.rsyncCmd;
     const exec = this.exec;
@@ -48,14 +48,14 @@ export default class SyncImpl implements Sync {
     const src = subConfig.source;
     const dest = subConfig.destination;
 
-    return new Promise<any>(function(resolve, reject) {
+    return new Promise<string>((resolve, reject) => {
       var cmd = [rsyncCmd, '-avz --stats --delete', src, dest, excludes].join(' ');
       terminal.debug(cmd);
       exec(cmd, null, getExecCallback(resolve, reject));
     });
   }
   
-  private _syncSpecificFiles(subConfig: SubConfig, files: string[]) {
+  private _syncSpecificFiles(subConfig: SubConfig, files: string[]): Promise<string> {
     const terminal = this.terminal;
     const rsyncCmd = this.rsyncCmd;
     const exec = this.exec;
@@ -65,9 +65,9 @@ export default class SyncImpl implements Sync {
 
     files =  getUniqueFileFolders(files).concat(files);
 
-    var includes = ' --include \'' + files.join('\' --include \'') + '\'';
+    const includes = ' --include \'' + files.join('\' --include \'') + '\'';
 
-    return new Promise(function(resolve, reject) {
+    return new Promise<string>((resolve, reject) => {
       var cmd = [rsyncCmd, '-avz --stats --delete', includes, excludes, src, dest].join(' ');
       terminal.debug(cmd);
       exec(cmd, null, getExecCallback(resolve, reject));
@@ -76,13 +76,13 @@ export default class SyncImpl implements Sync {
 }
 
 function getUniqueFileFolders(files: string[]) {
-  const folders = [];
-  const length = files.length;
-  for (var i = 0, folderParts, folderPartsSum, file; i < length; i++) {
+  const folders: string[] = [];
+  const length: number = files.length;
+  for (let i = 0, folderParts: string[], folderPartsSum: string, file: string; i < length; i++) {
     file = files[i];
     folderParts = file.split('/');
     folderPartsSum = '';
-    for (var j = 0; j < folderParts.length - 1; j++) {
+    for (let j = 0; j < folderParts.length - 1; j++) {
       if (folderPartsSum.length > 0) {
         folderPartsSum += '/';
       }
@@ -94,14 +94,14 @@ function getUniqueFileFolders(files: string[]) {
 }
 
 function unique(arr: string[]) {
-  const seen = {};
-  return arr.filter(function(item) {
+  const seen: any = {};
+  return arr.filter((item: string) => {
     return seen.hasOwnProperty(item) ? false : (seen[item] = true);
   });
 }
 
 function getExecCallback(resolve: (out: string) => void, reject: (err: string | Error) => void) {
-  return function(err: string | Error, stdOut: string, stdErr: string) {
+  return (err: string | Error, stdOut: string, stdErr: string) => {
     if (err || stdErr) {
       reject(err || stdErr);
     } else {

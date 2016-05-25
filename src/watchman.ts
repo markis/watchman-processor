@@ -4,24 +4,24 @@ import { Config } from '../lib/config';
 import { SubscriptionResponse } from '../lib/fb-watchman';
 
 export interface Watchman {
-  start();
+  start(): void;
 }
 
 export default class WatchmanImpl implements Watchman {
-  private _config;
-  private _client;
+  private _config: Config;
+  private _client: any;
   private _terminal: Terminal;
   private _sync: Sync;
   
-  constructor(config: Config, watchmanClient, terminal: Terminal, sync: Sync) {
+  constructor(config: Config, watchmanClient: any, terminal: Terminal, sync: Sync) {
     this._config = config;
     this._client = watchmanClient;
     this._terminal = terminal;
     this._sync = sync;
   }
   
-  start() {
-    const capabilities = {
+  start(): void {
+    const capabilities: any = {
       optional: [], 
       required: ['relative_root']
     };
@@ -31,7 +31,7 @@ export default class WatchmanImpl implements Watchman {
     this._client.capabilityCheck(capabilities, onCapabilityCheck);
   }
   
-  private _onCapabilityCheck(error) {
+  private _onCapabilityCheck(error: string | Error): void {
     var terminal = this._terminal;
     if (error) {
       terminal.error(error);
@@ -39,7 +39,7 @@ export default class WatchmanImpl implements Watchman {
     }
     terminal.render();
 
-    var promises = [], subscriptions = Object.keys(this._config.subscriptions);
+    const promises: Promise<string | void>[] = [], subscriptions = Object.keys(this._config.subscriptions);
     for (var i = 0; i < subscriptions.length; i++) {
       var name = subscriptions[i],
         subscription = this._config.subscriptions[name];
@@ -53,7 +53,7 @@ export default class WatchmanImpl implements Watchman {
     this._client.on('subscription', onSubscription);
   }
   
-  private _onSubscription(resp: SubscriptionResponse) {
+  private _onSubscription(resp: SubscriptionResponse): void {
     const config = this._config;
     const terminal = this._terminal;
     const subscription = (resp && resp.subscription) || '';
@@ -76,7 +76,7 @@ export default class WatchmanImpl implements Watchman {
     }
   }
   
-  private _subscribe(folder, name, relativePath, expression) {
+  private _subscribe(folder: string, name: string, relativePath: string, expression: any[]): Promise<void> {
     var terminal = this._terminal;
     var client = this._client;
     if (typeof expression === 'undefined') {
@@ -92,9 +92,9 @@ export default class WatchmanImpl implements Watchman {
     }
 
     terminal.debug('starting:' + name + ' expression: ' + JSON.stringify(expression));
-    return new Promise(function (resolve, reject) {
+    return new Promise<string | void>(function (resolve, reject) {
       client.command(['subscribe', folder, name, sub],
-        function (error) {
+        (error: string) => {
           if (error) {
             reject('failed to subscribe: ' + error);
           }

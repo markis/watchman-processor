@@ -1,3 +1,6 @@
+export interface WatchmanClient {
+  
+}
 
 export interface SubscriptionResponse {
   subscription: string;

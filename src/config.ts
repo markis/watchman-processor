@@ -1,5 +1,5 @@
 import { Config } from '../lib/config';
-var fs = require('fs');
+import * as fs from 'fs';
 
 const HOME_FOLDER = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
 const CONF_FILE = HOME_FOLDER + '/.watchman-processor.config.js';
