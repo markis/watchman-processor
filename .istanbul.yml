@@ -1,6 +1,6 @@
 verbose: false
 instrumentation:
-  root: src
+  root: built
   excludes: ['**/coverage/**', '**/example/**']
   compact: true
   default-excludes: true

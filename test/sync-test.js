@@ -2,7 +2,7 @@ var chai = require('chai');
 var mocha = require('mocha');
 var sinon = require('sinon');
 
-var Sync = require('../src/sync');
+var Sync = require('../built/sync').default;
 
 chai.should();
 var mockTerminal = {
@@ -38,7 +38,7 @@ describe('Sync', function () {
     var example1 = config.subscriptions.example1;
 
     //Execute
-    sync.syncFiles(example1, example1.source, example1.destination, shortList);
+    sync.syncFiles(example1, shortList);
     exec.callArg(2);
 
     //Measure
@@ -58,7 +58,7 @@ describe('Sync', function () {
     var example1 = config.subscriptions.example1;
 
     //Execute
-    sync.syncFiles(example1, example1.source, example1.destination, longList);
+    sync.syncFiles(example1, longList);
     exec.callArg(2);
 
     //Measure
@@ -74,7 +74,7 @@ describe('Sync', function () {
     var example1 = config.subscriptions.example1;
 
     //Execute
-    sync.syncFiles(example1, example1.source, example1.destination);
+    sync.syncFiles(example1);
     exec.callArgWith(2, null, null, 'err3');
 
     //Measure

@@ -3,16 +3,25 @@
     "module": "commonjs",
     "target": "es5",
     "outDir": "built/",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "noImplicitAny": false,
     "sourceMap": false
   },
   "files": [
-    "src/init",
-    "src/sync",
-    "src/terminal",
-    "src/watchman"
+    "node_modules/typescript/lib/lib.es6.d.ts",
+    "lib/fb-watchman.d.ts",
+    "lib/config.d.ts",
+    "lib/node.d.ts",
+    "src/index.ts",
+    "src/config.ts",
+    "src/sync.ts",
+    "src/terminal.ts",
+    "src/watchman.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "coverage",
+    "built"
   ]
 }

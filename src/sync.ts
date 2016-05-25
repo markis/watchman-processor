@@ -1,24 +1,31 @@
-/// <reference path="../lib/_global.d.ts" />
+import { Terminal } from './terminal';
+import { SubConfig, Config } from '../lib/config';
+import { SubscriptionResponseFile } from '../lib/fb-watchman';
 
-export default class Sync {
-  private terminal;
+export interface Sync {
+  syncFiles(subConfig: SubConfig, files: SubscriptionResponseFile[]);
+}
+
+export default class SyncImpl implements Sync {
+  private terminal: Terminal;
   private exec;
   private rsyncCmd: string;
   private maxFileLength: number;
   
-  constructor(config, terminal, exec) {
+  constructor(config: Config, 
+              terminal: Terminal, 
+              exec: (command: string, options?: any, callback?: (error: string, stdout: string, stderr: string) => void) => void) {
+    
     this.terminal = terminal;
     this.exec = exec; 
     this.rsyncCmd = config && config.rsyncCmd || 'rsync';
     this.maxFileLength = config && config.maxFileLength || 100;
   }
   
-  syncFiles(subConfig, src, dest, files) {
-    files = files || [];
-    files = files.map(function(file) {
+  syncFiles(subConfig: SubConfig, fbFiles: SubscriptionResponseFile[] = []) {
+    const files: string[] = fbFiles.map(function(file) {
       return file.name;
-    });
-    files = files.filter(function(file) {
+    }).filter(function(file) {
       return file.indexOf('.sass-cache/') === -1 &&
         file.indexOf('.git/') === -1 &&
         file.indexOf('.idea/') === -1;
@@ -27,17 +34,19 @@ export default class Sync {
     // if there are too many files, it might just be better to let rsync figure out what
     // needs to be synced
     if (files.length > 0 && files.length < this.maxFileLength) {
-      return this._syncSpecificFiles(subConfig, src, dest, files);
+      return this._syncSpecificFiles(subConfig, files);
     } else {
-      return this._syncAllFiles(subConfig, src, dest);
+      return this._syncAllFiles(subConfig);
     }
   }
   
-  private _syncAllFiles(subConfig, src, dest) {
-    var terminal = this.terminal;
-    var rsyncCmd = this.rsyncCmd;
-    var exec = this.exec;
-    var excludes = ' --exclude \'.idea\' --exclude \'.git\' --exclude \'.sass-cache\'';
+  private _syncAllFiles(subConfig: SubConfig) {
+    const terminal = this.terminal;
+    const rsyncCmd = this.rsyncCmd;
+    const exec = this.exec;
+    const excludes = ' --exclude \'.idea\' --exclude \'.git\' --exclude \'.sass-cache\'';
+    const src = subConfig.source;
+    const dest = subConfig.destination;
 
     return new Promise<any>(function(resolve, reject) {
       var cmd = [rsyncCmd, '-avz --stats --delete', src, dest, excludes].join(' ');
@@ -46,11 +55,13 @@ export default class Sync {
     });
   }
   
-  private _syncSpecificFiles(subConfig, src, dest, files) {
-    var terminal = this.terminal;
-    var rsyncCmd = this.rsyncCmd;
-    var exec = this.exec;
-    var excludes = '--exclude \'*\'';
+  private _syncSpecificFiles(subConfig: SubConfig, files: string[]) {
+    const terminal = this.terminal;
+    const rsyncCmd = this.rsyncCmd;
+    const exec = this.exec;
+    const excludes = '--exclude \'*\'';
+    const src = subConfig.source;
+    const dest = subConfig.destination;
 
     files =  getUniqueFileFolders(files).concat(files);
 
@@ -64,9 +75,9 @@ export default class Sync {
   }
 }
 
-function getUniqueFileFolders(files) {
-  var folders = [];
-  var length = files.length;
+function getUniqueFileFolders(files: string[]) {
+  const folders = [];
+  const length = files.length;
   for (var i = 0, folderParts, folderPartsSum, file; i < length; i++) {
     file = files[i];
     folderParts = file.split('/');
@@ -82,15 +93,15 @@ function getUniqueFileFolders(files) {
   return unique(folders);
 }
 
-function unique(a) {
-  var seen = {};
-  return a.filter(function(item) {
+function unique(arr: string[]) {
+  const seen = {};
+  return arr.filter(function(item) {
     return seen.hasOwnProperty(item) ? false : (seen[item] = true);
   });
 }
 
-function getExecCallback(resolve, reject) {
-  return function(err, stdOut, stdErr) {
+function getExecCallback(resolve: (out: string) => void, reject: (err: string | Error) => void) {
+  return function(err: string | Error, stdOut: string, stdErr: string) {
     if (err || stdErr) {
       reject(err || stdErr);
     } else {

@@ -1,10 +1,19 @@
-export default class Watchman {
+import { Sync } from './sync';
+import { Terminal } from './terminal';
+import { Config } from '../lib/config';
+import { SubscriptionResponse } from '../lib/fb-watchman';
+
+export interface Watchman {
+  start();
+}
+
+export default class WatchmanImpl implements Watchman {
   private _config;
   private _client;
-  private _terminal;
-  private _sync;
+  private _terminal: Terminal;
+  private _sync: Sync;
   
-  constructor(config, watchmanClient, terminal, sync) {
+  constructor(config: Config, watchmanClient, terminal: Terminal, sync: Sync) {
     this._config = config;
     this._client = watchmanClient;
     this._terminal = terminal;
@@ -16,7 +25,7 @@ export default class Watchman {
       optional: [], 
       required: ['relative_root']
     };
-    const onCapabilityCheck = this._onCapabilityCheck.bind(this)
+    const onCapabilityCheck = this._onCapabilityCheck.bind(this);
     
     this._terminal.start();
     this._client.capabilityCheck(capabilities, onCapabilityCheck);
@@ -39,11 +48,12 @@ export default class Watchman {
     }
     Promise.all(promises).then(this._terminal.render);
 
+    const onSubscription = this._onSubscription.bind(this);
     // subscription is fired regardless of which subscriber fired it
-    this._client.on('subscription', this._onSubscription.bind(this));
+    this._client.on('subscription', onSubscription);
   }
   
-  private _onSubscription(resp) {
+  private _onSubscription(resp: SubscriptionResponse) {
     const config = this._config;
     const terminal = this._terminal;
     const subscription = (resp && resp.subscription) || '';
@@ -53,7 +63,7 @@ export default class Watchman {
     terminal.setState(subConfig, 'running');
     if (subConfig) {
       if (subConfig.type === 'rsync') {
-        this._sync.syncFiles(subConfig, subConfig.source, subConfig.destination, files)
+        this._sync.syncFiles(subConfig, files)
           .then((output) => {
             terminal.debug(output);
             terminal.setState(subConfig, 'good', output);

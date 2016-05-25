@@ -1,10 +1,13 @@
 
 export interface Config {
   // changes the output to show debug information, cmd and stdout output
-  debug: boolean;
+  debug?: boolean;
   
   // if your terminal window can support emojis  
-  emoji: boolean;
+  emoji?: boolean;
+
+  // this limits the number files to pass to rsync.
+  maxFileLength?: number;
   
   // default: 'rsync' -- override to whatever rsync command is installed or located
   rsyncCmd: string;
@@ -16,4 +19,6 @@ export interface SubConfig {
   source: string;
   destination: string;
   watchExpression: any[];
+  state: string;
+  statusMessage: string;
 }
