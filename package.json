@@ -1,6 +1,6 @@
 {
   "name": "watchman-processor",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Processor for the fb-watchman service",
   "author": "Markis Taylor <m@rkis.cc>",
   "main": "index.js",
