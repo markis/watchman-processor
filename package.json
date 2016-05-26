@@ -26,14 +26,13 @@
     "typescript": "^1.8.10"
   },
   "scripts": {
-    "coveralls": "npm run coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
-    "coverage": "istanbul cover _mocha test/_setup.js test/**/*-test.js",
-    "mocha": "mocha test/_setup.js test/**/*-test.js",
-    "pretest": "eslint src/",
+    "compile": "tsc",
+    "coveralls": "tsc && npm run coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
+    "coverage": "tsc && istanbul cover _mocha test/_setup.js test/**/*-test.js",
+    "mocha": "tsc && mocha test/_setup.js test/**/*-test.js",
     "test": "npm run coverage"
   },
   "pre-commit": [
-    "pretest",
     "coverage"
   ],
   "repository": "https://github.com/markistaylor/watchman-processor.git",

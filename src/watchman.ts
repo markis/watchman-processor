@@ -1,7 +1,7 @@
 import { Sync } from './sync';
 import { Terminal } from './terminal';
 import { Config } from '../lib/config';
-import { SubscriptionResponse } from '../lib/fb-watchman';
+import {SubscriptionResponse, WatchmanClient} from '../lib/fb-watchman';
 
 export interface Watchman {
   start(): void;
@@ -9,11 +9,11 @@ export interface Watchman {
 
 export default class WatchmanImpl implements Watchman {
   private _config: Config;
-  private _client: any;
+  private _client: WatchmanClient;
   private _terminal: Terminal;
   private _sync: Sync;
   
-  constructor(config: Config, watchmanClient: any, terminal: Terminal, sync: Sync) {
+  constructor(config: Config, watchmanClient: WatchmanClient, terminal: Terminal, sync: Sync) {
     this._config = config;
     this._client = watchmanClient;
     this._terminal = terminal;
@@ -39,6 +39,8 @@ export default class WatchmanImpl implements Watchman {
     }
     terminal.render();
 
+    const client = this._client;
+    const onSubscription = this._onSubscription.bind(this);
     const promises: Promise<string | void>[] = [], subscriptions = Object.keys(this._config.subscriptions);
     for (var i = 0; i < subscriptions.length; i++) {
       var name = subscriptions[i],
@@ -48,9 +50,8 @@ export default class WatchmanImpl implements Watchman {
     }
     Promise.all(promises).then(this._terminal.render);
 
-    const onSubscription = this._onSubscription.bind(this);
     // subscription is fired regardless of which subscriber fired it
-    this._client.on('subscription', onSubscription);
+    client.on('subscription', onSubscription);
   }
   
   private _onSubscription(resp: SubscriptionResponse): void {
@@ -77,8 +78,9 @@ export default class WatchmanImpl implements Watchman {
   }
   
   private _subscribe(folder: string, name: string, relativePath: string, expression: any[]): Promise<void> {
-    var terminal = this._terminal;
-    var client = this._client;
+    const terminal = this._terminal,
+      client = this._client;
+    
     if (typeof expression === 'undefined') {
       expression = ['allof', ['type', 'f']];
     }
