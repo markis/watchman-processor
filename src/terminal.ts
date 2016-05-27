@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+import { injectable, inject } from 'inversify';
 import { Config, SubConfig } from '../lib/config';
 
 export interface Terminal {
@@ -8,6 +10,7 @@ export interface Terminal {
   render(): void;
 }
 
+@injectable()
 export default class TerminalImpl implements Terminal {
   private _config: Config;
   private _error: (msg: string | Error) => void;
@@ -15,7 +18,13 @@ export default class TerminalImpl implements Terminal {
   private _chalk: Chalk;
   private _emoji: Emoji;
   
-  constructor(config: Config, stdOutWrite: (msg: string) => void, stdErrWrite: (msg: string) => void, chalk: Chalk, emoji: Emoji) {
+  constructor(
+    @inject('Config') config: Config,
+    @inject('stdOutWrite') stdOutWrite: (msg: string) => void,
+    @inject('stdErrWrite') stdErrWrite: (msg: string) => void,
+    @inject('Chalk') chalk: Chalk,
+    @inject('Emoji') emoji: Emoji
+  ) {
     this._config = config || {} as Config;
     this._error = stdErrWrite;
     this._write = stdOutWrite;

@@ -1,7 +1,9 @@
+import 'reflect-metadata';
+import { injectable, inject } from 'inversify';
 import { Terminal } from './terminal';
 import { SubConfig, Config } from '../lib/config';
 import { SubscriptionResponseFile } from '../lib/fb-watchman';
-import {ExecOptions} from 'child_process';
+import { ExecOptions } from 'child_process';
 
 export interface Exec {
   (command: string, options?: ExecOptions, callback?: (error: string, stdout: string, stderr: string) => void): void;
@@ -11,13 +13,18 @@ export interface Sync {
   syncFiles(subConfig: SubConfig, files: SubscriptionResponseFile[]): Promise<string>;
 }
 
+@injectable()
 export default class SyncImpl implements Sync {
   private terminal: Terminal;
   private exec: Exec;
   private rsyncCmd: string;
   private maxFileLength: number;
   
-  constructor(config: Config, terminal: Terminal, exec: Exec) {
+  constructor(
+    @inject('Config') config: Config,
+    @inject('Terminal') terminal: Terminal,
+    @inject('Exec') exec: Exec
+  ) {
     this.terminal = terminal;
     this.exec = exec;
     this.rsyncCmd = config && config.rsyncCmd || 'rsync';

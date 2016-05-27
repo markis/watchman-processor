@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+import { injectable, inject } from 'inversify';
 import { Sync } from './sync';
 import { Terminal } from './terminal';
 import { Config } from '../lib/config';
@@ -7,13 +9,19 @@ export interface Watchman {
   start(): void;
 }
 
+@injectable()
 export default class WatchmanImpl implements Watchman {
   private _config: Config;
   private _client: WatchmanClient;
   private _terminal: Terminal;
   private _sync: Sync;
   
-  constructor(config: Config, watchmanClient: WatchmanClient, terminal: Terminal, sync: Sync) {
+  constructor(
+    @inject('Config') config: Config, 
+    @inject('WatchmanClient') watchmanClient: WatchmanClient,
+    @inject('Terminal') terminal: Terminal, 
+    @inject('Sync') sync: Sync
+  ) {
     this._config = config;
     this._client = watchmanClient;
     this._terminal = terminal;

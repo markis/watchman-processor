@@ -1,4 +1,4 @@
-declare class Emoji {
+declare interface Emoji {
   emojify(msg: string): string;
 }
 

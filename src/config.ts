@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+import { injectable } from 'inversify';
 import { Config } from '../lib/config';
 import * as fs from 'fs';
 
@@ -10,6 +12,7 @@ export interface ConfigManager {
   createConfig(): void;
 }
 
+@injectable()
 export default class ConfigManagerImpl implements ConfigManager {
   public getConfig(): Config {
     try {
@@ -18,7 +21,7 @@ export default class ConfigManagerImpl implements ConfigManager {
       if (e.code === 'MODULE_NOT_FOUND') {
         console.error('"' + HOME_FOLDER + '/.watchman-processor.config.js" does not exist. \n\n' +
           'Run "watchman-processor init" to create an example configuration file.');
-        return null;
+        return null as Config;
       } else {
         throw e;
       }
@@ -26,7 +29,7 @@ export default class ConfigManagerImpl implements ConfigManager {
   }
 
   public createConfig(): Promise<string> {
-    return new Promise((resolve, reject) => {
+    return new Promise<string>((resolve, reject) => {
       const reader = fs.createReadStream(EXAMPLE_CONF_FILE);
       reader.on('error', function (err: Error) {
         console.error(err);

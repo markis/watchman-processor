@@ -10,6 +10,8 @@
   },
   "files": [
     "node_modules/typescript/lib/lib.es6.d.ts",
+    "node_modules/inversify-dts/inversify/inversify.d.ts",
+    "node_modules/reflect-metadata/reflect-metadata.d.ts",
     "lib/fb-watchman.d.ts",
     "lib/config.d.ts",
     "lib/node.d.ts",
