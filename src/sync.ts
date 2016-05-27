@@ -1,6 +1,11 @@
 import { Terminal } from './terminal';
 import { SubConfig, Config } from '../lib/config';
 import { SubscriptionResponseFile } from '../lib/fb-watchman';
+import {ExecOptions} from 'child_process';
+
+export interface Exec {
+  (command: string, options?: ExecOptions, callback?: (error: string, stdout: string, stderr: string) => void): void;
+}
 
 export interface Sync {
   syncFiles(subConfig: SubConfig, files: SubscriptionResponseFile[]): Promise<string>;
@@ -8,21 +13,18 @@ export interface Sync {
 
 export default class SyncImpl implements Sync {
   private terminal: Terminal;
-  private exec: (command: string, options?: any, callback?: (error: string, stdout: string, stderr: string) => void) => void;
+  private exec: Exec;
   private rsyncCmd: string;
   private maxFileLength: number;
   
-  constructor(config: Config, 
-              terminal: Terminal, 
-              exec: (command: string, options?: any, callback?: (error: string, stdout: string, stderr: string) => void) => void) {
-    
+  constructor(config: Config, terminal: Terminal, exec: Exec) {
     this.terminal = terminal;
-    this.exec = exec; 
+    this.exec = exec;
     this.rsyncCmd = config && config.rsyncCmd || 'rsync';
     this.maxFileLength = config && config.maxFileLength || 100;
   }
   
-  syncFiles(subConfig: SubConfig, fbFiles: SubscriptionResponseFile[] = []): Promise<string> {
+  public syncFiles(subConfig: SubConfig, fbFiles: SubscriptionResponseFile[] = []): Promise<string> {
     const files: string[] = fbFiles.map(function(file) {
       return file.name;
     }).filter(function(file) {
@@ -49,7 +51,7 @@ export default class SyncImpl implements Sync {
     const dest = subConfig.destination;
 
     return new Promise<string>((resolve, reject) => {
-      var cmd = [rsyncCmd, '-avz --stats --delete', src, dest, excludes].join(' ');
+      const cmd = [rsyncCmd, '-avz --stats --delete', src, dest, excludes].join(' ');
       terminal.debug(cmd);
       exec(cmd, null, getExecCallback(resolve, reject));
     });
@@ -68,7 +70,7 @@ export default class SyncImpl implements Sync {
     const includes = ' --include \'' + files.join('\' --include \'') + '\'';
 
     return new Promise<string>((resolve, reject) => {
-      var cmd = [rsyncCmd, '-avz --stats --delete', includes, excludes, src, dest].join(' ');
+      const cmd = [rsyncCmd, '-avz --stats --delete', includes, excludes, src, dest].join(' ');
       terminal.debug(cmd);
       exec(cmd, null, getExecCallback(resolve, reject));
     });
@@ -93,10 +95,10 @@ function getUniqueFileFolders(files: string[]) {
   return unique(folders);
 }
 
-function unique(arr: string[]) {
-  const seen: any = {};
+function unique(arr: string[]): string[] {
+  const seen: Map<string, boolean> = new Map();
   return arr.filter((item: string) => {
-    return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+    return seen.has(item) ? false : !!seen.set(item, true);
   });
 }
 

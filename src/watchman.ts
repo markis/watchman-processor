@@ -20,10 +20,10 @@ export default class WatchmanImpl implements Watchman {
     this._sync = sync;
   }
   
-  start(): void {
-    const capabilities: any = {
-      optional: [], 
-      required: ['relative_root']
+  public start(): void {
+    const capabilities = {
+      optional: [] as string[],
+      required: ['relative_root'] as string[]
     };
     const onCapabilityCheck = this._onCapabilityCheck.bind(this);
     
@@ -32,7 +32,7 @@ export default class WatchmanImpl implements Watchman {
   }
   
   private _onCapabilityCheck(error: string | Error): void {
-    var terminal = this._terminal;
+    const terminal = this._terminal;
     if (error) {
       terminal.error(error);
       return;
@@ -42,8 +42,8 @@ export default class WatchmanImpl implements Watchman {
     const client = this._client;
     const onSubscription = this._onSubscription.bind(this);
     const promises: Promise<string | void>[] = [], subscriptions = Object.keys(this._config.subscriptions);
-    for (var i = 0; i < subscriptions.length; i++) {
-      var name = subscriptions[i],
+    for (let i = 0; i < subscriptions.length; i++) {
+      const name = subscriptions[i],
         subscription = this._config.subscriptions[name];
 
       promises.push(this._subscribe(subscription.source, name, null, subscription.watchExpression));
@@ -77,14 +77,14 @@ export default class WatchmanImpl implements Watchman {
     }
   }
   
-  private _subscribe(folder: string, name: string, relativePath: string, expression: any[]): Promise<void> {
+  private _subscribe(folder: string, name: string, relativePath: string, expression: (string | string[])[]): Promise<void> {
     const terminal = this._terminal,
       client = this._client;
     
     if (typeof expression === 'undefined') {
       expression = ['allof', ['type', 'f']];
     }
-    var sub = {
+    const sub = {
       expression: expression,
       fields: ['name', 'exists'],
       relative_root: ''
@@ -104,5 +104,5 @@ export default class WatchmanImpl implements Watchman {
         });
     });
   }
-  
 }
+

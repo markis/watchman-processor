@@ -1,4 +1,4 @@
 #!/usr/bin/env node
 
 process.title = 'watchman-processor';
-require('../built/index');
+require('../built/src/index');

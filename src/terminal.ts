@@ -23,12 +23,12 @@ export default class TerminalImpl implements Terminal {
     this._emoji = emoji;
   }
   
-  error(err: string | Error) {
+  public error(err: string | Error) {
     const msg = err.toString();
     this._error(this._chalk.red(msg));
   }
   
-  start() {
+  public start() {
     this.debug('starting');
     if (!this._config.debug) {
       this._enableFullScreen();
@@ -36,19 +36,19 @@ export default class TerminalImpl implements Terminal {
     }
   }
   
-  debug(msg: string) {
+  public debug(msg: string) {
     if (this._config.debug && msg) {
       this._write(this._chalk.white(msg + '\n'));
     }
   }
   
-  setState(configEntry: SubConfig, state: string, statusMessage?: string) {
+  public setState(configEntry: SubConfig, state: string, statusMessage?: string) {
     configEntry.state = state;
     configEntry.statusMessage = statusMessage;
     this.render();
   }
   
-  render() {
+  public render() {
     if (this._config.debug) {
       return;
     }
@@ -56,20 +56,19 @@ export default class TerminalImpl implements Terminal {
     const chalk = this._chalk,
       subscriptions = Object.keys(this._config.subscriptions);
     
-    for (var i = 0; i < subscriptions.length; i++) {
-      var name = subscriptions[i],
-        subscription = this._config.subscriptions[name];
-      if (subscription) {
-        var state = subscription.state;
-        if (state === 'good') {
-          this._log(':thumbsup:  ' + name + ' ', chalk.bgGreen);
-        } else if (state === 'running') {
-          this._log(':running:  ' + name + ' ', chalk.bgYellow);
-        } else if (state === 'error') {
-          this._log(':skull_and_crossbones:  ' + name + ' ', chalk.bgRed);
-        } else {
-          this._log(':hourglass:  ' + name + ' ', chalk.bgWhite);
-        }
+    for (let i = 0; i < subscriptions.length; i++) {
+      const name = subscriptions[i],
+        subscription = this._config.subscriptions[name],
+        state = subscription.state;
+      
+      if (state === 'good') {
+        this._log(':thumbsup:  ' + name + ' ', chalk.bgGreen);
+      } else if (state === 'running') {
+        this._log(':running:  ' + name + ' ', chalk.bgYellow);
+      } else if (state === 'error') {
+        this._log(':skull_and_crossbones:  ' + name + ' ', chalk.bgRed);
+      } else {
+        this._log(':hourglass:  ' + name + ' ', chalk.bgWhite);
       }
     }
     this._log('\n');

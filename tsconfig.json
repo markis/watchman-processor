@@ -15,11 +15,16 @@
     "lib/node.d.ts",
     "lib/emojify.d.ts",
     "lib/chalk.d.ts",
+    "lib/mocha.d.ts",
+    "lib/chai.d.ts",
+    "lib/sinon.d.ts",
     "src/index.ts",
     "src/config.ts",
     "src/sync.ts",
     "src/terminal.ts",
-    "src/watchman.ts"
+    "src/watchman.ts",
+    "test/sync-test.ts",
+    "test/terminal-test.ts"
   ],
   "exclude": [
     "node_modules",

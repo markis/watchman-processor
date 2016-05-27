@@ -10,15 +10,15 @@ export interface Config {
   maxFileLength?: number;
   
   // default: 'rsync' -- override to whatever rsync command is installed or located
-  rsyncCmd: string;
-  subscriptions: any;
+  rsyncCmd?: string;
+  subscriptions?: any;
 }
 
 export interface SubConfig {
   type: 'rsync';
   source: string;
   destination: string;
-  watchExpression: any[];
-  state: string;
-  statusMessage: string;
+  watchExpression?: (string | string[])[];
+  state?: string;
+  statusMessage?: string;
 }

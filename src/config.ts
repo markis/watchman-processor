@@ -6,12 +6,12 @@ const CONF_FILE = HOME_FOLDER + '/.watchman-processor.config.js';
 const EXAMPLE_CONF_FILE = process.cwd() + '/example/watchman-processor.config.js';
 
 export interface ConfigManager {
-  getConfig(): Config
+  getConfig(): Config;
   createConfig(): void;
 }
 
 export default class ConfigManagerImpl implements ConfigManager {
-  getConfig(): Config {
+  public getConfig(): Config {
     try {
       return require(CONF_FILE) as Config;
     } catch (e) {
@@ -25,7 +25,7 @@ export default class ConfigManagerImpl implements ConfigManager {
     }
   }
 
-  createConfig(): Promise<string> {
+  public createConfig(): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = fs.createReadStream(EXAMPLE_CONF_FILE);
       reader.on('error', function (err: Error) {

@@ -28,11 +28,13 @@
   "scripts": {
     "compile": "tsc",
     "coveralls": "tsc && npm run coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
-    "coverage": "tsc && istanbul cover _mocha test/_setup.js test/**/*-test.js",
-    "mocha": "tsc && mocha test/_setup.js test/**/*-test.js",
+    "coverage": "tsc && istanbul cover _mocha built/test/**/*-test.js",
+    "lint": "tslint -c tslint.json src/*.ts test/*.ts",
+    "mocha": "tsc && mocha test/_setup.js built/test/**/*-test.js",
     "test": "npm run coverage"
   },
   "pre-commit": [
+    "lint",
     "coverage"
   ],
   "repository": "https://github.com/markistaylor/watchman-processor.git",

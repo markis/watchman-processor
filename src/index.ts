@@ -21,7 +21,7 @@ if (process.argv[2] === 'init') {
   const watchmanSync = new WatchmanSync(config, client, terminal, sync);
   watchmanSync.start();
 
-  exports = watchmanSync; 
+  exports = watchmanSync;
 }
 
 function stdErrWrite(msg: string) {
