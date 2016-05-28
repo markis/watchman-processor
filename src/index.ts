@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import 'ts-helpers';
 import { Kernel } from 'inversify';
 import ConfigManager from './config';
 import SyncImpl, {Sync, Exec} from './sync';

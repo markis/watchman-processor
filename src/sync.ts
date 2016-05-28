@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import 'ts-helpers';
 import { injectable, inject } from 'inversify';
 import { Terminal } from './terminal';
 import { SubConfig, Config } from '../lib/config';
