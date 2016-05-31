@@ -1,14 +1,20 @@
-export interface WatchmanClient {
+declare interface WatchmanClient {
   capabilityCheck(capabilities: any, onCapabilityCheck: (error: string) => void): void;
   on(subscription: string, onSubscription: (resp: SubscriptionResponse) => void): void;
   command(params: any[], onCommand: (error: string) => void): void;
 }
 
-export interface SubscriptionResponse {
+declare interface SubscriptionResponse {
   subscription: string;
   files: SubscriptionResponseFile[];
 }
 
-export interface SubscriptionResponseFile {
+declare interface SubscriptionResponseFile {
   name: string;
+}
+
+declare module 'fb-watchman' {
+  export var Client: {
+    new (): WatchmanClient;
+  };
 }

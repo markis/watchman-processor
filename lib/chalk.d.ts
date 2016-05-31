@@ -9,8 +9,10 @@ declare interface ChalkColors {
   black(msg: string): string;
   red(msg: string): string;
   white(msg: string): string;
-} 
+}
 
-declare module "chalk" {
-  export = Chalk;
+declare var chalk: Chalk;
+
+declare module 'chalk' {
+  export = chalk;
 }

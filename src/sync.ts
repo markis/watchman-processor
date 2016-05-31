@@ -1,9 +1,7 @@
 import 'reflect-metadata';
-import 'ts-helpers';
 import { injectable, inject } from 'inversify';
 import { Terminal } from './terminal';
-import { SubConfig, Config } from '../lib/config';
-import { SubscriptionResponseFile } from '../lib/fb-watchman';
+import { SubConfig, Config } from './config';
 import { ExecOptions } from 'child_process';
 
 export interface Exec {
@@ -32,8 +30,8 @@ export default class SyncImpl implements Sync {
     this.maxFileLength = config && config.maxFileLength || 100;
   }
   
-  public syncFiles(subConfig: SubConfig, fbFiles: SubscriptionResponseFile[] = []): Promise<string> {
-    const files: string[] = fbFiles.map(function(file) {
+  public syncFiles(subConfig: SubConfig, fbFiles?: SubscriptionResponseFile[]): Promise<string> {
+    const files: string[] = (fbFiles || []).map(function(file) {
       return file.name;
     }).filter(function(file) {
       return file.indexOf('.sass-cache/') === -1 &&

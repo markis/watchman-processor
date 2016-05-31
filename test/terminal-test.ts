@@ -1,4 +1,4 @@
-import {Config} from '../lib/config';
+import { Config } from '../src/config';
 import Terminal from '../src/terminal';
 import * as chai from 'chai';
 import * as sinon from 'sinon';

@@ -1,10 +1,8 @@
 import 'reflect-metadata';
-import 'ts-helpers';
 import { injectable, inject } from 'inversify';
 import { Sync } from './sync';
 import { Terminal } from './terminal';
-import { Config } from '../lib/config';
-import {SubscriptionResponse, WatchmanClient} from '../lib/fb-watchman';
+import { Config } from './config';
 
 export interface Watchman {
   start(): void;

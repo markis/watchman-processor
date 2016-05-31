@@ -1,7 +1,5 @@
 import 'reflect-metadata';
-import 'ts-helpers';
 import { injectable } from 'inversify';
-import { Config } from '../lib/config';
 import * as fs from 'fs';
 
 const HOME_FOLDER = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
@@ -11,6 +9,30 @@ const EXAMPLE_CONF_FILE = process.cwd() + '/example/watchman-processor.config.js
 export interface ConfigManager {
   getConfig(): Config;
   createConfig(): void;
+}
+
+export interface Config {
+  // changes the output to show debug information, cmd and stdout output
+  debug?: boolean;
+  
+  // if your terminal window can support emojis  
+  emoji?: boolean;
+
+  // this limits the number files to pass to rsync.
+  maxFileLength?: number;
+  
+  // default: 'rsync' -- override to whatever rsync command is installed or located
+  rsyncCmd?: string;
+  subscriptions?: any;
+}
+
+export interface SubConfig {
+  type: 'rsync';
+  source: string;
+  destination: string;
+  watchExpression?: (string | string[])[];
+  state?: string;
+  statusMessage?: string;
 }
 
 @injectable()

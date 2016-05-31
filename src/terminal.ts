@@ -1,7 +1,6 @@
 import 'reflect-metadata';
-import 'ts-helpers';
 import { injectable, inject } from 'inversify';
-import { Config, SubConfig } from '../lib/config';
+import { Config, SubConfig } from './config';
 
 export interface Terminal {
   start(): void;
@@ -81,7 +80,7 @@ export default class TerminalImpl implements Terminal {
         this._log(':hourglass:  ' + name + ' ', chalk.bgWhite);
       }
     }
-    this._log('\n');
+    this._log('\n', chalk.bgWhite);
   }
   
   private _clear() {
@@ -104,7 +103,7 @@ export default class TerminalImpl implements Terminal {
     return msg;
   }
   
-  private _log(msg: string, chalkColor: ChalkColors = this._chalk.bgWhite) {
+  private _log(msg: string, chalkColor: ChalkColors) {
     msg = this._emojify(msg);
     msg = chalkColor.black(msg);
     this._write(msg);

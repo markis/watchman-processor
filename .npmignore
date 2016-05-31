@@ -1,7 +1,10 @@
-index.js
-node_modules
+
+src/
+test/
+lib/
+node_modules/
 *.log
-coverage
+coverage/
 built/
 
 ### Vim template

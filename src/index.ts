@@ -1,17 +1,16 @@
 import 'reflect-metadata';
-import 'ts-helpers';
 import { Kernel } from 'inversify';
-import ConfigManager from './config';
-import SyncImpl, {Sync, Exec} from './sync';
+import ConfigManager, { Config } from './config';
+import TerminalImpl, {Terminal} from './terminal';
+import SyncImpl, { Sync, Exec } from './sync';
 import WatchmanSyncImpl, { Watchman } from './watchman';
 import * as proc from 'child_process';
-import TerminalImpl, {Terminal} from './terminal';
-import { Config } from '../lib/config';
-const emoji = require('node-emoji') as Emoji;
-const chalk = require('chalk') as Chalk;
-const watchman = require('fb-watchman');
+import * as chalk from 'chalk';
+import * as emoji from 'node-emoji';
+import * as watchman from 'fb-watchman';
 
 const configManager = new ConfigManager();
+let watchmanSync: Watchman;
 
 if (process.argv[2] === 'init') {
   configManager.createConfig();
@@ -19,7 +18,7 @@ if (process.argv[2] === 'init') {
   const kernel = new Kernel();
   const config = configManager.getConfig();
 
-  kernel.bind('WatchmanClient').toConstantValue(new watchman.Client);
+  kernel.bind<WatchmanClient>('WatchmanClient').toConstantValue(new watchman.Client);
   kernel.bind<Config>('Config').toConstantValue(config);
   kernel.bind<Exec>('Exec').toConstantValue(proc.exec);
   kernel.bind('stdErrWrite').toConstantValue(stdErrWriteImpl);
@@ -30,10 +29,8 @@ if (process.argv[2] === 'init') {
   kernel.bind<Sync>('Sync').to(SyncImpl);
   kernel.bind<Watchman>('WatchmanSync').to(WatchmanSyncImpl);
 
-  const watchmanSync = kernel.get<Watchman>('WatchmanSync');
+  watchmanSync = kernel.get<Watchman>('WatchmanSync');
   watchmanSync.start();
-
-  exports = watchmanSync;
 }
 
 function stdErrWriteImpl(msg: string) {
@@ -43,3 +40,5 @@ function stdErrWriteImpl(msg: string) {
 function stdOutWriteImpl(msg: string) {
   process.stdout.write(msg);
 }
+
+export default watchmanSync;
