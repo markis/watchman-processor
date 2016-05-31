@@ -1,3 +1,4 @@
+import 'ts-helpers';
 import { Config } from '../src/config';
 import Terminal from '../src/terminal';
 import * as chai from 'chai';
