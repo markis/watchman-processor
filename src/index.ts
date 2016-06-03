@@ -28,7 +28,7 @@ if (process.argv[2] === 'init') {
   kernel.bind<Terminal>('Terminal').to(TerminalImpl);
   kernel.bind<Sync>('Sync').to(SyncImpl);
   kernel.bind<Watchman>('WatchmanSync').to(WatchmanSyncImpl);
-
+  
   watchmanSync = kernel.get<Watchman>('WatchmanSync');
   watchmanSync.start();
 }

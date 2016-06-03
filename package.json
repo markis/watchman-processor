@@ -31,7 +31,7 @@
     "typescript": "^1.8.10"
   },
   "scripts": {
-    "compile": "tsc --noEmitHelpers && rollup -c rollup.config.js",
+    "compile": "tsc --noEmitHelpers && rollup -c",
     "coveralls": "npm run compile && npm run coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "coverage": "npm run compile && istanbul cover _mocha built/test/**/*-test.js",
     "lint": "tslint -c tslint.json src/*.ts test/*.ts",
