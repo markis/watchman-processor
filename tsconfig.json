@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "outDir": "built/",
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "noImplicitAny": true,
+    "sourceMap": true
+  },
+  "files": [
+    "node_modules/typescript/lib/lib.es6.d.ts",
+    "node_modules/inversify-dts/inversify/inversify.d.ts",
+    "node_modules/reflect-metadata/reflect-metadata.d.ts",
+    "lib/fb-watchman.d.ts",
+    "lib/config.d.ts",
+    "lib/node.d.ts",
+    "lib/emojify.d.ts",
+    "lib/chalk.d.ts",
+    "lib/mocha.d.ts",
+    "lib/chai.d.ts",
+    "lib/sinon.d.ts",
+    "src/index.ts",
+    "src/config.ts",
+    "src/sync.ts",
+    "src/terminal.ts",
+    "src/watchman.ts",
+    "test/config-test.ts",
+    "test/sync-test.ts",
+    "test/terminal-test.ts",
+    "test/watchman-test.ts"
+  ]
+}

@@ -22,7 +22,10 @@ module.exports = {
 
       // Watchman file query expresion: https://facebook.github.io/watchman/docs/file-query.html
       // Default: ['allof', ['type', 'f']]
-      watchExpression: WATCH_EXPRESSION
+      watchExpression: WATCH_EXPRESSION,
+
+      // relative paths to ignore from watchman and rsync
+      ignoreFolders: []
     },
     example2: {
       type: 'rsync',
