@@ -43,5 +43,5 @@
     "coverage"
   ],
   "repository": "https://github.com/markistaylor/watchman-processor.git",
-  "license": "ISC"
+  "license": "MIT"
 }

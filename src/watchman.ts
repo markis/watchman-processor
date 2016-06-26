@@ -53,7 +53,7 @@ export default class WatchmanImpl implements Watchman {
       const name = subscriptions[i],
         subscription = this._config.subscriptions[name];
 
-      promises.push(this._subscribe(subscription.source, name, null, subscription.watchExpression));
+      promises.push(this._subscribe(subscription.source, name, subscription.watchExpression));
     }
     Promise.all(promises).then(this._terminal.render);
 
@@ -64,43 +64,33 @@ export default class WatchmanImpl implements Watchman {
   private _onSubscription(resp: SubscriptionResponse): void {
     const config = this._config;
     const terminal = this._terminal;
-    const subscription = (resp && resp.subscription) || '';
+    const subscription = resp && resp.subscription;
     const files = resp.files;
 
     const subConfig = config.subscriptions[subscription];
     terminal.setState(subConfig, 'running');
-    if (subConfig) {
-      if (subConfig.type === 'rsync') {
-        this._sync.syncFiles(subConfig, files)
-          .then((output) => {
-            terminal.debug(output);
-            terminal.setState(subConfig, 'good', output);
-          })
-          .catch((err) => {
-            terminal.debug(err);
-            terminal.setState(subConfig, 'error', err);
-          });
-      }
-    }
+    this._sync.syncFiles(subConfig, files)
+      .then((output) => {
+        terminal.debug(output);
+        terminal.setState(subConfig, 'good', output);
+      })
+      .catch((err) => {
+        terminal.debug(err);
+        terminal.setState(subConfig, 'error', err);
+      });
   }
   
-  private _subscribe(folder: string, name: string, relativePath: string, expression: (string | string[])[]): Promise<void> {
+  private _subscribe(folder: string, name: string, expression: (string | string[])[] = ['allof', ['type', 'f']]): Promise<void> {
     const terminal = this._terminal,
       client = this._client;
     
-    if (typeof expression === 'undefined') {
-      expression = ['allof', ['type', 'f']];
-    }
     const sub = {
       expression: expression,
       fields: ['name', 'exists'],
       relative_root: ''
     };
-    if (relativePath) {
-      sub.relative_root = relativePath;
-    }
 
-    terminal.debug('starting:' + name + ' expression: ' + JSON.stringify(expression));
+    terminal.debug(`starting: ${name} expression: ${JSON.stringify(expression)}`);
     return new Promise<string | void>(function (resolve, reject) {
       client.command(['subscribe', folder, name, sub],
         (error: string) => {

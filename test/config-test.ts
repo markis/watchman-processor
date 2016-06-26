@@ -22,7 +22,7 @@ describe('Config', function () {
   it('Throw error on not getting config file', function () {
     const configMgr = new ConfigManager({
       confFile: path.resolve(__dirname + '/example-watchman-processor.config.js.tmp'),
-      exampleConfFile: path.resolve(__dirname + '../../..//example/watchman-processor.config.js')
+      exampleConfFile: path.resolve(__dirname + '../../../example/watchman-processor.config.js')
     });
 
     configMgr.createConfig();
