@@ -77,7 +77,7 @@ export default class ConfigManagerImpl implements ConfigManager {
       writer.on('error', reject);
       writer.on('close', function () {
         console.log('Done.  "' + confFile + '" created.');
-        resolve('Done.  "' + confFile + '" created.');
+        resolve();
       });
       reader.pipe(writer);
     });

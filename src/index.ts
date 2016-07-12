@@ -2,9 +2,8 @@ import 'reflect-metadata';
 import { Kernel } from 'inversify';
 import ConfigManager, { Config } from './config';
 import TerminalImpl, {Terminal} from './terminal';
-import SyncImpl, { Sync, Exec } from './sync';
+import SyncImpl, { Sync } from './sync';
 import WatchmanSyncImpl, { Watchman } from './watchman';
-import * as proc from 'child_process';
 import * as chalk from 'chalk';
 import * as emoji from 'node-emoji';
 import * as watchman from 'fb-watchman';
@@ -20,7 +19,6 @@ if (process.argv[2] === 'init') {
 
   kernel.bind<WatchmanClient>('WatchmanClient').toConstantValue(new watchman.Client);
   kernel.bind<Config>('Config').toConstantValue(config);
-  kernel.bind<Exec>('Exec').toConstantValue(proc.exec);
   kernel.bind('stdErrWrite').toConstantValue(stdErrWriteImpl);
   kernel.bind('stdOutWrite').toConstantValue(stdOutWriteImpl);
   kernel.bind<Emoji>('Emoji').toConstantValue(emoji);
