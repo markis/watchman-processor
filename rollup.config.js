@@ -1,6 +1,4 @@
-var fileSize = require('rollup-plugin-filesize');
 var typescript = require('rollup-plugin-typescript');
-var uglify = require('rollup-plugin-uglify');
 
 module.exports = {
   entry: './src/index.ts',
@@ -27,7 +25,6 @@ module.exports = {
     'reflect-metadata': 'reflectMetadata'
   },
   plugins: [
-    fileSize(),
     typescript(),
   ]
 };
