@@ -60,27 +60,29 @@ export default class WatchmanImpl implements Watchman {
     // subscription is fired regardless of which subscriber fired it
     client.on('subscription', onSubscription);
   }
+
+  private _syncFiles(subConfig: any, files: SubscriptionResponseFile[] = null) {
+    const terminal = this._terminal;
+    terminal.setState(subConfig, 'running');
+    this._sync.syncFiles(subConfig, files)
+      .then(() => {
+        terminal.setState(subConfig, 'good');
+      })
+      .catch(() => {
+        terminal.setState(subConfig, 'error');
+      });
+  }
   
   private _onSubscription(resp: SubscriptionResponse): void {
     const config = this._config;
-    const terminal = this._terminal;
     const subscription = resp && resp.subscription;
     const files = resp.files;
 
     const subConfig = config.subscriptions[subscription];
-    terminal.setState(subConfig, 'running');
-    this._sync.syncFiles(subConfig, files)
-      .then((output) => {
-        terminal.debug(output);
-        terminal.setState(subConfig, 'good', output);
-      })
-      .catch((err) => {
-        terminal.debug(err);
-        terminal.setState(subConfig, 'error', err);
-      });
+    this._syncFiles(subConfig, files);
   }
   
-  private _subscribe(folder: string, name: string, expression: (string | string[])[] = ['allof', ['type', 'f']]): Promise<void> {
+  private _subscribe(folder: string, name: string, expression: (string | string[])[] = ['allof', ['type', 'f']]): Promise<string | void> {
     const terminal = this._terminal,
       client = this._client;
     

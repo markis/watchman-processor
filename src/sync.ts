@@ -2,35 +2,34 @@ import 'reflect-metadata';
 import { injectable, inject } from 'inversify';
 import { Terminal } from './terminal';
 import { SubConfig, Config } from './config';
-import { ExecOptions } from 'child_process';
-
-export interface Exec {
-  (command: string, options?: ExecOptions, callback?: (error: string, stdout: string, stderr: string) => void): void;
-}
 
 export interface Sync {
-  syncFiles(subConfig: SubConfig, files: SubscriptionResponseFile[]): Promise<string>;
+  syncFiles(subConfig: SubConfig, files: SubscriptionResponseFile[]): Promise<void>;
+}
+
+export interface Spawn {
+  (cmd: string, args: string[]): any; 
 }
 
 @injectable()
 export default class SyncImpl implements Sync {
   private terminal: Terminal;
-  private exec: Exec;
   private rsyncCmd: string;
   private maxFileLength: number;
+  private spawn: Spawn;
   
   constructor(
     @inject('Config') config: Config,
     @inject('Terminal') terminal: Terminal,
-    @inject('Exec') exec: Exec
+    @inject('spawn') spawn: Spawn
   ) {
     this.terminal = terminal;
-    this.exec = exec;
     this.rsyncCmd = config && config.rsyncCmd || 'rsync';
     this.maxFileLength = config && config.maxFileLength || 100;
+    this.spawn = spawn;
   }
   
-  public syncFiles(subConfig: SubConfig, fbFiles?: SubscriptionResponseFile[]): Promise<string> {
+  public syncFiles(subConfig: SubConfig, fbFiles?: SubscriptionResponseFile[]): Promise<void> {
     const files: string[] = (fbFiles || []).map(function(file) {
       return file.name;
     }).filter(function(file) {
@@ -48,37 +47,35 @@ export default class SyncImpl implements Sync {
     }
   }
   
-  private _syncAllFiles(subConfig: SubConfig): Promise<string> {
-    const terminal = this.terminal;
-    const rsyncCmd = this.rsyncCmd;
-    const exec = this.exec;
-    const excludes = ' --exclude \'.idea\' --exclude \'.git\' --exclude \'.sass-cache\'';
+  private _syncAllFiles(subConfig: SubConfig): Promise<void> {
     const src = subConfig.source;
     const dest = subConfig.destination;
 
-    return new Promise<string>((resolve, reject) => {
-      const cmd = [rsyncCmd, '-avz --stats --delete', src, dest, excludes].join(' ');
-      terminal.debug(cmd);
-      exec(cmd, null, getExecCallback(resolve, reject));
-    });
+    const args = ['-az', '--stats', '--delete', src, dest];
+    return this._exec(args);
   }
   
-  private _syncSpecificFiles(subConfig: SubConfig, files: string[]): Promise<string> {
-    const terminal = this.terminal;
-    const rsyncCmd = this.rsyncCmd;
-    const exec = this.exec;
-    const excludes = '--exclude \'*\'';
+  private _syncSpecificFiles(subConfig: SubConfig, files: string[]): Promise<void> {
     const src = subConfig.source;
     const dest = subConfig.destination;
-
+    
     files =  getUniqueFileFolders(files).concat(files);
+    const includes = (`--include '${files.join(`' --include '`)}'`).split(' ');
+    
+    const args = [].concat(['-az', '--stats', '--delete'], includes, ['--exclude', `'*'`, src, dest]);
+    return this._exec(args);
+  }
 
-    const includes = ' --include \'' + files.join('\' --include \'') + '\'';
-
-    return new Promise<string>((resolve, reject) => {
-      const cmd = [rsyncCmd, '-avz --stats --delete', includes, excludes, src, dest].join(' ');
-      terminal.debug(cmd);
-      exec(cmd, null, getExecCallback(resolve, reject));
+  private _exec(args: string[]): Promise<void> {
+    const spawn = this.spawn;
+    const rsyncCmd = this.rsyncCmd;
+    const terminal = this.terminal;
+    return new Promise<void>((resolve, reject) => {
+      terminal.debug(rsyncCmd + ' ' + args.join(' '));
+      const child = spawn(rsyncCmd, args);
+      child.stdout.on('data', (data: string) => terminal.debug(data));
+      // child.stderr.on('data', (data: string) => terminal.error(data));
+      child.on('close', (code: string) => resolve());
     });
   }
 }
@@ -106,14 +103,4 @@ function unique(arr: string[]): string[] {
   return arr.filter((item: string) => {
     return seen.has(item) ? false : !!seen.set(item, true);
   });
-}
-
-function getExecCallback(resolve: (out: string) => void, reject: (err: string | Error) => void) {
-  return (err: string | Error, stdOut: string, stdErr: string) => {
-    if (err || stdErr) {
-      reject(err || stdErr);
-    } else {
-      resolve(stdOut);
-    }
-  };
 }
