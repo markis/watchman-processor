@@ -26,7 +26,7 @@ describe('Config', function () {
     configMgr.getConfig();
   }));
 
-  it('Throw error on not getting config file', sinon.test(function () {
+  it('Throw error on not getting config file', sinon.test(function (done) {
     this.stub(console, 'log');
     this.stub(console, 'error');
     
@@ -35,7 +35,7 @@ describe('Config', function () {
       exampleConfFile: path.resolve(__dirname + '../../../example/watchman-processor.config.js')
     });
 
-    configMgr.createConfig();
+    configMgr.createConfig().then(done);
   }));
 });
 
