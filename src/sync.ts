@@ -104,13 +104,3 @@ function unique(arr: string[]): string[] {
     return seen.has(item) ? false : !!seen.set(item, true);
   });
 }
-
-// function getExecCallback(resolve: (out: string) => void, reject: (err: string | Error) => void) {
-//   return (err: string | Error, stdOut: string, stdErr: string) => {
-//     if (err || stdErr) {
-//       reject(err || stdErr);
-//     } else {
-//       resolve(stdOut);
-//     }
-//   };
-// }

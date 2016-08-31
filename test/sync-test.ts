@@ -34,8 +34,6 @@ describe('Sync', function () {
     sync.syncFiles(example1, shortList);
 
     chai.assert(spawn.called);
-    // chai.expect(exec.firstCall.args[0]).to.contain('rsync');
-    // chai.expect(exec.firstCall.args[0]).to.contain('--include');
   }));
 
   it('should sync to rsync all files when too many files are sent', function () {
@@ -53,8 +51,6 @@ describe('Sync', function () {
     sync.syncFiles(example1, longList);
     
     chai.assert(spawn.called);
-    // chai.expect(exec.firstCall.args[0]).to.contain('rsync');
-    // chai.expect(exec.firstCall.args[0]).to.not.contain('--include');
   });
 
   it('should sync to rsync all files when no files are sent', function () {
@@ -68,8 +64,6 @@ describe('Sync', function () {
     sync.syncFiles(example1);
 
     chai.assert(spawn.called);
-    // chai.expect(exec.firstCall.args[0]).to.contain('rsync');
-    // chai.expect(exec.firstCall.args[0]).to.not.contain('--include');
   });
 });
 
