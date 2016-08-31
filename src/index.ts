@@ -7,6 +7,7 @@ import WatchmanSyncImpl, { Watchman } from './watchman';
 import * as chalk from 'chalk';
 import * as emoji from 'node-emoji';
 import * as watchman from 'fb-watchman';
+import * as proc from 'child_process';
 
 const configManager = new ConfigManager();
 let watchmanSync: Watchman;
@@ -17,6 +18,7 @@ if (process.argv[2] === 'init') {
   const kernel = new Kernel();
   const config = configManager.getConfig();
 
+  kernel.bind('spawn').toConstantValue(proc.spawn);
   kernel.bind<WatchmanClient>('WatchmanClient').toConstantValue(new watchman.Client);
   kernel.bind<Config>('Config').toConstantValue(config);
   kernel.bind('stdErrWrite').toConstantValue(stdErrWriteImpl);
