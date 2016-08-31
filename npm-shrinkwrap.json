@@ -1,6 +1,6 @@
 {
   "name": "watchman-processor",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "dependencies": {
     "chalk": {
       "version": "1.1.3",
