@@ -27,7 +27,7 @@ export interface SubConfig {
   source: string;
   destination: string;
   ignoreFolders: string[];
-  watchExpression?: (string | string[])[];
+  watchExpression?: (string | string[] | (string | string[])[])[];
   state?: string;
   statusMessage?: string;
 }
@@ -54,7 +54,17 @@ export default class ConfigManagerImpl implements ConfigManager {
   
   public getConfig(): Config {
     try {
-      return require(this._confFile) as Config;
+      const config = require(this._confFile) as Config,
+        subscriptions = Object.keys(config.subscriptions);
+
+      // ensure ignoreFolders has a value
+      for (let i = 0; i < subscriptions.length; i++) {
+        const name = subscriptions[i],
+          subscription: SubConfig = config.subscriptions[name];
+        
+        subscription.ignoreFolders = subscription.ignoreFolders || [];
+      }
+      return config;
     } catch (e) {
       if (e.code === 'MODULE_NOT_FOUND') {
         console.error('"' + this._confFile + '" does not exist. \n\n' +
