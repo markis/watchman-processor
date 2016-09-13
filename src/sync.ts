@@ -115,18 +115,11 @@ function unique(arr: string[]): string[] {
 if (!Array.prototype.findIndex) {
   Array.prototype.findIndex = function(predicate) {
     'use strict';
-    if (this == null) {
-      throw new TypeError('Array.prototype.findIndex called on null or undefined');
-    }
-    if (typeof predicate !== 'function') {
-      throw new TypeError('predicate must be a function');
-    }
     const list = Object(this),
       length = list.length,
       thisArg = arguments[1];
     
     let value: any;
-
     for (let i = 0; i < length; i++) {
       value = list[i];
       if (predicate.call(thisArg, value, i, list)) {

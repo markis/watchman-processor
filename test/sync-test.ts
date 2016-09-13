@@ -66,5 +66,22 @@ describe('Sync', function () {
 
     chai.assert(spawn.called);
   });
+
+  it('should sync to rsync ignore specific files', sinon.test(function () {
+
+    // Setup
+    const shortList = [
+      {name: 'example1/js/1.js'},
+      {name: '.git/js/2.js'}
+    ];
+    const spawn = sinon.stub().returns({on: sinon.stub(), stdout: {on: sinon.stub()}});
+    const terminal = new mockTerminal.object();
+    const sync = new Sync(config, terminal, spawn);
+
+    // Execute
+    sync.syncFiles(example1, shortList);
+
+    chai.assert(spawn.called);
+  }));
 });
 
