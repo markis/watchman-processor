@@ -71,8 +71,9 @@ export default class SyncImpl implements Sync {
       terminal.debug(rsyncCmd + ' ' + args.join(' '));
       const child = spawn(rsyncCmd, args);
       child.stdout.on('data', (data: string) => terminal.debug(data));
-      // child.stderr.on('data', (data: string) => terminal.error(data));
-      child.on('close', (code: string) => resolve());
+      child.stdout.on('end', resolve);
+      child.on('exit', resolve);
+      child.on('close', resolve);
     });
   }
 }
