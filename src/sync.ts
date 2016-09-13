@@ -17,6 +17,7 @@ export default class SyncImpl implements Sync {
   private rsyncCmd: string;
   private maxFileLength: number;
   private spawn: Spawn;
+  private shell: string;
   
   constructor(
     @inject('Config') config: Config,
@@ -27,6 +28,7 @@ export default class SyncImpl implements Sync {
     this.rsyncCmd = config && config.rsyncCmd || 'rsync';
     this.maxFileLength = config && config.maxFileLength || 100;
     this.spawn = spawn;
+    this.shell = '/bin/sh';
   }
   
   public syncFiles(subConfig: SubConfig, fbFiles?: SubscriptionResponseFile[]): Promise<void> {
@@ -51,7 +53,7 @@ export default class SyncImpl implements Sync {
 
     const excludes = (`--exclude '${ignoreFolders.join(`' --exclude '`)}'`).split(' ');
 
-    const args = [].concat(['-az', '--stats', '--delete'], excludes, [src, dest]);
+    const args = [].concat(['-avz', '--delete'], excludes, [src, dest]);
     return this._exec(args);
   }
   
@@ -62,17 +64,19 @@ export default class SyncImpl implements Sync {
     files =  getUniqueFileFolders(files).concat(files);
     const includes = (`--include '${files.join(`' --include '`)}'`).split(' ');
     
-    const args = [].concat(['-az', '--stats', '--delete'], includes, ['--exclude', `'*'`, src, dest]);
+    const args = [].concat(['-avz', '--delete'], includes, ['--exclude', `'*'`, src, dest]);
     return this._exec(args);
   }
 
   private _exec(args: string[]): Promise<void> {
-    const spawn = this.spawn;
-    const rsyncCmd = this.rsyncCmd;
-    const terminal = this.terminal;
+    const spawn = this.spawn,
+      rsyncCmd = this.rsyncCmd,
+      terminal = this.terminal,
+      shell = this.shell,
+      cmdAndArgs = rsyncCmd + ' ' + args.join(' ');
     return new Promise<void>((resolve, reject) => {
-      terminal.debug(rsyncCmd + ' ' + args.join(' '));
-      const child = spawn(rsyncCmd, args);
+      terminal.debug(cmdAndArgs);
+      const child = spawn(shell, ['-c', cmdAndArgs]);
       child.stdout.on('data', (data: string) => terminal.debug(data));
       child.stdout.on('end', resolve);
       child.on('exit', resolve);
