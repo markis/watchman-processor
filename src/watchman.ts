@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import { injectable, inject } from 'inversify';
 import { Sync } from './sync';
 import { Terminal } from './terminal';
-import { Config } from './config';
+import { Config, SubConfig } from './config';
 
 export interface Watchman {
   start(): void;
@@ -51,9 +51,15 @@ export default class WatchmanImpl implements Watchman {
     const promises: Promise<string | void>[] = [], subscriptions = Object.keys(this._config.subscriptions);
     for (let i = 0; i < subscriptions.length; i++) {
       const name = subscriptions[i],
-        subscription = this._config.subscriptions[name];
+        subscription: SubConfig = this._config.subscriptions[name],
+        ignoreFolders = subscription.ignoreFolders,
+        watchExpression = subscription.watchExpression || ['allof', ['type', 'f']];
 
-      promises.push(this._subscribe(subscription.source, name, subscription.watchExpression));
+      for (let j = 0; j < ignoreFolders.length; j++) {
+        watchExpression.push(['not', ['dirname', ignoreFolders[j]]]);
+      }
+
+      promises.push(this._subscribe(subscription.source, name, watchExpression));
     }
     Promise.all(promises).then(this._terminal.render);
 
@@ -82,7 +88,7 @@ export default class WatchmanImpl implements Watchman {
     this._syncFiles(subConfig, files);
   }
   
-  private _subscribe(folder: string, name: string, expression: (string | string[])[] = ['allof', ['type', 'f']]): Promise<string | void> {
+  private _subscribe(folder: string, name: string, expression: (string | string[] | (string | string[])[])[]): Promise<string | void> {
     const terminal = this._terminal,
       client = this._client;
     

@@ -17,6 +17,7 @@ const config: Config = {
   subscriptions: {
     example1: {
       destination: 'user@server:/tmp/example1/',
+      ignoreFolders: ['.git'],
       source: 'example1',
       type: 'rsync'
     }

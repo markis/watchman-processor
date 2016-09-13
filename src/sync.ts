@@ -30,13 +30,7 @@ export default class SyncImpl implements Sync {
   }
   
   public syncFiles(subConfig: SubConfig, fbFiles?: SubscriptionResponseFile[]): Promise<void> {
-    const files: string[] = (fbFiles || []).map(function(file) {
-      return file.name;
-    }).filter(function(file) {
-      return file.indexOf('.sass-cache/') === -1 &&
-        file.indexOf('.git/') === -1 &&
-        file.indexOf('.idea/') === -1;
-    });
+    const files: string[] = (fbFiles || []).map(file => file.name);
 
     // if there are too many files, it might just be better to let rsync figure out what
     // needs to be synced
@@ -50,8 +44,11 @@ export default class SyncImpl implements Sync {
   private _syncAllFiles(subConfig: SubConfig): Promise<void> {
     const src = subConfig.source;
     const dest = subConfig.destination;
+    const ignoreFolders = subConfig.ignoreFolders;
 
-    const args = ['-az', '--stats', '--delete', src, dest];
+    const excludes = (`--exclude '${ignoreFolders.join(`' --exclude '`)}'`).split(' ');
+
+    const args = [].concat(['-az', '--stats', '--delete'], excludes, [src, dest]);
     return this._exec(args);
   }
   

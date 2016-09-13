@@ -37,5 +37,19 @@ describe('Config', function () {
 
     configMgr.createConfig().then(done);
   }));
+
+  it('Initialize the example config file', sinon.test(function () {
+    this.stub(console, 'log');
+    this.stub(console, 'error');
+    
+    const configMgr = new ConfigManager({
+      confFile: path.resolve(__dirname + '../../../example/watchman-processor.config.js'),
+      exampleConfFile: path.resolve(__dirname + '../../../example/watchman-processor.config.js')
+    });
+
+    configMgr.getConfig();
+
+    chai.assert.isObject(configMgr, 'configMgr is an object');
+  }));
 });
 
