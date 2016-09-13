@@ -30,11 +30,7 @@ export default class SyncImpl implements Sync {
   }
   
   public syncFiles(subConfig: SubConfig, fbFiles?: SubscriptionResponseFile[]): Promise<void> {
-    const files: string[] = (fbFiles || [])
-      .map(file => file.name);
-      // .filter(
-      //   file => subConfig.ignoreFolders.find(folder => file.indexOf(folder) === -1) !== null
-      // );
+    const files: string[] = (fbFiles || []).map(file => file.name);
 
     // if there are too many files, it might just be better to let rsync figure out what
     // needs to be synced
