@@ -30,7 +30,10 @@ export default class SyncImpl implements Sync {
   }
   
   public syncFiles(subConfig: SubConfig, fbFiles?: SubscriptionResponseFile[]): Promise<void> {
-    const files: string[] = (fbFiles || []).map(file => file.name);
+    const
+      ignoreFolders = subConfig.ignoreFolders,
+      filesNames: string[] = (fbFiles || []).map(file => file.name),
+      files = filesNames.filter(file => ignoreFolders.findIndex(folder => file.startsWith(folder)) === -1);
 
     // if there are too many files, it might just be better to let rsync figure out what
     // needs to be synced
@@ -101,4 +104,35 @@ function unique(arr: string[]): string[] {
   return arr.filter((item: string) => {
     return seen.has(item) ? false : !!seen.set(item, true);
   });
+}
+
+
+/*
+ *
+ *  Polyfills for basic javascript functionality that doesn't exist in 0.12
+ * 
+ */ 
+if (!Array.prototype.findIndex) {
+  Array.prototype.findIndex = function(predicate) {
+    'use strict';
+    const list = Object(this),
+      length = list.length,
+      thisArg = arguments[1];
+    
+    let value: any;
+    for (let i = 0; i < length; i++) {
+      value = list[i];
+      if (predicate.call(thisArg, value, i, list)) {
+        return i;
+      }
+    }
+    return -1;
+  };
+}
+
+if (!String.prototype.startsWith) {
+    String.prototype.startsWith = function(searchString, position){
+      position = position || 0;
+      return this.substr(position, searchString.length) === searchString;
+  };
 }
