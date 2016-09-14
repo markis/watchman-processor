@@ -15,8 +15,9 @@ let watchmanSync: Watchman;
 if (process.argv[2] === 'init') {
   configManager.createConfig();
 } else {
-  const kernel = new Kernel();
-  const config = configManager.getConfig();
+  const 
+    kernel = new Kernel(),
+    config = configManager.getConfig();
 
   kernel.bind('spawn').toConstantValue(proc.spawn);
   kernel.bind<WatchmanClient>('WatchmanClient').toConstantValue(new watchman.Client);
@@ -33,10 +34,20 @@ if (process.argv[2] === 'init') {
   watchmanSync.start();
 }
 
+/**
+ * Wraps process.stderr.write, so that we can mock this method in tests 
+ * 
+ * @param {string} msg
+ */
 function stdErrWriteImpl(msg: string) {
   process.stderr.write(msg);
 }
 
+/**
+ * Wraps process.stdout.write, so that we mock this method in tests
+ * 
+ * @param {string} msg
+ */
 function stdOutWriteImpl(msg: string) {
   process.stdout.write(msg);
 }

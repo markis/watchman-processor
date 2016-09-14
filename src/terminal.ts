@@ -3,10 +3,43 @@ import { injectable, inject } from 'inversify';
 import { Config, SubConfig } from './config';
 
 export interface Terminal {
+  /**
+   * This let's the terminal know that the application is starting.  So do any setup necessary.
+   * 
+   * @memberOf Terminal
+   */
   start(): void;
+  /**
+   * Display the user an error message
+   * 
+   * @param {(string | Error)} err
+   * 
+   * @memberOf Terminal
+   */
   error(err: string | Error): void;
+  /**
+   * Display debug information to the user.  Is automatically ignored if the config.debug switch is set to false. 
+   * 
+   * @param {string} msg
+   * 
+   * @memberOf Terminal
+   */
   debug(msg: string): void;
+  /**
+   * Set the state of the subscription and any potential extra information in statusMessage
+   * 
+   * @param {SubConfig} configEntry
+   * @param {string} state
+   * @param {string} [statusMessage]
+   * 
+   * @memberOf Terminal
+   */
   setState(configEntry: SubConfig, state: string, statusMessage?: string): void;
+  /**
+   * Render the current state of all the subscriptions 
+   * 
+   * @memberOf Terminal
+   */
   render(): void;
 }
 
@@ -39,15 +72,11 @@ export default class TerminalImpl implements Terminal {
   
   public start() {
     this.debug('starting');
-    if (!this._config.debug) {
-      this._enableFullScreen();
-      this._hideCursor();
-    }
   }
   
   public debug(msg: string) {
     if (this._config.debug && msg) {
-      this._write(this._chalk.white(msg + '\n'));
+      this._write(this._chalk.white(msg));
     }
   }
   
@@ -62,13 +91,15 @@ export default class TerminalImpl implements Terminal {
       return;
     }
     this._clear();
-    const chalk = this._chalk,
+    const 
+      chalk = this._chalk,
       subscriptions = Object.keys(this._config.subscriptions);
     
+    let name: string, subscription: SubConfig, state: string;
     for (let i = 0; i < subscriptions.length; i++) {
-      const name = subscriptions[i],
-        subscription = this._config.subscriptions[name],
-        state = subscription.state;
+      name = subscriptions[i];
+      subscription = this._config.subscriptions[name];
+      state = subscription.state;
       
       if (state === 'good') {
         this._log(':thumbsup:  ' + name + ' ', chalk.bgGreen);
@@ -87,15 +118,6 @@ export default class TerminalImpl implements Terminal {
     this._write('\x1b[H\x1b[J');
   }
   
-  private _enableFullScreen() {
-    this._write('\x1b[?1049h');
-    this._clear();
-  }
-  
-  private _hideCursor() {
-    this._write('\x1B[?25l'); // Hide terminal cursor
-  }
-  
   private _emojify(msg: string) {
     if (this._config && this._config.emoji) {
       return this._emoji.emojify(msg);
@@ -108,4 +130,14 @@ export default class TerminalImpl implements Terminal {
     msg = chalkColor.black(msg);
     this._write(msg);
   }
+
+  // These are just here if I decide to bring them back. But right now they seem like a nuisance
+  // private _enableFullScreen() {
+  //   this._write('\x1b[?1049h');
+  //   this._clear();
+  // }
+  
+  // private _hideCursor() {
+  //   this._write('\x1B[?25l'); // Hide terminal cursor
+  // }
 }

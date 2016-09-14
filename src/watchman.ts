@@ -5,6 +5,12 @@ import { Terminal } from './terminal';
 import { Config, SubConfig } from './config';
 
 export interface Watchman {
+  /**
+   * Get this party started!  This is the start of everything.
+   * This is also what communicates directly with fb-watchman and then passes data to sync/terminal.
+   * 
+   * @memberOf Watchman
+   */
   start(): void;
 }
 

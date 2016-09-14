@@ -3,7 +3,19 @@ import { injectable, inject } from 'inversify';
 import { Terminal } from './terminal';
 import { SubConfig, Config } from './config';
 
+
 export interface Sync {
+  /**
+   * Sync files between the source and destination
+   *  if no files are specified then attempt to sync everything
+   *  otherwise sync the specific list of files sent from watchman
+   * 
+   * @param {SubConfig} subConfig
+   * @param {SubscriptionResponseFile[]} files
+   * @returns {Promise<void>}
+   * 
+   * @memberOf Sync
+   */
   syncFiles(subConfig: SubConfig, files: SubscriptionResponseFile[]): Promise<void>;
 }
 
@@ -34,7 +46,7 @@ export default class SyncImpl implements Sync {
   public syncFiles(subConfig: SubConfig, fbFiles?: SubscriptionResponseFile[]): Promise<void> {
     const
       ignoreFolders = subConfig.ignoreFolders,
-      filesNames: string[] = (fbFiles || []).map(file => file.name),
+      filesNames: string[] = (fbFiles || []).map(file => file.name), 
       files = filesNames.filter(file => ignoreFolders.findIndex(folder => file.startsWith(folder)) === -1);
 
     // if there are too many files, it might just be better to let rsync figure out what
@@ -47,33 +59,36 @@ export default class SyncImpl implements Sync {
   }
   
   private _syncAllFiles(subConfig: SubConfig): Promise<void> {
-    const src = subConfig.source;
-    const dest = subConfig.destination;
-    const ignoreFolders = subConfig.ignoreFolders;
-
-    const excludes = (`--exclude '${ignoreFolders.join(`' --exclude '`)}'`).split(' ');
-
-    const args = [].concat(['-avz', '--delete'], excludes, [src, dest]);
+    const 
+      src = subConfig.source,
+      dest = subConfig.destination,
+      ignoreFolders = subConfig.ignoreFolders,
+      excludes = (`--exclude '${ignoreFolders.join(`' --exclude '`)}'`).split(' '),
+      args = [].concat(['-avz', '--delete'], excludes, [src, dest]);
+    
     return this._exec(args);
   }
   
   private _syncSpecificFiles(subConfig: SubConfig, files: string[]): Promise<void> {
-    const src = subConfig.source;
-    const dest = subConfig.destination;
-    
     files =  getUniqueFileFolders(files).concat(files);
-    const includes = (`--include '${files.join(`' --include '`)}'`).split(' ');
+
+    const 
+      src = subConfig.source,
+      dest = subConfig.destination,
+      includes = (`--include '${files.join(`' --include '`)}'`).split(' '),
+      args = [].concat(['-avz', '--delete'], includes, ['--exclude', `'*'`, src, dest]);
     
-    const args = [].concat(['-avz', '--delete'], includes, ['--exclude', `'*'`, src, dest]);
     return this._exec(args);
   }
 
   private _exec(args: string[]): Promise<void> {
-    const spawn = this.spawn,
+    const 
+      spawn = this.spawn,
       rsyncCmd = this.rsyncCmd,
       terminal = this.terminal,
       shell = this.shell,
       cmdAndArgs = rsyncCmd + ' ' + args.join(' ');
+
     return new Promise<void>((resolve, reject) => {
       terminal.debug(cmdAndArgs);
       const child = spawn(shell, ['-c', cmdAndArgs]);
@@ -86,8 +101,10 @@ export default class SyncImpl implements Sync {
 }
 
 function getUniqueFileFolders(files: string[]) {
-  const folders: string[] = [];
-  const length: number = files.length;
+  const 
+    folders: string[] = [],
+    length: number = files.length;
+
   for (let i = 0, folderParts: string[], folderPartsSum: string, file: string; i < length; i++) {
     file = files[i];
     folderParts = file.split('/');
@@ -119,7 +136,8 @@ function unique(arr: string[]): string[] {
 if (!Array.prototype.findIndex) {
   Array.prototype.findIndex = function(predicate) {
     'use strict';
-    const list = Object(this),
+    const 
+      list = Object(this),
       length = list.length,
       thisArg = arguments[1];
     
