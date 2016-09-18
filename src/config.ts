@@ -5,7 +5,7 @@ import * as fs from 'fs';
 export interface ConfigManager {
   /**
    * Retrieve the Config data, it is dependent on the config file existing
-   * 
+   *
    * @returns {Config}
    * @memberOf ConfigManager
    */
@@ -13,7 +13,7 @@ export interface ConfigManager {
 
   /**
    * This will create config file in the default location with the example data
-   * 
+   *
    * @memberOf ConfigManager
    */
   createConfig(): void;
@@ -22,15 +22,15 @@ export interface ConfigManager {
 export interface Config {
   /**
    * changes the output to show debug information, cmd and stdout output
-   * 
+   *
    * @type {boolean}
    * @memberOf Config
    */
   debug?: boolean;
-  
+
   /**
    * if your terminal window can support emojis
-   * 
+   *
    * @type {boolean}
    * @memberOf Config
    */
@@ -38,15 +38,15 @@ export interface Config {
 
   /**
    * this limits the number files to pass to rsync.
-   * 
+   *
    * @type {number}
    * @memberOf Config
    */
   maxFileLength?: number;
-  
+
   /**
    *  default: 'rsync' -- override to whatever rsync command is installed or located
-   * 
+   *
    * @type {string}
    * @memberOf Config
    */
@@ -54,7 +54,7 @@ export interface Config {
 
   /**
    * These are specified subscriptions, they are listed by name
-   * 
+   *
    * @type {*}
    * @memberOf Config
    */
@@ -64,28 +64,28 @@ export interface Config {
 export interface SubConfig {
   /**
    * This specifies the type of process that should be performed.
-   * 
+   *
    * @type {'rsync'}
    * @memberOf SubConfig
    */
   type: 'rsync';
   /**
    * Source of the files, also the watch folder
-   * 
+   *
    * @type {string}
    * @memberOf SubConfig
    */
   source: string;
   /**
    * Destination of where the files should go
-   * 
+   *
    * @type {string}
    * @memberOf SubConfig
    */
   destination: string;
   /**
    * These are folders to ignore relative to the source.
-   * 
+   *
    * @type {string}
    * @memberOf SubConfig
    */
@@ -93,21 +93,21 @@ export interface SubConfig {
   /**
    * This will be combined with ignore folders, but this can allow for more granular
    * watch expressions with fb-watchman @see https://facebook.github.io/watchman/
-   * 
+   *
    * @type {(string | string[] | (string | string[])[])[]}
    * @memberOf SubConfig
    */
-  watchExpression?: (string | string[] | (string | string[])[])[];
+  watchExpression?: WatchmanExpression;
   /**
    * This reflects the current state of synchronization
-   * 
+   *
    * @type {string}
    * @memberOf SubConfig
    */
   state?: string;
   /**
    * Error messages get relected here.  Should mostly get left empty.
-   * 
+   *
    * @type {string}
    * @memberOf SubConfig
    */
@@ -117,49 +117,48 @@ export interface SubConfig {
 export interface ConfigManagerOptions {
   /**
    * Location of the user's config file
-   * 
+   *
    * @type {string}
    * @memberOf ConfigManagerOptions
    */
   confFile?: string;
   /**
    * Location of the example file within the project
-   * 
+   *
    * @type {string}
    * @memberOf ConfigManagerOptions
    */
   exampleConfFile?: string;
 }
 
+export type WatchmanExpression = (string | string[] | (string | string[])[])[];
+
 @injectable()
 export default class ConfigManagerImpl implements ConfigManager {
-  private _confFile: string;
-  private _exampleConfFile: string;
-  private _require: NodeRequireFunction;
+  private confFile: string;
+  private exampleConfFile: string;
+  private require: NodeRequireFunction;
 
   constructor(
     options: ConfigManagerOptions = {},
-    _require: NodeRequireFunction = null
+    customRequire: NodeRequireFunction = null
   ) {
-    const 
-      HOME_FOLDER = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'],
-      CONF_FILE = HOME_FOLDER + '/.watchman-processor.config.js',
-      EXAMPLE_CONF_FILE = process.cwd() + '/example/watchman-processor.config.js';
-   
-    this._require = _require || require;
-    this._confFile = options.confFile || CONF_FILE;
-    this._exampleConfFile = options.exampleConfFile || EXAMPLE_CONF_FILE;
+    const HOME_FOLDER = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
+    const CONF_FILE = HOME_FOLDER + '/.watchman-processor.config.js';
+    const EXAMPLE_CONF_FILE = process.cwd() + '/example/watchman-processor.config.js';
+
+    this.require = customRequire || require;
+    this.confFile = options.confFile || CONF_FILE;
+    this.exampleConfFile = options.exampleConfFile || EXAMPLE_CONF_FILE;
   }
-  
+
   public getConfig(): Config {
     try {
-      const 
-        config = this._require(this._confFile) as Config,
-        subscriptions = Object.keys(config.subscriptions);
+      const config = this.require(this.confFile) as Config;
+      const subscriptions = Object.keys(config.subscriptions);
 
       // ensure ignoreFolders has a value
-      let name: string, subscription: SubConfig;
-      for (let i = 0; i < subscriptions.length; i++) {
+      for (let i = 0, name: string, subscription: SubConfig; i < subscriptions.length; i++) {
         name = subscriptions[i];
         subscription = config.subscriptions[name];
         subscription.ignoreFolders = subscription.ignoreFolders || [];
@@ -167,8 +166,8 @@ export default class ConfigManagerImpl implements ConfigManager {
       return config;
     } catch (e) {
       if (e && e.code === 'MODULE_NOT_FOUND') {
-        console.error('"' + this._confFile + '" does not exist. \n\n' +
-          'Run "watchman-processor init" to create an example configuration file.');
+        process.stderr.write('"' + this.confFile + '" does not exist. \n\n' +
+          'Run "watchman-processor init" to create an example configuration file.\n');
         return null as Config;
       } else {
         throw e;
@@ -177,19 +176,17 @@ export default class ConfigManagerImpl implements ConfigManager {
   }
 
   public createConfig(): Promise<string> {
-    const 
-      confFile = this._confFile,
-      exampleConfFile = this._exampleConfFile;
-    
+    const confFile = this.confFile;
+    const exampleConfFile = this.exampleConfFile;
+
     return new Promise<string>((resolve, reject) => {
-      const 
-        reader = fs.createReadStream(exampleConfFile),
-        writer = fs.createWriteStream(confFile);
+      const reader = fs.createReadStream(exampleConfFile);
+      const writer = fs.createWriteStream(confFile);
 
       reader.on('error', reject);
       writer.on('error', reject);
       writer.on('close', function () {
-        console.log('Done.  "' + confFile + '" created.');
+        process.stdout.write('Done.  "' + confFile + '" created.\n');
         resolve();
       });
       reader.pipe(writer);

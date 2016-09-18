@@ -15,9 +15,9 @@ const config: Config = {
       destination: 'user@server:/tmp/example1/',
       ignoreFolders: ['.git'],
       source: 'example1',
-      type: 'rsync'
-    }
-  }
+      type: 'rsync',
+    },
+  },
 };
 const example1 = config.subscriptions.example1;
 
@@ -28,7 +28,7 @@ describe('Sync', function () {
     // Setup
     const shortList = [
       {name: 'example1/js/1.js'},
-      {name: 'example1/js/2.js'}
+      {name: 'example1/js/2.js'},
     ];
     const spawn = sinon.stub().returns({on: sinon.stub(), stdout: {on: sinon.stub().callsArg(1)}});
     const sync = new Sync(config, terminal, spawn);
@@ -51,7 +51,7 @@ describe('Sync', function () {
 
     // Execute
     sync.syncFiles(example1, longList);
-    
+
     chai.assert(spawn.called);
   });
 
@@ -72,7 +72,7 @@ describe('Sync', function () {
     // Setup
     const shortList = [
       {name: 'example1/js/1.js'},
-      {name: '.git/js/2.js'}
+      {name: '.git/js/2.js'},
     ];
     const spawn = sinon.stub().returns({on: sinon.stub(), stdout: {on: sinon.stub()}});
     const sync = new Sync(config, terminal, spawn);
@@ -83,4 +83,3 @@ describe('Sync', function () {
     chai.assert(spawn.called);
   }));
 });
-

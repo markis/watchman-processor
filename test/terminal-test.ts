@@ -9,10 +9,9 @@ function noop() {
 }
 
 describe('Terminal', () => {
-  let 
-    config: Config, 
-    mockEmoji: Emoji = { emojify: noop } as any, 
-    mockChalk = {
+  let config: Config;
+  let mockEmoji: Emoji = { emojify: noop } as any;
+  let mockChalk = {
       bgGreen: this,
       bgRed: this,
       bgWhite: this,
@@ -20,15 +19,15 @@ describe('Terminal', () => {
       black: noop,
       red: noop,
       white: noop,
-    },
-    stdOutWrite = sinon.stub(), 
-    stdErrWrite = sinon.stub();
+    };
+  let stdOutWrite = sinon.stub();
+  let stdErrWrite = sinon.stub();
 
   mockChalk.bgGreen = mockChalk;
   mockChalk.bgRed = mockChalk;
   mockChalk.bgYellow = mockChalk;
   mockChalk.bgWhite = mockChalk;
-  
+
   beforeEach(() => {
     stdOutWrite = sinon.stub();
     stdErrWrite = sinon.stub();
@@ -40,27 +39,27 @@ describe('Terminal', () => {
           destination: 'user@server:/tmp/example1/',
           source: 'example1',
           state: 'initial',
-          type: 'rsync'
+          type: 'rsync',
         },
         example2: {
           destination: 'user@server:/tmp/example1/',
           source: 'example1',
           state: 'good',
-          type: 'rsync'
+          type: 'rsync',
         },
         example3: {
           destination: 'user@server:/tmp/example1/',
           source: 'example1',
           state: 'running',
-          type: 'rsync'
+          type: 'rsync',
         },
         example4: {
           destination: 'user@server:/tmp/example1/',
           source: 'example1',
           state: 'error',
-          type: 'rsync'
-        }
-      }
+          type: 'rsync',
+        },
+      },
     };
   });
 
@@ -80,7 +79,7 @@ describe('Terminal', () => {
 
     // Execute
     terminal.debug('err');
-    
+
     chai.assert(stdOutWrite.called);
   });
 
@@ -143,4 +142,3 @@ describe('Terminal', () => {
   });
 
 });
-

@@ -9,9 +9,9 @@ import * as sinon from 'sinon';
 const mockTerminal = sinon.mock(Terminal);
 const terminal: Terminal = mockTerminal as any;
 const mockSync = {
-  syncFiles: sinon.stub()
+  syncFiles: sinon.stub(),
 };
-const sync: Sync = mockSync as any; 
+const sync: Sync = mockSync as any;
 const mockWatchmanClient = {
   capabilityCheck: sinon.stub(),
   command: sinon.stub(),
@@ -25,13 +25,13 @@ const config: Config = {
       destination: 'user@server:/tmp/example1/',
       ignoreFolders: ['.git'],
       source: 'example1',
-      type: 'rsync'
-    }
-  }
+      type: 'rsync',
+    },
+  },
 };
 
 describe('Watchman', function () {
-  
+
   beforeEach(function() {
     // mock all the defaults before
     terminal.start = sinon.stub();
@@ -39,7 +39,7 @@ describe('Watchman', function () {
     terminal.error = sinon.stub();
     terminal.debug = sinon.stub();
     terminal.setState = sinon.stub();
-   
+
     mockSync.syncFiles = sinon.stub().returns(new Promise(resolve => resolve()));
     mockWatchmanClient.capabilityCheck = sinon.stub().callsArg(1);
     mockWatchmanClient.on = sinon.stub().callsArgWith(1, {files: [], subscription: 'example1'});
@@ -88,4 +88,3 @@ describe('Watchman', function () {
   });
 
 });
-
