@@ -3,23 +3,33 @@ import { Config } from '../src/config';
 import Terminal from '../src/terminal';
 import * as chai from 'chai';
 import * as sinon from 'sinon';
-import SinonMock = Sinon.SinonMock;
-import SinonStub = Sinon.SinonStub;
-
-const emoji = require('node-emoji') as Emoji;
-const chalk = require('chalk') as Chalk;
 
 function noop() {
   // do nothing
 }
 
 describe('Terminal', () => {
-  let config: Config, mockEmoji: SinonMock, mockChalk: SinonMock,
-    stdOutWrite: SinonStub, stdErrWrite: SinonStub;
+  let 
+    config: Config, 
+    mockEmoji: Emoji = { emojify: noop } as any, 
+    mockChalk = {
+      bgGreen: this,
+      bgRed: this,
+      bgWhite: this,
+      bgYellow: this,
+      black: noop,
+      red: noop,
+      white: noop,
+    },
+    stdOutWrite = sinon.stub(), 
+    stdErrWrite = sinon.stub();
+
+  mockChalk.bgGreen = mockChalk;
+  mockChalk.bgRed = mockChalk;
+  mockChalk.bgYellow = mockChalk;
+  mockChalk.bgWhite = mockChalk;
   
   beforeEach(() => {
-    mockChalk = sinon.mock(chalk);
-    mockEmoji = sinon.mock(emoji);
     stdOutWrite = sinon.stub();
     stdErrWrite = sinon.stub();
 
@@ -56,7 +66,7 @@ describe('Terminal', () => {
 
   it('Expect terminal.error to execute stdErrWrite', function () {
     // Setup
-    const terminal = new Terminal(config, noop, stdErrWrite, mockChalk.object, null);
+    const terminal = new Terminal(config, noop, stdErrWrite, mockChalk, null);
 
     // Execute
     terminal.error('err');
@@ -66,7 +76,7 @@ describe('Terminal', () => {
 
   it('Expect terminal.debug to execute stdOutWrite', function () {
     // Setup
-    const terminal = new Terminal({ debug: true }, stdOutWrite, noop, mockChalk.object, null);
+    const terminal = new Terminal({ debug: true }, stdOutWrite, noop, mockChalk, null);
 
     // Execute
     terminal.debug('err');
@@ -76,7 +86,7 @@ describe('Terminal', () => {
 
   it('Expect terminal.render to render', function () {
     // Setup
-    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk.object, mockEmoji.object);
+    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk, mockEmoji);
 
     // Execute
     terminal.render();
@@ -87,7 +97,7 @@ describe('Terminal', () => {
   it('Expect terminal.render to render without emojis', () => {
     // Setup
     config.emoji = false;
-    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk.object, mockEmoji.object);
+    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk, mockEmoji);
 
     // Execute
     terminal.render();
@@ -98,7 +108,7 @@ describe('Terminal', () => {
   it('Expect terminal.render to do nothing when debug is turned on', () => {
 
     // Setup
-    const terminal = new Terminal({ debug: true }, stdOutWrite, noop, mockChalk.object, mockEmoji.object);
+    const terminal = new Terminal({ debug: true }, stdOutWrite, noop, mockChalk, mockEmoji);
 
     // Execute
     terminal.render();
@@ -109,7 +119,7 @@ describe('Terminal', () => {
   it('Expect terminal.setState to execute', () => {
 
     // Setup
-    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk.object, mockEmoji.object);
+    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk, mockEmoji);
 
     // Execute
     terminal.setState(config.subscriptions.example1, 'good');
@@ -120,7 +130,7 @@ describe('Terminal', () => {
 
     // Setup
     const startConfig = { debug: false };
-    const terminal = new Terminal(startConfig, stdOutWrite, noop, mockChalk.object, mockEmoji.object);
+    const terminal = new Terminal(startConfig, stdOutWrite, noop, mockChalk, mockEmoji);
 
     // Execute with debug on
     startConfig.debug = false;

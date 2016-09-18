@@ -3,16 +3,22 @@ import { Config } from '../src/config';
 import Terminal from '../src/terminal';
 import Sync from '../src/sync';
 import Watchman from '../src/watchman';
-import * as fbWatchmanClient from 'fb-watchman';
 import * as chai from 'chai';
 import * as sinon from 'sinon';
 
 const mockTerminal = sinon.mock(Terminal);
-const terminal = new mockTerminal.object();
-const mockSync = sinon.mock(Sync);
-const sync = new mockSync.object();
-const mockWatchmanClient = sinon.mock(fbWatchmanClient);
-const watchmanClient = mockWatchmanClient.object;
+const terminal: Terminal = mockTerminal as any;
+const mockSync = {
+  syncFiles: sinon.stub()
+};
+const sync: Sync = mockSync as any; 
+const mockWatchmanClient = {
+  capabilityCheck: sinon.stub(),
+  command: sinon.stub(),
+  on: sinon.stub(),
+  syncFiles: sinon.stub(),
+};
+const watchmanClient: WatchmanClient = mockWatchmanClient as any;
 const config: Config = {
   subscriptions: {
     example1: {
@@ -27,20 +33,17 @@ const config: Config = {
 describe('Watchman', function () {
   
   beforeEach(function() {
-    // mock all the default before
+    // mock all the defaults before
     terminal.start = sinon.stub();
     terminal.render = sinon.stub();
     terminal.error = sinon.stub();
-    
-    sync.syncFiles = sinon.stub();
-    sync.syncFiles.returns(new Promise(resolve => resolve()));
-    
-    watchmanClient.capabilityCheck = sinon.stub();
-    watchmanClient.capabilityCheck.callsArg(1);
-    watchmanClient.on = sinon.stub();
-    watchmanClient.on.callsArgWith(1, {files: [], subscription: 'example1'});
-    watchmanClient.command = sinon.stub();
-    watchmanClient.command.callsArg(1);
+    terminal.debug = sinon.stub();
+    terminal.setState = sinon.stub();
+   
+    mockSync.syncFiles = sinon.stub().returns(new Promise(resolve => resolve()));
+    mockWatchmanClient.capabilityCheck = sinon.stub().callsArg(1);
+    mockWatchmanClient.on = sinon.stub().callsArgWith(1, {files: [], subscription: 'example1'});
+    mockWatchmanClient.command = sinon.stub().callsArg(1);
   });
 
   it('should start watchman', function () {
@@ -51,7 +54,7 @@ describe('Watchman', function () {
   });
 
   it('should log errors from watchman.capabilityCheck', function () {
-    watchmanClient.capabilityCheck.callsArgWith(1, 'error');
+    mockWatchmanClient.capabilityCheck.callsArgWith(1, 'error');
 
     const watchman = new Watchman(config, watchmanClient, terminal, sync);
     watchman.start();
@@ -60,7 +63,7 @@ describe('Watchman', function () {
   });
 
   it('should log errors from watchman.command', function () {
-    watchmanClient.command.callsArgWith(1, 'error');
+    mockWatchmanClient.command.callsArgWith(1, 'error');
 
     const watchman = new Watchman(config, watchmanClient, terminal, sync);
     watchman.start();
@@ -69,8 +72,15 @@ describe('Watchman', function () {
   });
 
   it('should log errors from sync.syncFiles', function () {
-    sync.syncFiles.returns(new Promise(() => { throw 'error'; }));
+    mockSync.syncFiles.returns(new Promise(() => { throw 'error'; }));
 
+    const watchman = new Watchman(config, watchmanClient, terminal, sync);
+    watchman.start();
+
+    chai.assert.isObject(watchman, 'watchman is an object');
+  });
+
+  it('should attempt to sync files', function () {
     const watchman = new Watchman(config, watchmanClient, terminal, sync);
     watchman.start();
 

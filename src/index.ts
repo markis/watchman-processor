@@ -20,12 +20,13 @@ if (process.argv[2] === 'init') {
     config = configManager.getConfig();
 
   kernel.bind('spawn').toConstantValue(proc.spawn);
+  kernel.bind('require').toConstantValue(require);
   kernel.bind<WatchmanClient>('WatchmanClient').toConstantValue(new watchman.Client);
   kernel.bind<Config>('Config').toConstantValue(config);
   kernel.bind('stdErrWrite').toConstantValue(stdErrWriteImpl);
   kernel.bind('stdOutWrite').toConstantValue(stdOutWriteImpl);
   kernel.bind<Emoji>('Emoji').toConstantValue(emoji);
-  kernel.bind<Chalk>('Chalk').toConstantValue(chalk);
+  kernel.bind('Chalk').toConstantValue(chalk);
   kernel.bind<Terminal>('Terminal').to(TerminalImpl);
   kernel.bind<Sync>('Sync').to(SyncImpl);
   kernel.bind<Watchman>('WatchmanSync').to(WatchmanSyncImpl);

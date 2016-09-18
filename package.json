@@ -26,15 +26,18 @@
     "sinon": "^1.17.4",
     "ts-helpers": "^1.1.1",
     "tslint": "^3.10.2",
-    "typescript": "^1.8.10"
+    "typescript": "^1.8.10",
+    "typings": "^1.3.3"
   },
   "scripts": {
     "compile": "tsc --noEmitHelpers && rollup -c",
     "coveralls": "npm run compile && npm run coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "coverage": "npm run compile && istanbul cover _mocha built/test/**/*-test.js",
+    "postinstall": "npm run typings",
     "lint": "tslint -c tslint.json src/*.ts test/*.ts",
     "mocha": "npm run compile && mocha test/_setup.js built/test/**/*-test.js",
-    "test": "npm run coverage"
+    "test": "npm run coverage",
+    "typings": "typings i"
   },
   "pre-commit": [
     "lint",

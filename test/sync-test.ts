@@ -5,7 +5,10 @@ import Sync from '../src/sync';
 import * as chai from 'chai';
 import * as sinon from 'sinon';
 
-const mockTerminal = sinon.mock(Terminal);
+function noop() {
+  // do nothing
+}
+const terminal: Terminal = { debug: noop } as any;
 const config: Config = {
   subscriptions: {
     example1: {
@@ -27,8 +30,7 @@ describe('Sync', function () {
       {name: 'example1/js/1.js'},
       {name: 'example1/js/2.js'}
     ];
-    const spawn = sinon.stub().returns({on: sinon.stub(), stdout: {on: sinon.stub()}});
-    const terminal = new mockTerminal.object();
+    const spawn = sinon.stub().returns({on: sinon.stub(), stdout: {on: sinon.stub().callsArg(1)}});
     const sync = new Sync(config, terminal, spawn);
 
     // Execute
@@ -45,7 +47,6 @@ describe('Sync', function () {
       longList[i] = { name: 'example1/' + i + '.js' };
     }
     const spawn = sinon.stub();
-    const terminal = new mockTerminal.object();
     const sync = new Sync(config, terminal, spawn);
 
     // Execute
@@ -58,7 +59,6 @@ describe('Sync', function () {
 
     // Setup
     const spawn = sinon.stub();
-    const terminal = new mockTerminal.object();
     const sync = new Sync(config, terminal, spawn);
 
     // Execute
@@ -75,7 +75,6 @@ describe('Sync', function () {
       {name: '.git/js/2.js'}
     ];
     const spawn = sinon.stub().returns({on: sinon.stub(), stdout: {on: sinon.stub()}});
-    const terminal = new mockTerminal.object();
     const sync = new Sync(config, terminal, spawn);
 
     // Execute

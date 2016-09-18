@@ -48,17 +48,17 @@ export default class TerminalImpl implements Terminal {
   private _config: Config;
   private _error: (msg: string | Error) => void;
   private _write: (msg: string) => void;
-  private _chalk: Chalk;
+  private _chalk: any;
   private _emoji: Emoji;
   
   constructor(
     @inject('Config') config: Config,
     @inject('stdOutWrite') stdOutWrite: (msg: string) => void,
     @inject('stdErrWrite') stdErrWrite: (msg: string) => void,
-    @inject('Chalk') chalk: Chalk,
+    @inject('Chalk') chalk: any,
     @inject('Emoji') emoji: Emoji
   ) {
-    this._config = config || {} as Config;
+    this._config = config as Config;
     this._error = stdErrWrite;
     this._write = stdOutWrite;
     this._chalk = chalk;
@@ -125,7 +125,7 @@ export default class TerminalImpl implements Terminal {
     return msg;
   }
   
-  private _log(msg: string, chalkColor: ChalkColors) {
+  private _log(msg: string, chalkColor: any) {
     msg = this._emojify(msg);
     msg = chalkColor.black(msg);
     this._write(msg);

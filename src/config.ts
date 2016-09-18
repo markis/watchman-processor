@@ -135,14 +135,18 @@ export interface ConfigManagerOptions {
 export default class ConfigManagerImpl implements ConfigManager {
   private _confFile: string;
   private _exampleConfFile: string;
+  private _require: NodeRequireFunction;
+
   constructor(
-    options: ConfigManagerOptions = {}
+    options: ConfigManagerOptions = {},
+    _require: NodeRequireFunction = null
   ) {
     const 
       HOME_FOLDER = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'],
       CONF_FILE = HOME_FOLDER + '/.watchman-processor.config.js',
       EXAMPLE_CONF_FILE = process.cwd() + '/example/watchman-processor.config.js';
    
+    this._require = _require || require;
     this._confFile = options.confFile || CONF_FILE;
     this._exampleConfFile = options.exampleConfFile || EXAMPLE_CONF_FILE;
   }
@@ -150,7 +154,7 @@ export default class ConfigManagerImpl implements ConfigManager {
   public getConfig(): Config {
     try {
       const 
-        config = require(this._confFile) as Config,
+        config = this._require(this._confFile) as Config,
         subscriptions = Object.keys(config.subscriptions);
 
       // ensure ignoreFolders has a value
@@ -162,7 +166,7 @@ export default class ConfigManagerImpl implements ConfigManager {
       }
       return config;
     } catch (e) {
-      if (e.code === 'MODULE_NOT_FOUND') {
+      if (e && e.code === 'MODULE_NOT_FOUND') {
         console.error('"' + this._confFile + '" does not exist. \n\n' +
           'Run "watchman-processor init" to create an example configuration file.');
         return null as Config;
