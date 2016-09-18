@@ -1,8 +1,9 @@
 index.js
-node_modules
 *.log
 coverage
 built/
+node_modules/
+typings/
 
 ### Vim template
 # swap

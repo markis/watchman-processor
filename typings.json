@@ -1,0 +1,11 @@
+{
+  "globalDependencies": {
+    "chalk": "registry:dt/chalk#0.4.0+20160317120654",
+    "mocha": "registry:dt/mocha#2.2.5+20160720003353",
+    "node": "registry:dt/node#6.0.0+20160915134512"
+  },
+  "dependencies": {
+    "chai": "registry:npm/chai#3.5.0+20160723033700",
+    "sinon": "registry:npm/sinon#1.16.0+20160723033700"
+  }
+}

@@ -6,7 +6,9 @@ import * as sinon from 'sinon';
 
 describe('Config', function () {
 
-  it('Config can construct without options', sinon.test(function () {
+
+
+  it('should construct the config without options', sinon.test(function () {
     this.stub(console, 'log');
     this.stub(console, 'error');
     
@@ -15,9 +17,10 @@ describe('Config', function () {
     chai.assert.isObject(configMgr, 'configMgr is an object');
   }));
 
-  it('Throw error on not getting config file', sinon.test(function () {
+  it('should throw error on not getting config file', sinon.test(function () {
     this.stub(console, 'log');
     this.stub(console, 'error');
+    
     
     const configMgr = new ConfigManager({
       confFile: 'non-existent.js'
@@ -26,7 +29,24 @@ describe('Config', function () {
     configMgr.getConfig();
   }));
 
-  it('Throw error on not getting config file', sinon.test(function (done) {
+  it('should throw generic error', sinon.test(function () {
+    this.stub(console, 'log');
+    this.stub(console, 'error');
+
+    const _require: NodeRequireFunction = (id: string) => {
+      throw 'error';
+    };
+    
+    const configMgr = new ConfigManager({}, _require);
+    
+    try {
+      configMgr.getConfig();
+    } catch (e) {
+      // do nothing
+    }
+  }));
+
+  it('should throw error on not getting config file', sinon.test(function (done) {
     this.stub(console, 'log');
     this.stub(console, 'error');
     
@@ -38,7 +58,7 @@ describe('Config', function () {
     configMgr.createConfig().then(done);
   }));
 
-  it('Initialize the example config file', sinon.test(function () {
+  it('should initialize the example config file', sinon.test(function () {
     this.stub(console, 'log');
     this.stub(console, 'error');
     

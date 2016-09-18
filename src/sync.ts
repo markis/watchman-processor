@@ -90,6 +90,7 @@ export default class SyncImpl implements Sync {
       cmdAndArgs = rsyncCmd + ' ' + args.join(' ');
 
     return new Promise<void>((resolve, reject) => {
+
       terminal.debug(cmdAndArgs);
       const child = spawn(shell, ['-c', cmdAndArgs]);
       child.stdout.on('data', (data: string) => terminal.debug(data));
