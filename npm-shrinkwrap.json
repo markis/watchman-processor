@@ -69,12 +69,12 @@
     },
     "inversify": {
       "version": "2.0.0",
-      "from": "inversify@>=2.0.0-beta.6 <3.0.0",
+      "from": "inversify@>=2.0.0 <3.0.0",
       "resolved": "https://registry.npmjs.org/inversify/-/inversify-2.0.0.tgz"
     },
     "node-emoji": {
       "version": "1.4.1",
-      "from": "node-emoji@>=1.3.0 <2.0.0",
+      "from": "node-emoji@>=1.4.1 <2.0.0",
       "resolved": "https://registry.npmjs.org/node-emoji/-/node-emoji-1.4.1.tgz",
       "dependencies": {
         "string.prototype.codepointat": {
@@ -86,7 +86,7 @@
     },
     "reflect-metadata": {
       "version": "0.1.8",
-      "from": "reflect-metadata@>=0.1.3 <0.2.0",
+      "from": "reflect-metadata@>=0.1.8 <0.2.0",
       "resolved": "https://registry.npmjs.org/reflect-metadata/-/reflect-metadata-0.1.8.tgz"
     }
   }
