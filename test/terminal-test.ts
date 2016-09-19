@@ -1,6 +1,6 @@
 import 'ts-helpers';
 import { Config } from '../src/config';
-import Terminal from '../src/terminal';
+import Terminal, { StdErrWriteImpl, StdOutWriteImpl } from '../src/terminal';
 import * as chai from 'chai';
 import * as sinon from 'sinon';
 
@@ -139,6 +139,11 @@ describe('Terminal', () => {
     startConfig.debug = true;
     terminal.start();
 
+  });
+
+  it('should execute the std*write methods', () => {
+    StdErrWriteImpl('');
+    StdOutWriteImpl('');
   });
 
 });

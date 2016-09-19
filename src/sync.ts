@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { injectable, inject } from 'inversify';
 import { Terminal } from './terminal';
 import { SubConfig, Config } from './config';
+import * as proc from 'child_process';
 
 export interface Sync {
   /**
@@ -19,7 +20,7 @@ export interface Sync {
 }
 
 export interface Spawn {
-  (cmd: string, args: string[]): any;
+  (cmd: string, args: string[]): proc.ChildProcess;
 }
 
 @injectable()
@@ -85,8 +86,8 @@ export default class SyncImpl implements Sync {
     const cmdAndArgs = rsyncCmd + ' ' + args.join(' ');
 
     return new Promise<void>((resolve, reject) => {
-
       terminal.debug(cmdAndArgs);
+
       const child = spawn(shell, ['-c', cmdAndArgs]);
       child.stdout.on('data', (data: string) => terminal.debug(data));
       child.stdout.on('end', resolve);

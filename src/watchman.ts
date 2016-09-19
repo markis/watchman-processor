@@ -4,7 +4,7 @@ import { Sync } from './sync';
 import { Terminal } from './terminal';
 import { Config, SubConfig, WatchmanExpression } from './config';
 
-export interface Watchman {
+export interface WatchmanSync {
   /**
    * Get this party started!  This is the start of everything.
    * This is what communicates directly with fb-watchman and then passes data to sync/terminal.
@@ -15,7 +15,7 @@ export interface Watchman {
 }
 
 @injectable()
-export default class WatchmanImpl implements Watchman {
+export default class WatchmanSyncImpl implements WatchmanSync {
   private config: Config;
   private client: WatchmanClient;
   private terminal: Terminal;

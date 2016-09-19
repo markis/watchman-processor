@@ -6,6 +6,12 @@ node_modules/
 *.log
 coverage/
 built/
+typings/
+
+rollup.config.json
+tsconfig.json
+tslint.json
+typings.json
 
 ### Vim template
 # swap

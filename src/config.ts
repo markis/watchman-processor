@@ -2,6 +2,8 @@ import 'reflect-metadata';
 import { injectable } from 'inversify';
 import * as fs from 'fs';
 
+import { Write } from './terminal';
+
 export interface ConfigManager {
   /**
    * Retrieve the Config data, it is dependent on the config file existing
@@ -138,10 +140,13 @@ export default class ConfigManagerImpl implements ConfigManager {
   private confFile: string;
   private exampleConfFile: string;
   private require: NodeRequireFunction;
+  private write: Write;
+  private cachedConfig: Config;
 
   constructor(
     options: ConfigManagerOptions = {},
-    customRequire: NodeRequireFunction = null
+    customRequire: NodeRequireFunction = null,
+    write: Write = null
   ) {
     const HOME_FOLDER = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
     const CONF_FILE = HOME_FOLDER + '/.watchman-processor.config.js';
@@ -150,11 +155,15 @@ export default class ConfigManagerImpl implements ConfigManager {
     this.require = customRequire || require;
     this.confFile = options.confFile || CONF_FILE;
     this.exampleConfFile = options.exampleConfFile || EXAMPLE_CONF_FILE;
+    this.write = write || noop;
   }
 
   public getConfig(): Config {
     try {
-      const config = this.require(this.confFile) as Config;
+      if (this.cachedConfig) {
+        return this.cachedConfig;
+      }
+      const config = this.cachedConfig = this.require(this.confFile) as Config;
       const subscriptions = Object.keys(config.subscriptions);
 
       // ensure ignoreFolders has a value
@@ -165,17 +174,12 @@ export default class ConfigManagerImpl implements ConfigManager {
       }
       return config;
     } catch (e) {
-      if (e && e.code === 'MODULE_NOT_FOUND') {
-        process.stderr.write('"' + this.confFile + '" does not exist. \n\n' +
-          'Run "watchman-processor init" to create an example configuration file.\n');
-        return null as Config;
-      } else {
-        throw e;
-      }
+      return null;
     }
   }
 
   public createConfig(): Promise<string> {
+    const self = this;
     const confFile = this.confFile;
     const exampleConfFile = this.exampleConfFile;
 
@@ -186,11 +190,15 @@ export default class ConfigManagerImpl implements ConfigManager {
       reader.on('error', reject);
       writer.on('error', reject);
       writer.on('close', function () {
-        process.stdout.write('Done.  "' + confFile + '" created.\n');
+        self.write('Done.  "' + confFile + '" created.\n');
         resolve();
       });
       reader.pipe(writer);
     });
 
   }
+}
+
+function noop() {
+  // do nothing
 }
