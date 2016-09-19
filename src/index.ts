@@ -48,7 +48,6 @@ function setupKernel(kernel: Kernel): Kernel {
 
 function getWatchmanSync(kernel: Kernel): WatchmanSync {
   return kernel.get<WatchmanSync>('WatchmanSync');
-
 }
 
 export default watchmanSync;

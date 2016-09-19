@@ -2,4 +2,6 @@
 
 process.title = 'watchman-processor';
 var watchman = require('../index');
-watchman.start();
+if (watchman && typeof watchman.start === 'function') {
+  watchman.start()
+}
