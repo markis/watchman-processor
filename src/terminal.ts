@@ -43,11 +43,15 @@ export interface Terminal {
   render(): void;
 }
 
+export interface Write {
+  (str: string): void;
+}
+
 @injectable()
 export default class TerminalImpl implements Terminal {
   private config: Config;
-  private errorFunc: (msg: string | Error) => void;
-  private writeFunc: (msg: string) => void;
+  private errorFunc: Write;
+  private writeFunc: Write;
   private chalk: any;
   private emoji: Emoji;
 
@@ -138,4 +142,22 @@ export default class TerminalImpl implements Terminal {
   // private _hideCursor() {
   //   this._write('\x1B[?25l'); // Hide terminal cursor
   // }
+}
+
+/**
+ * Wraps process.stderr.write, so that we can mock this method in tests
+ *
+ * @param {string} msg
+ */
+export function StdErrWriteImpl(msg: string) {
+  process.stderr.write(msg);
+}
+
+/**
+ * Wraps process.stdout.write, so that we mock this method in tests
+ *
+ * @param {string} msg
+ */
+export function StdOutWriteImpl(msg: string) {
+  process.stdout.write(msg);
 }

@@ -1,4 +1,6 @@
 index.js
+index.d.ts
+index.js.map
 *.log
 coverage
 built/
