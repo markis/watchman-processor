@@ -2,24 +2,30 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "es5",
+    "lib": [ "es6" ],
     "outDir": "built/",
     "declaration": true,
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "noImplicitAny": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "typeRoots": [
+      "node_modules/@types",
+      "types"
+    ],
+    "types": [
+      "chai",
+      "chalk",
+      "emojify",
+      "fb-watchman",
+      "mocha",
+      "node",
+      "sinon"
+    ]
   },
-  "files": [
-    "node_modules/typescript/lib/lib.es6.d.ts",
-    "node_modules/inversify/dts/inversify.d.ts",
-    "node_modules/reflect-metadata/reflect-metadata.d.ts",
-    "typings/index.d.ts",
-    "typings-custom/fb-watchman.d.ts",
-    "typings-custom/emojify.d.ts",
-    "src/index.ts",
-    "test/config-test.ts",
-    "test/sync-test.ts",
-    "test/terminal-test.ts",
-    "test/watchman-test.ts"
+  "exclude": [
+    "node_modules",
+    "built",
+    "index.d.ts"
   ]
 }

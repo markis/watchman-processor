@@ -25,6 +25,8 @@ module.exports = {
     'reflect-metadata': 'reflectMetadata'
   },
   plugins: [
-    typescript(),
+    typescript({
+      typescript: require('typescript')
+    }),
   ]
 };
