@@ -1,8 +1,8 @@
-index.js
-index.d.ts
-index.js.map
+/index.js
+/index.d.ts
+/index.js.map
 *.log
-coverage
+coverage/
 built/
 node_modules/
 typings/

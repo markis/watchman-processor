@@ -6,7 +6,7 @@ node_modules/
 *.log
 coverage/
 built/
-typings/
+types/
 
 rollup.config.json
 tsconfig.json

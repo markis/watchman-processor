@@ -11,7 +11,7 @@
     "sourceMap": true,
     "typeRoots": [
       "node_modules/@types",
-      "custom-types"
+      "types"
     ],
     "types": [
       "chai",
