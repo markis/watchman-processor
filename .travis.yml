@@ -15,4 +15,7 @@ install:
   - "npm install"
 
 script:
-  - "npm run coveralls"
+  - "npm test"
+
+after_success:
+  - "cat ./coverage/lcov.info | coveralls"
