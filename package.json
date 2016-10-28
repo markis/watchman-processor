@@ -30,7 +30,6 @@
     "@types/reflect-metadata": "0.0.5",
     "@types/sinon": "^1.16.31",
     "chai": "^3.5.0",
-    "coveralls": "^2.11.14",
     "istanbul": "^0.4.5",
     "mocha": "^3.1.2",
     "mocha-lcov-reporter": "^1.2.0",
