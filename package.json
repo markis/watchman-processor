@@ -23,10 +23,10 @@
   },
   "devDependencies": {
     "@types/chai": "^3.4.34",
-    "@types/chalk": "^0.4.30",
+    "@types/chalk": "^0.4.31",
     "@types/inversify": "^2.0.31",
     "@types/mocha": "^2.2.32",
-    "@types/node": "^6.0.45",
+    "@types/node": "^6.0.46",
     "@types/reflect-metadata": "0.0.5",
     "@types/sinon": "^1.16.31",
     "chai": "^3.5.0",
@@ -38,22 +38,20 @@
     "rollup": "^0.36.3",
     "rollup-plugin-typescript": "^0.8.1",
     "sinon": "^1.17.6",
-    "ts-helpers": "^1.1.1",
+    "ts-helpers": "^1.1.2",
     "tslint": "^3.15.1",
-    "typescript": "^2.0.3"
+    "typescript": "^2.0.6"
   },
   "scripts": {
     "compile": "tsc --noEmitHelpers --module amd --out index.js && tsc --noEmitHelpers && rollup -c",
-    "coveralls": "npm run compile && npm run coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "coverage": "npm run compile && istanbul cover _mocha built/test/**/*-test.js",
     "lint": "tslint -c tslint.json src/*.ts test/*.ts",
-    "mocha": "npm run compile && mocha test/_setup.js built/test/**/*-test.js",
-    "test": "npm run coverage"
+    "test": "npm run lint && npm run coverage"
   },
   "pre-commit": [
     "lint",
     "coverage"
   ],
-  "repository": "https://github.com/markistaylor/watchman-processor.git",
+  "repository": "https://github.com/markis/watchman-processor.git",
   "license": "MIT"
 }
