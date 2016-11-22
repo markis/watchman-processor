@@ -1,8 +1,10 @@
 import 'ts-helpers';
-import { Config } from '../src/config';
-import Terminal, { StdErrWriteImpl, StdOutWriteImpl } from '../src/terminal';
+
 import * as chai from 'chai';
 import * as sinon from 'sinon';
+
+import { Config } from '../src/config';
+import Terminal, { StdErrWriteImpl, StdOutWriteImpl } from '../src/terminal';
 
 function noop() {
   // do nothing
@@ -63,7 +65,7 @@ describe('Terminal', () => {
     };
   });
 
-  it('Expect terminal.error to execute stdErrWrite', function () {
+  it('Expect terminal.error to execute stdErrWrite', () => {
     // Setup
     const terminal = new Terminal(config, noop, stdErrWrite, mockChalk, null);
 
@@ -73,7 +75,7 @@ describe('Terminal', () => {
     chai.assert(stdErrWrite.called);
   });
 
-  it('Expect terminal.debug to execute stdOutWrite', function () {
+  it('Expect terminal.debug to execute stdOutWrite', () => {
     // Setup
     const terminal = new Terminal({ debug: true }, stdOutWrite, noop, mockChalk, null);
 
@@ -83,7 +85,7 @@ describe('Terminal', () => {
     chai.assert(stdOutWrite.called);
   });
 
-  it('Expect terminal.render to render', function () {
+  it('Expect terminal.render to render', () => {
     // Setup
     const terminal = new Terminal(config, stdOutWrite, noop, mockChalk, mockEmoji);
 

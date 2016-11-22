@@ -1,8 +1,10 @@
 import 'reflect-metadata';
-import { injectable, inject } from 'inversify';
-import { Terminal } from './terminal';
-import { SubConfig, Config } from './config';
+
 import * as proc from 'child_process';
+import { inject, injectable } from 'inversify';
+
+import { Config, SubConfig } from './config';
+import { Terminal } from './terminal';
 
 export interface Sync {
   /**
@@ -34,7 +36,7 @@ export default class SyncImpl implements Sync {
   constructor(
     @inject('Config') config: Config,
     @inject('Terminal') terminal: Terminal,
-    @inject('spawn') spawn: Spawn
+    @inject('spawn') spawn: Spawn,
   ) {
     this.terminal = terminal;
     this.rsyncCmd = config && config.rsyncCmd || 'rsync';
@@ -129,7 +131,7 @@ function unique(arr: string[]): string[] {
  *
  */
 if (!Array.prototype.findIndex) {
-  Array.prototype.findIndex = function(predicate: (value: string) => boolean) {
+  Array.prototype.findIndex = (predicate: (value: string) => boolean) => {
     'use strict';
     const list = Object(this);
     const length = list.length;
@@ -146,7 +148,7 @@ if (!Array.prototype.findIndex) {
 }
 
 if (!String.prototype.startsWith) {
-    String.prototype.startsWith = function(searchString: string, position?: number){
+    String.prototype.startsWith = (searchString: string, position?: number) => {
       position = position || 0;
       return this.substr(position, searchString.length) === searchString;
   };

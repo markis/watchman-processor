@@ -1,8 +1,10 @@
 import 'ts-helpers';
+
 import { Config } from '../src/config';
-import Terminal from '../src/terminal';
 import Sync from '../src/sync';
+import Terminal from '../src/terminal';
 import Watchman from '../src/watchman';
+
 import * as chai from 'chai';
 import * as sinon from 'sinon';
 
@@ -30,9 +32,9 @@ const config: Config = {
   },
 };
 
-describe('Watchman', function () {
+describe('Watchman', () => {
 
-  beforeEach(function() {
+  beforeEach(() => {
     // mock all the defaults before
     terminal.start = sinon.stub();
     terminal.render = sinon.stub();
@@ -46,14 +48,14 @@ describe('Watchman', function () {
     mockWatchmanClient.command = sinon.stub().callsArg(1);
   });
 
-  it('should start watchman', function () {
+  it('should start watchman', () => {
     const watchman = new Watchman(config, watchmanClient, terminal, sync);
     watchman.start();
 
     chai.assert.isObject(watchman, 'watchman is an object');
   });
 
-  it('should log errors from watchman.capabilityCheck', function () {
+  it('should log errors from watchman.capabilityCheck', () => {
     mockWatchmanClient.capabilityCheck.callsArgWith(1, 'error');
 
     const watchman = new Watchman(config, watchmanClient, terminal, sync);
@@ -62,7 +64,7 @@ describe('Watchman', function () {
     chai.assert.isObject(watchman, 'watchman is an object');
   });
 
-  it('should log errors from watchman.command', function () {
+  it('should log errors from watchman.command', () => {
     mockWatchmanClient.command.callsArgWith(1, 'error');
 
     const watchman = new Watchman(config, watchmanClient, terminal, sync);
@@ -71,7 +73,7 @@ describe('Watchman', function () {
     chai.assert.isObject(watchman, 'watchman is an object');
   });
 
-  it('should log errors from sync.syncFiles', function () {
+  it('should log errors from sync.syncFiles', () => {
     mockSync.syncFiles.returns(new Promise(() => { throw 'error'; }));
 
     const watchman = new Watchman(config, watchmanClient, terminal, sync);
@@ -80,7 +82,7 @@ describe('Watchman', function () {
     chai.assert.isObject(watchman, 'watchman is an object');
   });
 
-  it('should attempt to sync files', function () {
+  it('should attempt to sync files', () => {
     const watchman = new Watchman(config, watchmanClient, terminal, sync);
     watchman.start();
 

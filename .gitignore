@@ -2,6 +2,7 @@
 /index.d.ts
 /index.js.map
 *.log
+.vscode/
 coverage/
 built/
 node_modules/

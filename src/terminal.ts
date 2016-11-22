@@ -1,5 +1,7 @@
 import 'reflect-metadata';
-import { injectable, inject } from 'inversify';
+
+import { inject, injectable } from 'inversify';
+
 import { Config, SubConfig } from './config';
 
 export interface Terminal {
@@ -60,7 +62,7 @@ export default class TerminalImpl implements Terminal {
     @inject('stdOutWrite') stdOutWrite: (msg: string) => void,
     @inject('stdErrWrite') stdErrWrite: (msg: string) => void,
     @inject('Chalk') chalk: any,
-    @inject('Emoji') emoji: Emoji
+    @inject('Emoji') emoji: Emoji,
   ) {
     this.config = config as Config;
     this.errorFunc = stdErrWrite;
@@ -98,10 +100,9 @@ export default class TerminalImpl implements Terminal {
     const chalk = this.chalk;
     const subscriptions = Object.keys(this.config.subscriptions);
 
-    for (let i = 0, name: string, subscription: SubConfig, state: string; i < subscriptions.length; i++) {
-      name = subscriptions[i];
-      subscription = this.config.subscriptions[name];
-      state = subscription.state;
+    for (let name of subscriptions) {
+      let subscription = this.config.subscriptions[name];
+      let state = subscription.state;
 
       if (state === 'good') {
         this._log(':thumbsup:  ' + name + ' ', chalk.bgGreen);

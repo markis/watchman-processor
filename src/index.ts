@@ -1,14 +1,15 @@
 import 'reflect-metadata';
+
 import { Kernel } from 'inversify';
 
 import * as chalk from 'chalk';
-import * as emoji from 'node-emoji';
-import * as watchman from 'fb-watchman';
 import * as proc from 'child_process';
+import * as watchman from 'fb-watchman';
+import * as emoji from 'node-emoji';
 
 import ConfigManager, { Config } from './config';
-import TerminalImpl, { Terminal, Write, StdErrWriteImpl, StdOutWriteImpl } from './terminal';
-import SyncImpl, { Sync, Spawn } from './sync';
+import SyncImpl, { Spawn, Sync } from './sync';
+import TerminalImpl, { StdErrWriteImpl, StdOutWriteImpl, Terminal, Write } from './terminal';
 import WatchmanSyncImpl, { WatchmanSync } from './watchman';
 
 const configManager = new ConfigManager({}, require, StdOutWriteImpl);
