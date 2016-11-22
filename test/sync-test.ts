@@ -1,9 +1,11 @@
 import 'ts-helpers';
-import { Config } from '../src/config';
-import Terminal from '../src/terminal';
-import Sync from '../src/sync';
+
 import * as chai from 'chai';
 import * as sinon from 'sinon';
+
+import { Config } from '../src/config';
+import Sync from '../src/sync';
+import Terminal from '../src/terminal';
 
 function noop() {
   // do nothing
@@ -21,9 +23,9 @@ const config: Config = {
 };
 const example1 = config.subscriptions.example1;
 
-describe('Sync', function () {
+describe('Sync', () => {
 
-  it('should sync to rsync specific files', sinon.test(function () {
+  it('should sync to rsync specific files', sinon.test(() => {
 
     // Setup
     const shortList = [
@@ -39,7 +41,7 @@ describe('Sync', function () {
     chai.assert(spawn.called);
   }));
 
-  it('should sync to rsync all files when too many files are sent', function () {
+  it('should sync to rsync all files when too many files are sent', () => {
 
     // Setup
     const longList = new Array(1000);
@@ -55,7 +57,7 @@ describe('Sync', function () {
     chai.assert(spawn.called);
   });
 
-  it('should sync to rsync all files when no files are sent', function () {
+  it('should sync to rsync all files when no files are sent', () => {
 
     // Setup
     const spawn = sinon.stub();
@@ -67,7 +69,7 @@ describe('Sync', function () {
     chai.assert(spawn.called);
   });
 
-  it('should sync to rsync ignore specific files', sinon.test(function () {
+  it('should sync to rsync ignore specific files', sinon.test(() => {
 
     // Setup
     const shortList = [

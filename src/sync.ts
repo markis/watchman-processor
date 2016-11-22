@@ -1,8 +1,10 @@
 import 'reflect-metadata';
-import { injectable, inject } from 'inversify';
-import { Terminal } from './terminal';
-import { SubConfig, Config } from './config';
+
 import * as proc from 'child_process';
+import { inject, injectable } from 'inversify';
+
+import { Config, SubConfig } from './config';
+import { Terminal } from './terminal';
 
 export interface Sync {
   /**
@@ -34,7 +36,7 @@ export default class SyncImpl implements Sync {
   constructor(
     @inject('Config') config: Config,
     @inject('Terminal') terminal: Terminal,
-    @inject('spawn') spawn: Spawn
+    @inject('spawn') spawn: Spawn,
   ) {
     this.terminal = terminal;
     this.rsyncCmd = config && config.rsyncCmd || 'rsync';
@@ -46,9 +48,11 @@ export default class SyncImpl implements Sync {
   public syncFiles(subConfig: SubConfig, fbFiles?: SubscriptionResponseFile[]): Promise<void> {
     const ignoreFolders = subConfig.ignoreFolders;
     const filesNames: string[] = (fbFiles || []).map(file => file.name);
-    const files = filesNames.filter(file => ignoreFolders.findIndex(folder => file.startsWith(folder)) === -1);
 
-    // if there are too many files, it might just be better to let rsync figure out what
+    // remove files that are in the ignore folders
+    const files = filesNames.filter(file => exists(ignoreFolders, folder => startsWith(file, folder)));
+
+    // if ther are too many files, it might just be better to let rsync figure out what
     // needs to be synced
     if (files.length > 0 && files.length < this.maxFileLength) {
       return this._syncSpecificFiles(subConfig, files);
@@ -123,31 +127,15 @@ function unique(arr: string[]): string[] {
   });
 }
 
-/*
- *
- *  Polyfills for basic javascript functionality that doesn't exist in 0.12
- *
- */
-if (!Array.prototype.findIndex) {
-  Array.prototype.findIndex = function(predicate: (value: string) => boolean) {
-    'use strict';
-    const list = Object(this);
-    const length = list.length;
-
-    let value: any;
-    for (let i = 0; i < length; i++) {
-      value = list[i];
-      if (predicate(value)) {
-        return i;
-      }
+function exists(values: string[], predicate: (value: string) => boolean): boolean {
+  for (let value of values) {
+    if (predicate(value)) {
+      return true;
     }
-    return -1;
-  };
+  }
+  return false;
 }
 
-if (!String.prototype.startsWith) {
-    String.prototype.startsWith = function(searchString: string, position?: number){
-      position = position || 0;
-      return this.substr(position, searchString.length) === searchString;
-  };
+function startsWith(value: string, search: string): boolean {
+  return value.substr(0, search.length) === search;
 }

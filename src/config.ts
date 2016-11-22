@@ -1,6 +1,7 @@
 import 'reflect-metadata';
-import { injectable } from 'inversify';
+
 import * as fs from 'fs';
+import { injectable } from 'inversify';
 
 import { Write } from './terminal';
 
@@ -96,7 +97,7 @@ export interface SubConfig {
    * This will be combined with ignore folders, but this can allow for more granular
    * watch expressions with fb-watchman @see https://facebook.github.io/watchman/
    *
-   * @type {(string | string[] | (string | string[])[])[]}
+   * @type {WatchmanExpression}
    * @memberOf SubConfig
    */
   watchExpression?: WatchmanExpression;
@@ -133,7 +134,7 @@ export interface ConfigManagerOptions {
   exampleConfFile?: string;
 }
 
-export type WatchmanExpression = (string | string[] | (string | string[])[])[];
+export type WatchmanExpression = Array<Array<(string | string[] | (string | string[]))>>;
 
 @injectable()
 export default class ConfigManagerImpl implements ConfigManager {
@@ -146,7 +147,7 @@ export default class ConfigManagerImpl implements ConfigManager {
   constructor(
     options: ConfigManagerOptions = {},
     customRequire: NodeRequireFunction = null,
-    write: Write = null
+    write: Write = null,
   ) {
     const HOME_FOLDER = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
     const CONF_FILE = HOME_FOLDER + '/.watchman-processor.config.js';
@@ -167,9 +168,8 @@ export default class ConfigManagerImpl implements ConfigManager {
       const subscriptions = Object.keys(config.subscriptions);
 
       // ensure ignoreFolders has a value
-      for (let i = 0, name: string, subscription: SubConfig; i < subscriptions.length; i++) {
-        name = subscriptions[i];
-        subscription = config.subscriptions[name];
+      for (let name of subscriptions) {
+        let subscription = config.subscriptions[name];
         subscription.ignoreFolders = subscription.ignoreFolders || [];
       }
       return config;
@@ -189,7 +189,7 @@ export default class ConfigManagerImpl implements ConfigManager {
 
       reader.on('error', reject);
       writer.on('error', reject);
-      writer.on('close', function () {
+      writer.on('close', () => {
         self.write('Done.  "' + confFile + '" created.\n');
         resolve();
       });

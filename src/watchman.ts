@@ -1,8 +1,10 @@
 import 'reflect-metadata';
-import { injectable, inject } from 'inversify';
+
+import { inject, injectable } from 'inversify';
+
+import { Config, SubConfig, WatchmanExpression } from './config';
 import { Sync } from './sync';
 import { Terminal } from './terminal';
-import { Config, SubConfig, WatchmanExpression } from './config';
 
 export interface WatchmanSync {
   /**
@@ -25,7 +27,7 @@ export default class WatchmanSyncImpl implements WatchmanSync {
     @inject('Config') config: Config,
     @inject('WatchmanClient') watchmanClient: WatchmanClient,
     @inject('Terminal') terminal: Terminal,
-    @inject('Sync') sync: Sync
+    @inject('Sync') sync: Sync,
   ) {
     this.config = config;
     this.client = watchmanClient;
@@ -54,17 +56,17 @@ export default class WatchmanSyncImpl implements WatchmanSync {
 
     const client = this.client;
     const onSubscription = this.onSubscription.bind(this);
-    const promises: Promise<string | void>[] = [];
+    const promises: Array<Promise<string | void>> = [];
     const subscriptions = Object.keys(this.config.subscriptions);
     const length = subscriptions.length;
-    for (let i = 0, name: string, sub: SubConfig, ignore: string[], expression: WatchmanExpression; i < length; i++) {
-      name = subscriptions[i];
-      sub = this.config.subscriptions[name];
-      ignore = sub.ignoreFolders;
-      expression = sub.watchExpression || ['allof', ['type', 'f']];
 
-      for (let j = 0; j < ignore.length; j++) {
-        expression.push(['not', ['dirname', ignore[j]]]);
+    for (let name of subscriptions) {
+      let sub = this.config.subscriptions[name];
+      let ignores = sub.ignoreFolders;
+      let expression = sub.watchExpression || ['allof', ['type', 'f']];
+
+      for (let ignore of ignores) {
+        expression.push(['not', ['dirname', ignore]]);
       }
 
       promises.push(this.subscribe(sub.source, name, expression));
@@ -100,13 +102,13 @@ export default class WatchmanSyncImpl implements WatchmanSync {
     const terminal = this.terminal;
     const client = this.client;
     const sub = {
-      expression: expression,
+      expression,
       fields: ['name', 'exists'],
       relative_root: '',
     };
 
     terminal.debug(`starting: ${name} expression: ${JSON.stringify(expression)}`);
-    return new Promise<string | void>(function (resolve, reject) {
+    return new Promise<string | void>((resolve, reject) => {
       client.command(['subscribe', folder, name, sub],
         (error: string) => {
           if (error) {

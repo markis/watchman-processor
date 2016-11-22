@@ -2,6 +2,7 @@
   "extends": "tslint:recommended",
   "rules": {
     "interface-name": [true, "never-prefix"],
-    "quotemark": [true, "single", "avoid-escape"]
+    "quotemark": [true, "single", "avoid-escape"],
+    "arrow-parens": false
   }
 }

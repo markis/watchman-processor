@@ -1,18 +1,20 @@
 import 'ts-helpers';
-import ConfigManager from '../src/config';
-import * as path from 'path';
+
 import * as chai from 'chai';
+import * as path from 'path';
 import * as sinon from 'sinon';
 
-describe('Config', function () {
+import ConfigManager from '../src/config';
 
-  it('should construct the config without options', sinon.test(function () {
+describe('Config', () => {
+
+  it('should construct the config without options', sinon.test(() => {
     const configMgr = new ConfigManager();
 
     chai.assert.isObject(configMgr, 'configMgr is an object');
   }));
 
-  it('should throw error on not getting config file', sinon.test(function () {
+  it('should throw error on not getting config file', sinon.test(() => {
     const configMgr = new ConfigManager({
       confFile: 'non-existent.js',
     });
@@ -20,7 +22,7 @@ describe('Config', function () {
     configMgr.getConfig();
   }));
 
-  it('should throw generic error', sinon.test(function () {
+  it('should throw generic error', sinon.test(() => {
     const customRequire: NodeRequireFunction = (id: string) => {
       throw 'error';
     };
@@ -34,7 +36,7 @@ describe('Config', function () {
     }
   }));
 
-  it('should throw error on not getting config file', sinon.test(function (done) {
+  it('should throw error on not getting config file', sinon.test((done) => {
     const configMgr = new ConfigManager({
       confFile: path.resolve(__dirname + '/example-watchman-processor.config.js.tmp'),
       exampleConfFile: path.resolve(__dirname + '../../../example/watchman-processor.config.js'),
@@ -43,7 +45,7 @@ describe('Config', function () {
     configMgr.createConfig().then(done);
   }));
 
-  it('should initialize the example config file', sinon.test(function () {
+  it('should initialize the example config file', sinon.test(() => {
     const configMgr = new ConfigManager({
       confFile: path.resolve(__dirname + '../../../example/watchman-processor.config.js'),
       exampleConfFile: path.resolve(__dirname + '../../../example/watchman-processor.config.js'),
@@ -54,7 +56,7 @@ describe('Config', function () {
     chai.assert.isObject(configMgr, 'configMgr is an object');
   }));
 
-  it('second getConfig calls will get a cached version', sinon.test(function () {
+  it('second getConfig calls will get a cached version', sinon.test(() => {
     const configMgr = new ConfigManager({
       confFile: path.resolve(__dirname + '../../../example/watchman-processor.config.js'),
       exampleConfFile: path.resolve(__dirname + '../../../example/watchman-processor.config.js'),
