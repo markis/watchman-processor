@@ -44,7 +44,7 @@ describe('Watchman', () => {
 
     mockSync.syncFiles = sinon.stub().returns(new Promise(resolve => resolve()));
     mockWatchmanClient.capabilityCheck = sinon.stub().callsArg(1);
-    mockWatchmanClient.on = sinon.stub().callsArgWith(1, {files: [], subscription: 'example1'});
+    mockWatchmanClient.on = sinon.stub().callsArgWith(1, {files: [{name: 'example.js'}], subscription: 'example1'});
     mockWatchmanClient.command = sinon.stub().callsArg(1);
   });
 
@@ -83,6 +83,7 @@ describe('Watchman', () => {
   });
 
   it('should attempt to sync files', () => {
+    mockWatchmanClient.on = sinon.stub().callsArgWith(1, {subscription: 'example1'});
     const watchman = new Watchman(config, watchmanClient, terminal, sync);
     watchman.start();
 

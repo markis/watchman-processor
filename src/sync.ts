@@ -18,7 +18,7 @@ export interface Sync {
    *
    * @memberOf Sync
    */
-  syncFiles(subConfig: SubConfig, files: SubscriptionResponseFile[]): Promise<void>;
+  syncFiles(subConfig: SubConfig, files: string[]): Promise<void>;
 }
 
 export interface Spawn {
@@ -45,14 +45,13 @@ export default class SyncImpl implements Sync {
     this.shell = '/bin/sh';
   }
 
-  public syncFiles(subConfig: SubConfig, fbFiles?: SubscriptionResponseFile[]): Promise<void> {
+  public syncFiles(subConfig: SubConfig, filesNames?: string[]): Promise<void> {
     const ignoreFolders = subConfig.ignoreFolders;
-    const filesNames: string[] = (fbFiles || []).map(file => file.name);
 
     // remove files that are in the ignore folders
-    const files = filesNames.filter(file => exists(ignoreFolders, folder => startsWith(file, folder)));
+    const files = (filesNames || []).filter(file => !exists(ignoreFolders, file));
 
-    // if ther are too many files, it might just be better to let rsync figure out what
+    // if there are too many files, it might just be better to let rsync figure out what
     // needs to be synced
     if (files.length > 0 && files.length < this.maxFileLength) {
       return this._syncSpecificFiles(subConfig, files);
@@ -72,7 +71,7 @@ export default class SyncImpl implements Sync {
   }
 
   private _syncSpecificFiles(subConfig: SubConfig, files: string[]): Promise<void> {
-    files =  getUniqueFileFolders(files).concat(files);
+    files = getUniqueFileFolders(files).concat(files);
 
     const src = subConfig.source;
     const dest = subConfig.destination;
@@ -101,41 +100,59 @@ export default class SyncImpl implements Sync {
   }
 }
 
-function getUniqueFileFolders(files: string[]) {
+/**
+ * Given a list of files, return a list of folders leading up to those file names.
+ *  Example:
+ *    Given: ['example/js/1.js', 'example/js/2/.js']
+ *    Will Return: ['example/', 'example/js/', 'example/js/1.js', 'example/js/2/.js']
+ *
+ * @param {string[]} files
+ * @returns {string[]}
+ */
+function getUniqueFileFolders(files: string[]): string[] {
   const folders: string[] = [];
-  const length: number = files.length;
+  const seen: Map<string, void> = new Map();
 
-  for (let i = 0, folderParts: string[], folderPartsSum: string, file: string; i < length; i++) {
-    file = files[i];
-    folderParts = file.split('/');
-    folderPartsSum = '';
-    for (let j = 0; j < folderParts.length - 1; j++) {
+  for (let file of files) {
+    let folderParts = file.split('/');
+    let folderPartsSum = '';
+    for (let folderPart of folderParts) {
       if (folderPartsSum.length > 0) {
         folderPartsSum += '/';
       }
-      folderPartsSum += folderParts[j];
-      folders.push(folderPartsSum);
+      folderPartsSum += folderPart;
+      if (!seen.has(folderPartsSum)) {
+        seen.set(folderPartsSum);
+        folders.push(folderPartsSum);
+      }
     }
   }
-  return unique(folders);
+  return folders;
 }
 
-function unique(arr: string[]): string[] {
-  const seen: Map<string, boolean> = new Map();
-  return arr.filter((item: string) => {
-    return seen.has(item) ? false : !!seen.set(item, true);
-  });
-}
-
-function exists(values: string[], predicate: (value: string) => boolean): boolean {
+/*
+ * Return whether a value starts with a searchString in the given values array
+ *
+ * @param {string[]} values
+ * @param {string} searchString
+ * @returns {boolean}
+ */
+function exists(values: string[], stringToSearch: string): boolean {
   for (let value of values) {
-    if (predicate(value)) {
+    if (startsWith(stringToSearch, value)) {
       return true;
     }
   }
   return false;
 }
 
-function startsWith(value: string, search: string): boolean {
-  return value.substr(0, search.length) === search;
+/**
+ * Return whether a string starts with another string
+ *
+ * @param {string} value
+ * @param {string} search
+ * @returns {boolean}
+ */
+function startsWith(value: string, searchString: string): boolean {
+  return value.substr(0, searchString.length) === searchString;
 }
