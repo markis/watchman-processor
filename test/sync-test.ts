@@ -29,8 +29,8 @@ describe('Sync', () => {
 
     // Setup
     const shortList = [
-      {name: 'example1/js/1.js'},
-      {name: 'example1/js/2.js'},
+      'example1/js/1.js',
+      'example1/js/2.js',
     ];
     const spawn = sinon.stub().returns({on: sinon.stub(), stdout: {on: sinon.stub().callsArg(1)}});
     const sync = new Sync(config, terminal, spawn);
@@ -46,7 +46,7 @@ describe('Sync', () => {
     // Setup
     const longList = new Array(1000);
     for (let i = 0, length = longList.length; i < length; i++) {
-      longList[i] = { name: 'example1/' + i + '.js' };
+      longList[i] = 'example1/' + i + '.js' ;
     }
     const spawn = sinon.stub();
     const sync = new Sync(config, terminal, spawn);
@@ -73,8 +73,8 @@ describe('Sync', () => {
 
     // Setup
     const shortList = [
-      {name: 'example1/js/1.js'},
-      {name: '.git/js/2.js'},
+      'example1/js/1.js',
+      '.git/js/2.js',
     ];
     const spawn = sinon.stub().returns({on: sinon.stub(), stdout: {on: sinon.stub()}});
     const sync = new Sync(config, terminal, spawn);

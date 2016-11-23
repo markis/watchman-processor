@@ -7,6 +7,9 @@ import * as sinon from 'sinon';
 import ConfigManager from '../src/config';
 
 describe('Config', () => {
+  function noop() {
+    // do nothing
+  }
 
   it('should construct the config without options', sinon.test(() => {
     const configMgr = new ConfigManager();
@@ -64,6 +67,20 @@ describe('Config', () => {
 
     configMgr.getConfig();
     configMgr.getConfig();
+
+    chai.assert.isObject(configMgr, 'configMgr is an object');
+  }));
+
+  it('should construct on a windows machine', sinon.test(() => {
+    Object.defineProperty(process, 'platform', { value: 'win32' });
+    const configMgr = new ConfigManager(undefined, undefined, noop);
+
+    chai.assert.isObject(configMgr, 'configMgr is an object');
+  }));
+
+  it('should construct on a non-windows machine', sinon.test(() => {
+    Object.defineProperty(process, 'platform', { value: 'fakeOS' });
+    const configMgr = new ConfigManager(undefined, undefined, noop);
 
     chai.assert.isObject(configMgr, 'configMgr is an object');
   }));

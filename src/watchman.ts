@@ -77,10 +77,12 @@ export default class WatchmanSyncImpl implements WatchmanSync {
     client.on('subscription', onSubscription);
   }
 
-  private syncFiles(subConfig: any, files: SubscriptionResponseFile[]) {
+  private syncFiles(subConfig: SubConfig, files: SubscriptionResponseFile[]) {
     const terminal = this.terminal;
     terminal.setState(subConfig, 'running');
-    this.sync.syncFiles(subConfig, files)
+
+    const fileNames = (files || []).map(file => file.name);
+    this.sync.syncFiles(subConfig, fileNames)
       .then(() => {
         terminal.setState(subConfig, 'good');
       })

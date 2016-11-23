@@ -147,7 +147,7 @@ export default class ConfigManagerImpl implements ConfigManager {
   constructor(
     options: ConfigManagerOptions = {},
     customRequire: NodeRequireFunction = null,
-    write: Write = null,
+    write: Write = noop,
   ) {
     const HOME_FOLDER = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
     const CONF_FILE = HOME_FOLDER + '/.watchman-processor.config.js';
@@ -156,7 +156,7 @@ export default class ConfigManagerImpl implements ConfigManager {
     this.require = customRequire || require;
     this.confFile = options.confFile || CONF_FILE;
     this.exampleConfFile = options.exampleConfFile || EXAMPLE_CONF_FILE;
-    this.write = write || noop;
+    this.write = write;
   }
 
   public getConfig(): Config {
