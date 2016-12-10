@@ -1,21 +1,23 @@
 language: node_js
 
 node_js:
-  - "0.12"
+  - "4"
 
 cache:
   directories:
+    - $HOME/.npm
+    - $HOME/.yarn-cache
     - node_modules
 
 before_install:
-  - "npm config set spin false"
+  - "npm i -g yarn"
   - "npm --version"
 
 install:
-  - "npm install"
+  - "yarn install --no-progress"
 
 script:
-  - "npm test"
+  - "yarn test"
 
 after_success:
   - "cat ./coverage/lcov.info | coveralls"
