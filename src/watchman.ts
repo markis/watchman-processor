@@ -55,7 +55,7 @@ export default class WatchmanSyncImpl implements WatchmanSync {
   public end(): Promise<void> {
     const { client, config, terminal } = this;
     const subscriptions = config.subscriptions;
-    const promises = [];
+    const promises: Array<Promise<string | void>> = [];
     for (let name of Object.keys(subscriptions)) {
       const sub = subscriptions[name];
       promises.push(this.unsubscribe(sub.source, name));
