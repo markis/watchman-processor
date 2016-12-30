@@ -82,7 +82,7 @@ export default class TerminalImpl implements Terminal {
 
   public debug(msg: string) {
     if (this.config.debug && msg) {
-      this.writeFunc(msg);
+      this.writeFunc(msg + '\n');
     }
   }
 

@@ -14,6 +14,12 @@ export interface WatchmanSync {
    * @memberOf Watchman
    */
   start(): void;
+  /**
+   * All done!  Time to clean up.
+   *
+   * @memberOf Watchman
+   */
+  end(): Promise<void>;
 }
 
 @injectable()
@@ -44,6 +50,23 @@ export default class WatchmanSyncImpl implements WatchmanSync {
 
     this.terminal.start();
     this.client.capabilityCheck(capabilities, onCapabilityCheck);
+  }
+
+  public end(): Promise<void> {
+    const { client, config, terminal } = this;
+    const subscriptions = config.subscriptions;
+    const promises = [];
+    for (let name of Object.keys(subscriptions)) {
+      const sub = subscriptions[name];
+      promises.push(this.unsubscribe(sub.source, name));
+    }
+    return Promise.all(promises)
+      .then(() => {
+        if (config.controlWatchman) {
+          this.shutdown();
+        }
+        client.end();
+      });
   }
 
   private onCapabilityCheck(error?: string | Error): void {
@@ -109,15 +132,35 @@ export default class WatchmanSyncImpl implements WatchmanSync {
       relative_root: '',
     };
 
-    terminal.debug(`starting: ${name} expression: ${JSON.stringify(expression)}`);
+    terminal.debug(`starting: ${name}`);
     return new Promise<string | void>((resolve, reject) => {
       client.command(['subscribe', folder, name, sub],
         (error: string) => {
           if (error) {
-            reject('failed to subscribe: ' + error);
+            reject('failed to start: ' + error);
           }
           resolve();
         });
+    });
+  }
+
+  private unsubscribe(folder: string, name: string): Promise<string | void> {
+    const terminal = this.terminal;
+    const client = this.client;
+
+    terminal.debug(`stopping: ${name}`);
+    return new Promise<string | void>(resolve => {
+      client.command(['unsubscribe', folder, name], resolve);
+    });
+  }
+
+  private shutdown(): Promise<string | void> {
+    const terminal = this.terminal;
+    const client = this.client;
+
+    terminal.debug(`completely shutting down`);
+    return new Promise<string | void>((resolve, reject) => {
+      client.command(['shutdown-server'], resolve);
     });
   }
 }
