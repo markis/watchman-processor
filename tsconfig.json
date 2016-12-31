@@ -5,22 +5,14 @@
     "lib": [ "es6" ],
     "outDir": "built/",
     "declaration": true,
-    "moduleResolution": "node",
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": false,
+    "forceConsistentCasingInFileNames": true,
     "noImplicitAny": true,
     "sourceMap": true,
     "typeRoots": [
       "node_modules/@types",
       "types"
-    ],
-    "types": [
-      "chai",
-      "chalk",
-      "emojify",
-      "fb-watchman",
-      "mocha",
-      "node",
-      "sinon"
     ]
   },
   "exclude": [
