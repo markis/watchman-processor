@@ -99,7 +99,7 @@ describe('Watchman', () => {
 
   it('should end and shutdown', () => {
     mockWatchmanClient.end = sinon.stub();
-    const newConfig = { controlWatchman: true };
+    const newConfig = { controlWatchman: true, subscriptions: {} };
     const watchman = new Watchman(newConfig, watchmanClient, terminal, sync);
     watchman.end();
   });
