@@ -9,6 +9,7 @@ var WATCH_EXPRESSION = ['allof', ['type', 'f'],
 module.exports = {
   debug: false,           // changes the output to show debug information, cmd and stdout output
   emoji: true,            // if your terminal window can support emojis
+  controlWatchman: true,  // this will tell watchman-processor to shutdown watchman when quitting
   rsyncCmd: 'rsync',      // default: 'rsync' -- override to whatever rsync command is installed or located
   subscriptions: {
     example1: {
