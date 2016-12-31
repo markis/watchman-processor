@@ -17,6 +17,7 @@ const sync: Sync = mockSync as any;
 const mockWatchmanClient = {
   capabilityCheck: sinon.stub(),
   command: sinon.stub(),
+  end: sinon.stub(),
   on: sinon.stub(),
   syncFiles: sinon.stub(),
 };
@@ -88,6 +89,19 @@ describe('Watchman', () => {
     watchman.start();
 
     chai.assert.isObject(watchman, 'watchman is an object');
+  });
+
+  it('should end', () => {
+    mockWatchmanClient.end = sinon.stub();
+    const watchman = new Watchman(config, watchmanClient, terminal, sync);
+    watchman.end();
+  });
+
+  it('should end and shutdown', () => {
+    mockWatchmanClient.end = sinon.stub();
+    const newConfig = { controlWatchman: true, subscriptions: {} };
+    const watchman = new Watchman(newConfig, watchmanClient, terminal, sync);
+    watchman.end();
   });
 
 });

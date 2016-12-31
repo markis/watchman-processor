@@ -5,3 +5,8 @@ var watchman = require('../index');
 if (watchman && typeof watchman.start === 'function') {
   watchman.start()
 }
+process.on('SIGINT', function() {
+  watchman.end().then(() => {
+    process.exit();
+  });
+});

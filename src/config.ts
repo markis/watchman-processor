@@ -40,6 +40,15 @@ export interface Config {
   emoji?: boolean;
 
   /**
+   * if you want watchman to completely control the watchman process
+   *  - if true, this will shutdown and start the watchman process
+   *
+   * @type {boolean}
+   * @memberOf Config
+   */
+  controlWatchman?: boolean;
+
+  /**
    * this limits the number files to pass to rsync.
    *
    * @type {number}
