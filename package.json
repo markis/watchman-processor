@@ -26,7 +26,7 @@
     "@types/chalk": "^0.4.31",
     "@types/inversify": "^2.0.31",
     "@types/mocha": "^2.2.32",
-    "@types/node": "^6.0.46",
+    "@types/node": "^7.0.0",
     "@types/reflect-metadata": "0.0.5",
     "@types/sinon": "^1.16.31",
     "chai": "^3.5.0",
