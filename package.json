@@ -1,6 +1,6 @@
 {
   "name": "watchman-processor",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Processor for the fb-watchman service",
   "keywords": [
     "watchman",
@@ -14,8 +14,8 @@
   "bin": "./bin/watchman-processor",
   "typings": "index.d.ts",
   "preferGlobal": true,
-  "engines" : {
-    "node" : ">=4"
+  "engines": {
+    "node": ">=4"
   },
   "dependencies": {
     "chalk": "^1.1.3",
