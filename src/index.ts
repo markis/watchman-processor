@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import { Kernel } from 'inversify';
+import { Container } from 'inversify';
 
 import * as chalk from 'chalk';
 import * as proc from 'child_process';
@@ -18,37 +18,37 @@ let watchmanSync: WatchmanSync;
 if (process.argv[2] === 'init') {
   configManager.createConfig();
 } else {
-  const kernel = new Kernel();
+  const container = new Container();
   const config = configManager.getConfig();
   if (config) {
-    setupKernel(kernel);
-    watchmanSync = getWatchmanSync(kernel);
+    setupKernel(container);
+    watchmanSync = getWatchmanSync(container);
   } else {
     StdErrWriteImpl('The watchman-processor configuration does not exist. \n\n' +
       'Run "watchman-processor init" to create an example configuration file.\n');
   }
 }
 
-function setupKernel(kernel: Kernel): Kernel {
+function setupKernel(container: Container): Container {
   const config = configManager.getConfig();
   if (config) {
-    kernel.bind<Spawn>('spawn').toConstantValue(proc.spawn);
-    kernel.bind<NodeRequire>('require').toConstantValue(require);
-    kernel.bind<WatchmanClient>('WatchmanClient').toConstantValue(new watchman.Client());
-    kernel.bind<Config>('Config').toConstantValue(config);
-    kernel.bind<Write>('stdErrWrite').toConstantValue(StdErrWriteImpl);
-    kernel.bind<Write>('stdOutWrite').toConstantValue(StdOutWriteImpl);
-    kernel.bind<Emoji>('Emoji').toConstantValue(emoji);
-    kernel.bind('Chalk').toConstantValue(chalk);
-    kernel.bind<Terminal>('Terminal').to(TerminalImpl);
-    kernel.bind<Sync>('Sync').to(SyncImpl);
-    kernel.bind<WatchmanSync>('WatchmanSync').to(WatchmanSyncImpl);
+    container.bind<Spawn>('spawn').toConstantValue(proc.spawn);
+    container.bind<NodeRequire>('require').toConstantValue(require);
+    container.bind<WatchmanClient>('WatchmanClient').toConstantValue(new watchman.Client());
+    container.bind<Config>('Config').toConstantValue(config);
+    container.bind<Write>('stdErrWrite').toConstantValue(StdErrWriteImpl);
+    container.bind<Write>('stdOutWrite').toConstantValue(StdOutWriteImpl);
+    container.bind<Emoji>('Emoji').toConstantValue(emoji);
+    container.bind('Chalk').toConstantValue(chalk);
+    container.bind<Terminal>('Terminal').to(TerminalImpl);
+    container.bind<Sync>('Sync').to(SyncImpl);
+    container.bind<WatchmanSync>('WatchmanSync').to(WatchmanSyncImpl);
   }
-  return kernel;
+  return container;
 }
 
-function getWatchmanSync(kernel: Kernel): WatchmanSync {
-  return kernel.get<WatchmanSync>('WatchmanSync');
+function getWatchmanSync(container: Container): WatchmanSync {
+  return container.get<WatchmanSync>('WatchmanSync');
 }
 
 export default watchmanSync;
