@@ -122,7 +122,7 @@ function getUniqueFileFolders(files: string[]): string[] {
       }
       folderPartsSum += folderPart;
       if (!seen.has(folderPartsSum)) {
-        seen.set(folderPartsSum);
+        seen.set(folderPartsSum, undefined);
         folders.push(folderPartsSum);
       }
     }
