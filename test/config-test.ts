@@ -1,8 +1,7 @@
 import 'ts-helpers';
 
-import * as chai from 'chai';
-import * as path from 'path';
-import * as sinon from 'sinon';
+import { assert } from 'chai';
+import { resolve } from 'path';
 
 import ConfigManager from '../src/config';
 
@@ -11,21 +10,21 @@ describe('Config', () => {
     // do nothing
   }
 
-  it('should construct the config without options', sinon.test(() => {
+  it('should construct the config without options', () => {
     const configMgr = new ConfigManager();
 
-    chai.assert.isObject(configMgr, 'configMgr is an object');
-  }));
+    assert.isObject(configMgr, 'configMgr is an object');
+  });
 
-  it('should throw error on not getting config file', sinon.test(() => {
+  it('should throw error on not getting config file', () => {
     const configMgr = new ConfigManager({
       confFile: 'non-existent.js',
     });
 
     configMgr.getConfig();
-  }));
+  });
 
-  it('should throw generic error', sinon.test(() => {
+  it('should throw generic error', () => {
     const customRequire: NodeRequireFunction = (id: string) => {
       throw 'error';
     };
@@ -37,51 +36,51 @@ describe('Config', () => {
     } catch (e) {
       // do nothing
     }
-  }));
+  });
 
-  it('should throw error on not getting config file', sinon.test((done) => {
+  it('should throw error on not getting config file', (done) => {
     const configMgr = new ConfigManager({
-      confFile: path.resolve(__dirname + '/example-watchman-processor.config.js.tmp'),
-      exampleConfFile: path.resolve(__dirname + '../../../example/watchman-processor.config.js'),
+      confFile: resolve(__dirname + '/example-watchman-processor.config.js.tmp'),
+      exampleConfFile: resolve(__dirname + '../../../example/watchman-processor.config.js'),
     });
 
     configMgr.createConfig().then(done);
-  }));
+  });
 
-  it('should initialize the example config file', sinon.test(() => {
+  it('should initialize the example config file', () => {
     const configMgr = new ConfigManager({
-      confFile: path.resolve(__dirname + '../../../example/watchman-processor.config.js'),
-      exampleConfFile: path.resolve(__dirname + '../../../example/watchman-processor.config.js'),
+      confFile: resolve(__dirname + '../../../example/watchman-processor.config.js'),
+      exampleConfFile: resolve(__dirname + '../../../example/watchman-processor.config.js'),
     });
 
     configMgr.getConfig();
 
-    chai.assert.isObject(configMgr, 'configMgr is an object');
-  }));
+    assert.isObject(configMgr, 'configMgr is an object');
+  });
 
-  it('second getConfig calls will get a cached version', sinon.test(() => {
+  it('second getConfig calls will get a cached version', () => {
     const configMgr = new ConfigManager({
-      confFile: path.resolve(__dirname + '../../../example/watchman-processor.config.js'),
-      exampleConfFile: path.resolve(__dirname + '../../../example/watchman-processor.config.js'),
+      confFile: resolve(__dirname + '../../../example/watchman-processor.config.js'),
+      exampleConfFile: resolve(__dirname + '../../../example/watchman-processor.config.js'),
     });
 
     configMgr.getConfig();
     configMgr.getConfig();
 
-    chai.assert.isObject(configMgr, 'configMgr is an object');
-  }));
+    assert.isObject(configMgr, 'configMgr is an object');
+  });
 
-  it('should construct on a windows machine', sinon.test(() => {
+  it('should construct on a windows machine', () => {
     Object.defineProperty(process, 'platform', { value: 'win32' });
     const configMgr = new ConfigManager(undefined, undefined, noop);
 
-    chai.assert.isObject(configMgr, 'configMgr is an object');
-  }));
+    assert.isObject(configMgr, 'configMgr is an object');
+  });
 
-  it('should construct on a non-windows machine', sinon.test(() => {
+  it('should construct on a non-windows machine', () => {
     Object.defineProperty(process, 'platform', { value: 'fakeOS' });
     const configMgr = new ConfigManager(undefined, undefined, noop);
 
-    chai.assert.isObject(configMgr, 'configMgr is an object');
-  }));
+    assert.isObject(configMgr, 'configMgr is an object');
+  });
 });

@@ -1,7 +1,7 @@
 import 'ts-helpers';
 
-import * as chai from 'chai';
-import * as sinon from 'sinon';
+import { assert } from 'chai';
+import { stub } from 'sinon';
 
 import { Config } from '../src/config';
 import Terminal, { StdErrWriteImpl, StdOutWriteImpl } from '../src/terminal';
@@ -22,8 +22,8 @@ describe('Terminal', () => {
       red: noop,
       white: noop,
     };
-  let stdOutWrite = sinon.stub();
-  let stdErrWrite = sinon.stub();
+  let stdOutWrite = stub();
+  let stdErrWrite = stub();
 
   mockChalk.bgGreen = mockChalk;
   mockChalk.bgRed = mockChalk;
@@ -31,8 +31,8 @@ describe('Terminal', () => {
   mockChalk.bgWhite = mockChalk;
 
   beforeEach(() => {
-    stdOutWrite = sinon.stub();
-    stdErrWrite = sinon.stub();
+    stdOutWrite = stub();
+    stdErrWrite = stub();
 
     config = {
       emoji: true,
@@ -72,7 +72,7 @@ describe('Terminal', () => {
     // Execute
     terminal.error('err');
 
-    chai.assert(stdErrWrite.called);
+    assert(stdErrWrite.called);
   });
 
   it('Expect terminal.debug to execute stdOutWrite', () => {
@@ -82,7 +82,7 @@ describe('Terminal', () => {
     // Execute
     terminal.debug('err');
 
-    chai.assert(stdOutWrite.called);
+    assert(stdOutWrite.called);
   });
 
   it('Expect terminal.render to render', () => {
@@ -92,7 +92,7 @@ describe('Terminal', () => {
     // Execute
     terminal.render();
 
-    chai.assert(stdOutWrite.called);
+    assert(stdOutWrite.called);
   });
 
   it('Expect terminal.render to render without emojis', () => {
@@ -103,7 +103,7 @@ describe('Terminal', () => {
     // Execute
     terminal.render();
 
-    chai.assert(stdOutWrite.called);
+    assert(stdOutWrite.called);
   });
 
   it('Expect terminal.render to do nothing when debug is turned on', () => {
@@ -114,7 +114,7 @@ describe('Terminal', () => {
     // Execute
     terminal.render();
 
-    chai.assert(stdOutWrite.notCalled);
+    assert(stdOutWrite.notCalled);
   });
 
   it('Expect terminal.setState to execute', () => {

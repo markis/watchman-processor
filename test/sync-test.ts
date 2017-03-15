@@ -1,7 +1,7 @@
 import 'ts-helpers';
 
-import * as chai from 'chai';
-import * as sinon from 'sinon';
+import { assert } from 'chai';
+import { stub } from 'sinon';
 
 import { Config } from '../src/config';
 import Sync from '../src/sync';
@@ -25,21 +25,21 @@ const example1 = config.subscriptions.example1;
 
 describe('Sync', () => {
 
-  it('should sync to rsync specific files', sinon.test(() => {
+  it('should sync to rsync specific files', () => {
 
     // Setup
     const shortList = [
       'example1/js/1.js',
       'example1/js/2.js',
     ];
-    const spawn = sinon.stub().returns({on: sinon.stub(), stdout: {on: sinon.stub().callsArg(1)}});
+    const spawn = stub().returns({on: stub(), stdout: {on: stub().callsArg(1)}});
     const sync = new Sync(config, terminal, spawn);
 
     // Execute
     sync.syncFiles(example1, shortList);
 
-    chai.assert(spawn.called);
-  }));
+    assert(spawn.called);
+  });
 
   it('should sync to rsync all files when too many files are sent', () => {
 
@@ -48,40 +48,40 @@ describe('Sync', () => {
     for (let i = 0, length = longList.length; i < length; i++) {
       longList[i] = 'example1/' + i + '.js' ;
     }
-    const spawn = sinon.stub();
+    const spawn = stub();
     const sync = new Sync(config, terminal, spawn);
 
     // Execute
     sync.syncFiles(example1, longList);
 
-    chai.assert(spawn.called);
+    assert(spawn.called);
   });
 
   it('should sync to rsync all files when no files are sent', () => {
 
     // Setup
-    const spawn = sinon.stub();
+    const spawn = stub();
     const sync = new Sync(config, terminal, spawn);
 
     // Execute
     sync.syncFiles(example1);
 
-    chai.assert(spawn.called);
+    assert(spawn.called);
   });
 
-  it('should sync to rsync ignore specific files', sinon.test(() => {
+  it('should sync to rsync ignore specific files', () => {
 
     // Setup
     const shortList = [
       'example1/js/1.js',
       '.git/js/2.js',
     ];
-    const spawn = sinon.stub().returns({on: sinon.stub(), stdout: {on: sinon.stub()}});
+    const spawn = stub().returns({on: stub(), stdout: {on: stub()}});
     const sync = new Sync(config, terminal, spawn);
 
     // Execute
     sync.syncFiles(example1, shortList);
 
-    chai.assert(spawn.called);
-  }));
+    assert(spawn.called);
+  });
 });
