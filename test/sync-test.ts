@@ -10,7 +10,7 @@ import Terminal from '../src/terminal';
 function noop() {
   // do nothing
 }
-const terminal: Terminal = { debug: noop } as any;
+const terminal: Terminal = { debug: noop, error: (err: any) => { console.error(err); } } as any;
 const config: Config = {
   subscriptions: {
     example1: {
@@ -48,7 +48,7 @@ describe('Sync', () => {
     for (let i = 0, length = longList.length; i < length; i++) {
       longList[i] = 'example1/' + i + '.js' ;
     }
-    const spawn = stub();
+    const spawn = stub().returns({on: stub(), stdout: {on: stub()}});
     const sync = new Sync(config, terminal, spawn);
 
     // Execute
@@ -60,7 +60,7 @@ describe('Sync', () => {
   it('should sync to rsync all files when no files are sent', () => {
 
     // Setup
-    const spawn = stub();
+    const spawn = stub().returns({on: stub(), stdout: {on: stub()}});
     const sync = new Sync(config, terminal, spawn);
 
     // Execute

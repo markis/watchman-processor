@@ -40,8 +40,8 @@ describe('Config', () => {
 
   it('should throw error on not getting config file', (done) => {
     const configMgr = new ConfigManager({
-      confFile: resolve(__dirname + '/example-watchman-processor.config.js.tmp'),
-      exampleConfFile: resolve(__dirname + '../../../example/watchman-processor.config.js'),
+      confFile: resolve(__dirname, 'example-watchman-processor.config.js.tmp'),
+      exampleConfFile: resolve(__dirname, '../../', 'example/watchman-processor.config.js'),
     });
 
     configMgr.createConfig().then(done);
@@ -49,8 +49,8 @@ describe('Config', () => {
 
   it('should initialize the example config file', () => {
     const configMgr = new ConfigManager({
-      confFile: resolve(__dirname + '../../../example/watchman-processor.config.js'),
-      exampleConfFile: resolve(__dirname + '../../../example/watchman-processor.config.js'),
+      confFile: resolve(__dirname, '../../', 'example/watchman-processor.config.js'),
+      exampleConfFile: resolve(__dirname, '../../', 'example/watchman-processor.config.js'),
     });
 
     configMgr.getConfig();
@@ -60,8 +60,8 @@ describe('Config', () => {
 
   it('second getConfig calls will get a cached version', () => {
     const configMgr = new ConfigManager({
-      confFile: resolve(__dirname + '../../../example/watchman-processor.config.js'),
-      exampleConfFile: resolve(__dirname + '../../../example/watchman-processor.config.js'),
+      confFile: resolve(__dirname, '../../', 'example/watchman-processor.config.js'),
+      exampleConfFile: resolve(__dirname, '../../', 'example/watchman-processor.config.js'),
     });
 
     configMgr.getConfig();
