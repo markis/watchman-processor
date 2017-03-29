@@ -94,7 +94,7 @@ export default class WatchmanSyncImpl implements WatchmanSync {
 
       promises.push(this.subscribe(sub.source, name, expression));
     }
-    Promise.all(promises).then(this.terminal.render);
+    Promise.all(promises).then(this.terminal.render).catch(err => this.terminal.error(err));
 
     // subscription is fired regardless of which subscriber fired it
     client.on('subscription', onSubscription);

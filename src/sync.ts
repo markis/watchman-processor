@@ -96,6 +96,8 @@ export default class SyncImpl implements Sync {
       child.stdout.on('end', resolve);
       child.on('exit', resolve);
       child.on('close', resolve);
+    }).catch(reason => {
+      this.terminal.error(reason);
     });
   }
 }

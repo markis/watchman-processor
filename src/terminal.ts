@@ -74,6 +74,9 @@ export default class TerminalImpl implements Terminal {
   public error(err: string | Error) {
     const msg = err.toString();
     this.errorFunc(this.chalk.red(msg));
+    if (typeof err !== 'string') {
+      this.errorFunc(this.chalk.red(err.stack));
+    }
   }
 
   public start() {
@@ -93,7 +96,7 @@ export default class TerminalImpl implements Terminal {
   }
 
   public render() {
-    if (this.config.debug) {
+    if (!this || !this.config || this.config.debug) {
       return;
     }
     this._clear();
@@ -133,16 +136,6 @@ export default class TerminalImpl implements Terminal {
     msg = chalkColor.black(msg);
     this.writeFunc(msg);
   }
-
-  // These are just here if I decide to bring them back. But right now they seem like a nuisance
-  // private _enableFullScreen() {
-  //   this._write('\x1b[?1049h');
-  //   this._clear();
-  // }
-
-  // private _hideCursor() {
-  //   this._write('\x1B[?25l'); // Hide terminal cursor
-  // }
 }
 
 /**
