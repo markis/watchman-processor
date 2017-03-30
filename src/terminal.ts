@@ -85,6 +85,7 @@ export default class TerminalImpl implements Terminal {
 
   public debug(msg: string) {
     if (this.config.debug && msg) {
+      msg = msg.trim();
       this.writeFunc(msg + '\n');
     }
   }
