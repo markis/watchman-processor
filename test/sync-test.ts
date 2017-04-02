@@ -1,16 +1,15 @@
-import 'ts-helpers';
-
 import { assert } from 'chai';
+import 'reflect-metadata';
 import { stub } from 'sinon';
-
-import { Config } from '../src/config';
+import 'ts-helpers';
+import { Config } from '../interfaces';
 import Sync from '../src/sync';
 import Terminal from '../src/terminal';
 
 function noop() {
   // do nothing
 }
-const terminal: Terminal = { debug: noop, error: (err: any) => { console.error(err); } } as any;
+const terminal: Terminal = { debug: noop, error: noop } as any;
 const config: Config = {
   subscriptions: {
     example1: {
@@ -85,7 +84,7 @@ describe('Sync', () => {
     assert(spawn.called);
   });
 
-  it('should handle errors throw by the spawn process', () => {
+  it('should handle errors thrown by the spawn process', () => {
 
     // Setup
     const shortList = [
