@@ -1,6 +1,0 @@
-verbose: false
-instrumentation:
-  root: built
-  compact: true
-  default-excludes: true
-  include-all-sources: false

@@ -1,26 +1,5 @@
-import 'reflect-metadata';
-
 import { inject, injectable } from 'inversify';
-
-import { Config, SubConfig, WatchmanExpression } from './config';
-import { Sync } from './sync';
-import { Terminal } from './terminal';
-
-export interface WatchmanSync {
-  /**
-   * Get this party started!  This is the start of everything.
-   * This is what communicates directly with fb-watchman and then passes data to sync/terminal.
-   *
-   * @memberOf Watchman
-   */
-  start(): void;
-  /**
-   * All done!  Time to clean up.
-   *
-   * @memberOf Watchman
-   */
-  end(): Promise<void>;
-}
+import { Config, SubConfig, Sync, Terminal, WatchmanExpression, WatchmanSync } from '../interfaces';
 
 @injectable()
 export default class WatchmanSyncImpl implements WatchmanSync {
