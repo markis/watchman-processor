@@ -15,14 +15,15 @@
   "typings": "index.d.ts",
   "preferGlobal": true,
   "engines": {
-    "node": ">=4"
+    "node": ">=0.12"
   },
   "dependencies": {
     "chalk": "^1.1.3",
     "fb-watchman": "^2.0.0",
     "inversify": "^3.1.0",
     "node-emoji": "^1.5.1",
-    "reflect-metadata": "^0.1.10"
+    "reflect-metadata": "^0.1.10",
+    "tslib": "^1.6.0"
   },
   "devDependencies": {
     "@types/chai": "^3.4.35",
@@ -44,10 +45,12 @@
     "typescript": "^2.2.1"
   },
   "scripts": {
-    "compile": "tsc --noEmitHelpers --module amd --out index.js && tsc --noEmitHelpers && rollup -c",
-    "coverage": "npm run compile && istanbul cover _mocha built/test/**/*-test.js",
-    "lint": "tslint -c tslint.json src/*.ts test/*.ts",
-    "test": "npm run lint && npm run coverage"
+    "compile": "if-ver -ge 0.12 && rollup -c || if-ver -lt 0.12",
+    "compile:test": "if-ver -ge 0.12 && rollup -c rollup.config.js -e tslib -i test/index.ts -o test.js || if-ver -lt 0.12",
+    "coverage": "if-ver -ge 0.12 && npm run compile:test && istanbul cover _mocha test.js -x example/watchman-processor.config.js  || if-ver -lt 0.12",
+    "lint": "if-ver -ge 4 && tslint -c tslint.json src/*.ts test/*.ts || if-ver -lt 4",
+    "test": "npm run lint && npm run coverage",
+    "test:unit": "mocha mocha built/test/**/*-test.js"
   },
   "pre-commit": [
     "lint",

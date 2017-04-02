@@ -1,12 +1,11 @@
+import * as chai from 'chai';
+import 'reflect-metadata';
+import * as sinon from 'sinon';
 import 'ts-helpers';
-
-import { Config } from '../src/config';
+import { Config } from '../interfaces';
 import Sync from '../src/sync';
 import Terminal from '../src/terminal';
 import Watchman from '../src/watchman';
-
-import * as chai from 'chai';
-import * as sinon from 'sinon';
 
 const mockTerminal = sinon.mock(Terminal);
 const terminal: Terminal = mockTerminal as any;

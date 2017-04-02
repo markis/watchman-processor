@@ -6,24 +6,22 @@ module.exports = {
   format: 'cjs',
   moduleId: 'watchman-processor',
   moduleName: 'watchmanProcessor',
+  sourceMap: true,
+  context: 'this',
   external: [
+    'chai',
     'chalk',
     'child_process',
     'fb-watchman',
     'fs',
     'inversify',
+    'path',
     'node-emoji',
-    'reflect-metadata'
+    'sinon',
+    'reflect-metadata',
+    'ts-helpers',
+    'tslib'
   ],
-  globals: {
-    'chalk': 'chalk',
-    'child_process': 'proc',
-    'fb-watchman': 'watchman',
-    'fs': 'fs',
-    'inversify': 'inversify',
-    'node-emoji': 'emoji',
-    'reflect-metadata': 'reflectMetadata'
-  },
   plugins: [
     typescript({
       typescript: require('typescript')
