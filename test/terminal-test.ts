@@ -143,6 +143,16 @@ describe('Terminal', () => {
 
   });
 
+  it('Expect terminal.error to handle non-strings', () => {
+
+    // Setup
+    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk, mockEmoji);
+
+    // Execute
+    terminal.error(new Error());
+
+  });
+
   it('should execute the std*write methods', () => {
     StdErrWriteImpl('');
     StdOutWriteImpl('');

@@ -93,7 +93,7 @@ describe('Sync', () => {
       '.git/js/2.js',
     ];
     const onStub = stub();
-    onStub.alwaysThrew();
+    onStub.throws();
 
     const spawn = stub().returns({on: onStub, stdout: {on: stub()}});
     const sync = new Sync(config, terminal, spawn);
