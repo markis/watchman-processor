@@ -1,27 +1,5 @@
-import 'reflect-metadata';
-
-import * as proc from 'child_process';
 import { inject, injectable } from 'inversify';
-
-import { Config, SubConfig } from './config';
-import { Terminal } from './terminal';
-
-export interface Sync {
-  /**
-   * Sync files between the source and destination
-   *  if no files are specified then attempt to sync everything
-   *  otherwise sync the specific list of files sent from watchman
-   *
-   * @param {SubConfig} subConfig
-   * @param {SubscriptionResponseFile[]} files
-   * @returns {Promise<void>}
-   *
-   * @memberOf Sync
-   */
-  syncFiles(subConfig: SubConfig, files: string[]): Promise<void>;
-}
-
-export type Spawn = (cmd: string, args: string[]) => proc.ChildProcess;
+import { Config, Spawn, SubConfig, Sync, Terminal } from '../interfaces';
 
 @injectable()
 export default class SyncImpl implements Sync {

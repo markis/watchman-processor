@@ -9,6 +9,7 @@
     "experimentalDecorators": true,
     "noImplicitAny": true,
     "sourceMap": true,
+    "importHelpers": true,
     "typeRoots": [
       "node_modules/@types",
       "types"
