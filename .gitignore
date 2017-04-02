@@ -1,6 +1,9 @@
 /index.js
 /index.d.ts
 /index.js.map
+/test.js
+/test.js.map
+/example-watchman-processor.config.js.tmp
 *.log
 .vscode/
 coverage/

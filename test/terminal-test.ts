@@ -1,9 +1,8 @@
-import 'ts-helpers';
-
 import { assert } from 'chai';
+import 'reflect-metadata';
 import { stub } from 'sinon';
-
-import { Config } from '../src/config';
+import 'ts-helpers';
+import { Config } from '../interfaces';
 import Terminal, { StdErrWriteImpl, StdOutWriteImpl } from '../src/terminal';
 
 function noop() {
