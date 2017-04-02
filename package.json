@@ -32,6 +32,7 @@
     "@types/reflect-metadata": "0.0.5",
     "@types/sinon": "^2.1.0",
     "chai": "^3.5.0",
+    "if-ver": "^1.0.6",
     "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
     "mocha-lcov-reporter": "^1.3.0",
@@ -44,9 +45,9 @@
     "typescript": "^2.2.1"
   },
   "scripts": {
-    "compile": "tsc --noEmitHelpers --module amd --out index.js && tsc --noEmitHelpers && rollup -c",
-    "coverage": "npm run compile && istanbul cover _mocha built/test/**/*-test.js",
-    "lint": "tslint -c tslint.json src/*.ts test/*.ts",
+    "compile": "if-ver -gt 4.2 && tsc --noEmitHelpers --module amd --out index.js && tsc --noEmitHelpers && rollup -c || if-ver -lt 4.2",
+    "coverage": "if-ver -gt 0.12 && npm run compile && istanbul cover _mocha built/test/**/*-test.js || if-ver -lt 0.12",
+    "lint": "if-ver -gt 4 && tslint -c tslint.json src/*.ts test/*.ts || if-ver -lt 4",
     "test": "npm run lint && npm run coverage"
   },
   "pre-commit": [

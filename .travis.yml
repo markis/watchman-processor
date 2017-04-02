@@ -3,6 +3,7 @@ language: node_js
 node_js:
   - "4"
   - "6"
+  - "5"
   - "7"
 
 cache:
@@ -16,8 +17,18 @@ before_install:
 install:
   - "npm install"
 
+  # install dependencies for coverage testing
+  - npm install if-ver -g
+  - if-ver -ge 0.12 && npm install codacy-coverage coveralls istanbul remap-istanbul -g || if-ver -lt 0.12
+
+
 script:
   - "npm test"
 
+
 after_success:
-  - "cat ./coverage/lcov.info | coveralls"
+# run code coverage and push to codacy/coveralls
+- "(if-ver -ge 6 && istanbul cover test.js --report lcovonly) || if-ver -lt 6"
+- "(if-ver -ge 6 && remap-istanbul --type lcovonly -i coverage/coverage.json -o coverage/remapped-lcov.info) || if-ver -lt 6"
+- "(if-ver -ge 6 && cat coverage/remapped-lcov.info | codacy-coverage) || if-ver -lt 6"
+- "(if-ver -ge 6 && cat coverage/remapped-lcov.info | coveralls) || if-ver -lt 6"

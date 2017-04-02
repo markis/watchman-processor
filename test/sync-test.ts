@@ -84,4 +84,36 @@ describe('Sync', () => {
 
     assert(spawn.called);
   });
+
+  it('should sync to rsync ignore specific files', () => {
+
+    // Setup
+    const shortList = [
+      'example1/js/1.js',
+      '.git/js/2.js',
+    ];
+    const spawn = stub().returns({on: stub(), stdout: {on: stub()}});
+    const sync = new Sync(config, terminal, spawn);
+
+    // Execute
+    sync.syncFiles(example1, shortList);
+
+    assert(spawn.called);
+  });
+
+  it('should sync to rsync ignore specific files', () => {
+
+    // Setup
+    const shortList = [
+      'example1/js/1.js',
+      '.git/js/2.js',
+    ];
+    const spawn = stub().returns({on: stub().alwaysThrew('test'), stdout: {on: stub()}});
+    const sync = new Sync(config, terminal, spawn);
+
+    // Execute
+    sync.syncFiles(example1, shortList);
+
+    assert(spawn.called);
+  });
 });

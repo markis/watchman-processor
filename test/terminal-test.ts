@@ -143,6 +143,13 @@ describe('Terminal', () => {
 
   });
 
+  it('should handle non string errors', () => {
+    const startConfig = { debug: false };
+    const terminal = new Terminal(startConfig, stdOutWrite, noop, mockChalk, mockEmoji);
+
+    terminal.error(new Error('test'));
+  });
+
   it('should execute the std*write methods', () => {
     StdErrWriteImpl('');
     StdOutWriteImpl('');
