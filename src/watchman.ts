@@ -81,7 +81,6 @@ export default class WatchmanSyncImpl implements WatchmanSync {
     const onSubscription = this.onSubscription.bind(this);
     const promises: Array<Promise<string | void>> = [];
     const subscriptions = Object.keys(this.config.subscriptions);
-    const length = subscriptions.length;
 
     for (let name of subscriptions) {
       let sub = this.config.subscriptions[name];
