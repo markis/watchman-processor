@@ -24,6 +24,16 @@ describe('Config', () => {
     configMgr.getConfig();
   });
 
+  it('should throw error on not getting config file', () => {
+    const fakeConf = {
+      subscriptions: { test: {} },
+    };
+    const fakeRequire = () => fakeConf;
+    const configMgr = new ConfigManager(undefined, fakeRequire);
+
+    configMgr.getConfig();
+  });
+
   it('should throw generic error', () => {
     const customRequire: NodeRequireFunction = (id: string) => {
       throw new Error('error');
