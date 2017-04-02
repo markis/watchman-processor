@@ -84,4 +84,23 @@ describe('Sync', () => {
 
     assert(spawn.called);
   });
+
+  it('should handle errors throw by the spawn process', () => {
+
+    // Setup
+    const shortList = [
+      'example1/js/1.js',
+      '.git/js/2.js',
+    ];
+    const onStub = stub();
+    onStub.alwaysThrew();
+
+    const spawn = stub().returns({on: onStub, stdout: {on: stub()}});
+    const sync = new Sync(config, terminal, spawn);
+
+    // Execute
+    sync.syncFiles(example1, shortList);
+
+    assert(spawn.called);
+  });
 });

@@ -12,8 +12,8 @@ function noop() {
 
 describe('Terminal', () => {
   let config: Config;
-  let mockEmoji: Emoji = { emojify: noop } as any;
-  let mockChalk = {
+  const mockEmoji: Emoji = { emojify: noop } as any;
+  const mockChalk = {
       bgGreen: this,
       bgRed: this,
       bgWhite: this,

@@ -21,9 +21,7 @@ export interface Sync {
   syncFiles(subConfig: SubConfig, files: string[]): Promise<void>;
 }
 
-export interface Spawn {
-  (cmd: string, args: string[]): proc.ChildProcess;
-}
+export type Spawn = (cmd: string, args: string[]) => proc.ChildProcess;
 
 @injectable()
 export default class SyncImpl implements Sync {
@@ -115,10 +113,10 @@ function getUniqueFileFolders(files: string[]): string[] {
   const folders: string[] = [];
   const seen: Map<string, void> = new Map();
 
-  for (let file of files) {
-    let folderParts = file.split('/');
+  for (const file of files) {
+    const folderParts = file.split('/');
     let folderPartsSum = '';
-    for (let folderPart of folderParts) {
+    for (const folderPart of folderParts) {
       if (folderPartsSum.length > 0) {
         folderPartsSum += '/';
       }
@@ -140,7 +138,7 @@ function getUniqueFileFolders(files: string[]): string[] {
  * @returns {boolean}
  */
 function exists(values: string[], stringToSearch: string): boolean {
-  for (let value of values) {
+  for (const value of values) {
     if (startsWith(stringToSearch, value)) {
       return true;
     }

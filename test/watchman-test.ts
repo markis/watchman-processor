@@ -75,7 +75,7 @@ describe('Watchman', () => {
   });
 
   it('should log errors from sync.syncFiles', () => {
-    mockSync.syncFiles.returns(new Promise(() => { throw 'error'; }));
+    mockSync.syncFiles.returns(new Promise(() => { throw new Error('error'); }));
 
     const watchman = new Watchman(config, watchmanClient, terminal, sync);
     watchman.start();

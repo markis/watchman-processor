@@ -177,8 +177,8 @@ export default class ConfigManagerImpl implements ConfigManager {
       const subscriptions = Object.keys(config.subscriptions);
 
       // ensure ignoreFolders has a value
-      for (let name of subscriptions) {
-        let subscription = config.subscriptions[name];
+      for (const name of subscriptions) {
+        const subscription = config.subscriptions[name];
         subscription.ignoreFolders = subscription.ignoreFolders || [];
       }
       return config;
