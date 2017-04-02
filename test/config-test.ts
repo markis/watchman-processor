@@ -26,7 +26,7 @@ describe('Config', () => {
 
   it('should throw generic error', () => {
     const customRequire: NodeRequireFunction = (id: string) => {
-      throw 'error';
+      throw new Error('error');
     };
 
     const configMgr = new ConfigManager({}, customRequire);

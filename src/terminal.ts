@@ -45,9 +45,7 @@ export interface Terminal {
   render(): void;
 }
 
-export interface Write {
-  (str: string): void;
-}
+export type Write = (str: string) => void;
 
 @injectable()
 export default class TerminalImpl implements Terminal {
@@ -104,9 +102,9 @@ export default class TerminalImpl implements Terminal {
     const chalk = this.chalk;
     const subscriptions = Object.keys(this.config.subscriptions);
 
-    for (let name of subscriptions) {
-      let subscription = this.config.subscriptions[name];
-      let state = subscription.state;
+    for (const name of subscriptions) {
+      const subscription = this.config.subscriptions[name];
+      const state = subscription.state;
 
       if (state === 'good') {
         this._log(':thumbsup:  ' + name + ' ', chalk.bgGreen);

@@ -56,7 +56,7 @@ export default class WatchmanSyncImpl implements WatchmanSync {
     const { client, config, terminal } = this;
     const subscriptions = config.subscriptions;
     const promises: Array<Promise<string | void>> = [];
-    for (let name of Object.keys(subscriptions)) {
+    for (const name of Object.keys(subscriptions)) {
       const sub = subscriptions[name];
       promises.push(this.unsubscribe(sub.source, name));
     }
@@ -83,12 +83,12 @@ export default class WatchmanSyncImpl implements WatchmanSync {
     const subscriptions = Object.keys(this.config.subscriptions);
     const length = subscriptions.length;
 
-    for (let name of subscriptions) {
-      let sub = this.config.subscriptions[name];
-      let ignores = sub.ignoreFolders;
-      let expression = sub.watchExpression || ['allof', ['type', 'f']];
+    for (const name of subscriptions) {
+      const sub = this.config.subscriptions[name];
+      const ignores = sub.ignoreFolders;
+      const expression = sub.watchExpression || ['allof', ['type', 'f']];
 
-      for (let ignore of ignores) {
+      for (const ignore of ignores) {
         expression.push(['not', ['dirname', ignore]]);
       }
 
