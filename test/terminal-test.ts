@@ -84,6 +84,16 @@ describe('Terminal', () => {
     assert(stdOutWrite.called);
   });
 
+  it('Expect terminal.debug to handle nulls', () => {
+
+    // Setup
+    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk, mockEmoji);
+
+    // Execute
+    terminal.debug(null);
+
+  });
+
   it('Expect terminal.render to render', () => {
     // Setup
     const terminal = new Terminal(config, stdOutWrite, noop, mockChalk, mockEmoji);
