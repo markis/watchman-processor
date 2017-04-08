@@ -19,6 +19,7 @@
   },
   "files": [
     "bin/watchman-processor",
+    "example/watchman-processor.config.js",
     "index.js",
     "index.js.map",
     "package.json",
