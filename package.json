@@ -17,9 +17,17 @@
   "engines": {
     "node": ">=0.12"
   },
+  "files": [
+    "./bin/watchman-processor",
+    "index.js",
+    "index.js.map",
+    "package.json",
+    "README.md"
+  ],
   "dependencies": {
     "chalk": "^1.1.3",
     "fb-watchman": "^2.0.0",
+    "in-publish": "^2.0.0",
     "inversify": "^3.1.0",
     "node-emoji": "^1.5.1",
     "reflect-metadata": "^0.1.10",
@@ -34,6 +42,7 @@
     "@types/sinon": "^2.1.1",
     "chai": "^3.5.0",
     "if-ver": "^1.0.6",
+    "in-publish": "^2.0.0",
     "istanbul": "^0.4.5",
     "mocha": "^3.2.0",
     "mocha-lcov-reporter": "^1.3.0",
@@ -50,6 +59,7 @@
     "compile:test": "if-ver -ge 0.12 && rollup -c rollup.config.js -e tslib -i test/index.ts -o test.js || if-ver -lt 0.12",
     "coverage": "if-ver -ge 0.12 && npm run compile:test && istanbul cover _mocha test.js -x example/watchman-processor.config.js  || if-ver -lt 0.12",
     "lint": "if-ver -ge 4 && tslint -c tslint.json src/*.ts test/*.ts || if-ver -lt 4",
+    "prepublish": "in-publish && npm run compile || not-in-publish",
     "test": "npm run lint && npm run coverage",
     "test:unit": "mocha mocha built/test/**/*-test.js"
   },
