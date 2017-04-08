@@ -17,7 +17,7 @@ export default class ConfigManagerImpl implements ConfigManager {
   ) {
     const HOME_FOLDER = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
     const CONF_FILE = HOME_FOLDER + '/.watchman-processor.config.js';
-    const EXAMPLE_CONF_FILE = process.cwd() + '/example/watchman-processor.config.js';
+    const EXAMPLE_CONF_FILE = __dirname + '/example/watchman-processor.config.js';
 
     this.require = customRequire || require;
     this.confFile = options.confFile || CONF_FILE;
