@@ -18,7 +18,7 @@
     "node": ">=0.12"
   },
   "files": [
-    "./bin/watchman-processor",
+    "bin/watchman-processor",
     "index.js",
     "index.js.map",
     "package.json",
