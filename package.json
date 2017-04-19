@@ -1,6 +1,6 @@
 {
   "name": "watchman-processor",
-  "version": "2.0.11",
+  "version": "2.0.12",
   "description": "Processor for the fb-watchman service",
   "keywords": [
     "watchman",
