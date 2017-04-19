@@ -18,12 +18,17 @@ if (process.argv[2] === 'init') {
 } else {
   const container = new Container();
   const config = configManager.getConfig();
-  if (config) {
+
+  if (config instanceof Error) {
+    const error = config;
+    StdErrWriteImpl(error.message + '\n');
+    if (error.name !== 'init') {
+      StdErrWriteImpl(error.name);
+      StdErrWriteImpl(error.stack);
+    }
+  } else if (config) {
     setupKernel(container);
     watchmanSync = getWatchmanSync(container);
-  } else {
-    StdErrWriteImpl('The watchman-processor configuration does not exist. \n\n' +
-      'Run "watchman-processor init" to create an example configuration file.\n');
   }
 }
 

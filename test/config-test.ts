@@ -27,7 +27,7 @@ describe('Config', () => {
     done();
   });
 
-  it('should throw error on not getting config file', () => {
+  it('should handle initilizing ignoreFolders', (done) => {
     const fakeConf = {
       subscriptions: { test: {} },
     };
@@ -35,6 +35,16 @@ describe('Config', () => {
     const configMgr = new ConfigManager(undefined, fakeRequire);
 
     configMgr.getConfig();
+
+    done();
+  });
+
+  it('should handle dealing with non existant files', (done) => {
+    const configMgr = new ConfigManager({ confFile: 'non-existant.js' });
+
+    configMgr.getConfig();
+
+    done();
   });
 
   it('should throw generic error', () => {
