@@ -1,6 +1,10 @@
-import { createReadStream, createWriteStream } from 'fs';
+import { createReadStream, createWriteStream, existsSync } from 'fs';
 import { injectable } from 'inversify';
+import { resolve } from 'path';
 import { Config, ConfigManager, ConfigManagerOptions, Write } from '../interfaces';
+
+const INIT_MSG = 'The watchman-processor configuration does not exist. \n\n' +
+                 'Run "watchman-processor init" to create an example configuration file.\n';
 
 @injectable()
 export default class ConfigManagerImpl implements ConfigManager {
@@ -25,12 +29,19 @@ export default class ConfigManagerImpl implements ConfigManager {
     this.write = write;
   }
 
-  public getConfig(): Config {
+  public getConfig(): Config | Error {
     try {
       if (this.cachedConfig) {
         return this.cachedConfig;
       }
-      const config = this.cachedConfig = this.require(this.confFile) as Config;
+      const configFile = resolve(this.confFile);
+      if (!existsSync(configFile)) {
+        const error = new Error(INIT_MSG);
+        error.name = 'init';
+        throw error;
+      }
+
+      const config = this.cachedConfig = this.require(configFile) as Config;
       const subscriptions = Object.keys(config.subscriptions);
 
       // ensure ignoreFolders has a value
@@ -40,7 +51,7 @@ export default class ConfigManagerImpl implements ConfigManager {
       }
       return config;
     } catch (e) {
-      return null;
+      return e;
     }
   }
 
