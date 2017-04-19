@@ -47,20 +47,6 @@ describe('Config', () => {
     done();
   });
 
-  it('should throw generic error', () => {
-    const customRequire: NodeRequireFunction = (id: string) => {
-      throw new Error('error');
-    };
-
-    const configMgr = new ConfigManager({}, customRequire);
-
-    try {
-      configMgr.getConfig();
-    } catch (e) {
-      // do nothing
-    }
-  });
-
   it('should throw error on not getting config file', (done) => {
     const configMgr = new ConfigManager({
       confFile: resolve(__dirname, 'example-watchman-processor.config.js.tmp'),
