@@ -60,9 +60,9 @@ export default class TerminalImpl implements Terminal {
       if (state === 'good') {
         log(emoji('👍 ') + ' ' + name + ' ', chalk.bgGreen);
       } else if (state === 'running') {
-        log(emoji('⚡️ ') + ' ' + name + ' ', chalk.bgYellow);
+        log(emoji('🏃 ') + ' ' + name + ' ', chalk.bgYellow);
       } else if (state === 'error') {
-        log(emoji('💀 ') + ' ' + name + ' ', chalk.bgRed);
+        log(emoji('💀 ') + ' ' + name + ' ', chalk.bgRed); // ☠️
       } else {
         log(emoji('⚡️ ') + ' ' + name + ' ', chalk.bgWhite);
       }

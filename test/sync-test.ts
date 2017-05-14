@@ -31,11 +31,16 @@ describe('Sync', () => {
       'example1/js/1.js',
       'example1/js/2.js',
     ];
-    const spawn = stub().returns({on: stub(), stdout: {on: stub().callsArg(1)}});
+    const onData = stub().callsArgWith(1, '');
+    const onExit = stub();
+    const spawn = stub().returns({on: onExit, stderr: {on: onData}, stdout: {on: onData}});
     const sync = new Sync(config, terminal, spawn);
 
     // Execute
     sync.syncFiles(example1, shortList);
+
+    onExit.callArgWith(1, 0);
+    onExit.callArgWith(1, 255);
 
     assert(spawn.called);
   });
@@ -47,7 +52,7 @@ describe('Sync', () => {
     for (let i = 0, length = longList.length; i < length; i++) {
       longList[i] = 'example1/' + i + '.js' ;
     }
-    const spawn = stub().returns({on: stub(), stdout: {on: stub()}});
+    const spawn = stub().returns({on: stub(), stderr: {on: stub()}, stdout: {on: stub()}});
     const sync = new Sync(config, terminal, spawn);
 
     // Execute
@@ -59,7 +64,7 @@ describe('Sync', () => {
   it('should sync to rsync all files when no files are sent', () => {
 
     // Setup
-    const spawn = stub().returns({on: stub(), stdout: {on: stub()}});
+    const spawn = stub().returns({on: stub(), stderr: {on: stub()}, stdout: {on: stub()}});
     const sync = new Sync(config, terminal, spawn);
 
     // Execute
@@ -75,7 +80,7 @@ describe('Sync', () => {
       'example1/js/1.js',
       '.git/js/2.js',
     ];
-    const spawn = stub().returns({on: stub(), stdout: {on: stub()}});
+    const spawn = stub().returns({on: stub(), stderr: {on: stub()}, stdout: {on: stub()}});
     const sync = new Sync(config, terminal, spawn);
 
     // Execute
@@ -84,22 +89,17 @@ describe('Sync', () => {
     assert(spawn.called);
   });
 
-  it('should handle errors thrown by the spawn process', () => {
+  it('should kill running processes', () => {
 
     // Setup
-    const shortList = [
-      'example1/js/1.js',
-      '.git/js/2.js',
-    ];
-    const onStub = stub();
-    onStub.throws();
-
-    const spawn = stub().returns({on: onStub, stdout: {on: stub()}});
-    const sync = new Sync(config, terminal, spawn);
+    const killStub = stub();
+    const processes: any = new Set([{ kill: killStub }]);
+    const spawn = stub().returns({on: stub(), stderr: {on: stub()}, stdout: {on: stub()}});
+    const sync = new Sync(config, terminal, spawn, processes);
 
     // Execute
-    sync.syncFiles(example1, shortList);
+    sync.end();
 
-    assert(spawn.called);
+    assert(killStub.called);
   });
 });
