@@ -1,24 +1,19 @@
+import { Client, SubscriptionResponse, SubscriptionResponseFile } from 'fb-watchman';
 import { inject, injectable } from 'inversify';
 import { Config, SubConfig, Sync, Terminal, WatchmanExpression, WatchmanSync } from '../interfaces';
 
 @injectable()
 export default class WatchmanSyncImpl implements WatchmanSync {
-  private config: Config;
-  private client: WatchmanClient;
-  private terminal: Terminal;
-  private sync: Sync;
-
   constructor(
-    @inject('Config') config: Config,
-    @inject('WatchmanClient') watchmanClient: WatchmanClient,
-    @inject('Terminal') terminal: Terminal,
-    @inject('Sync') sync: Sync,
-  ) {
-    this.config = config;
-    this.client = watchmanClient;
-    this.terminal = terminal;
-    this.sync = sync;
-  }
+    @inject('Config')
+    private config: Config,
+    @inject('WatchmanClient')
+    private client: Client,
+    @inject('Terminal')
+    private terminal: Terminal,
+    @inject('Sync')
+    private sync: Sync,
+  ) { }
 
   public start(): void {
     const capabilities = {
@@ -32,9 +27,11 @@ export default class WatchmanSyncImpl implements WatchmanSync {
   }
 
   public end(): Promise<void> {
-    const { client, config, terminal } = this;
+    const { client, config, sync } = this;
     const subscriptions = config.subscriptions;
     const promises: Array<Promise<string | void>> = [];
+
+    sync.end();
     for (const name of Object.keys(subscriptions)) {
       const sub = subscriptions[name];
       promises.push(this.unsubscribe(sub.source, name));
@@ -43,8 +40,9 @@ export default class WatchmanSyncImpl implements WatchmanSync {
       .then(() => {
         if (config.controlWatchman) {
           this.shutdown();
+        } else {
+          client.end();
         }
-        client.end();
       });
   }
 
@@ -60,21 +58,19 @@ export default class WatchmanSyncImpl implements WatchmanSync {
     const onSubscription = this.onSubscription.bind(this);
     const promises: Array<Promise<string | void>> = [];
     const subscriptions = Object.keys(this.config.subscriptions);
-    const length = subscriptions.length;
 
     for (const name of subscriptions) {
       const sub = this.config.subscriptions[name];
-      const ignores = sub.ignoreFolders;
       const expression = sub.watchExpression || ['allof', ['type', 'f']];
 
-      for (const ignore of ignores) {
-        expression.push(['not', ['dirname', ignore]]);
+      for (const folder of sub.ignoreFolders) {
+        expression.push(['not', ['dirname', folder]]);
       }
 
       promises.push(this.subscribe(sub.source, name, expression));
     }
-    const render = this.terminal.render.bind(this.terminal);
-    const errHandler = this.terminal.error.bind(this.terminal);
+    const render = terminal.render.bind(terminal);
+    const errHandler = terminal.error.bind(terminal);
     Promise.all(promises).then(render).catch(errHandler);
 
     // subscription is fired regardless of which subscriber fired it
@@ -90,8 +86,8 @@ export default class WatchmanSyncImpl implements WatchmanSync {
       .then(() => {
         terminal.setState(subConfig, 'good');
       })
-      .catch(() => {
-        terminal.setState(subConfig, 'error');
+      .catch(err => {
+        terminal.setState(subConfig, 'error', err);
       });
   }
 
@@ -117,10 +113,7 @@ export default class WatchmanSyncImpl implements WatchmanSync {
     return new Promise<string | void>((resolve, reject) => {
       client.command(['subscribe', folder, name, sub],
         (error: string) => {
-          if (error) {
-            reject('failed to start: ' + error);
-          }
-          resolve();
+          error ? reject('failed to start: ' + error) : resolve();
         });
     });
   }
@@ -140,7 +133,7 @@ export default class WatchmanSyncImpl implements WatchmanSync {
     const client = this.client;
 
     terminal.debug(`completely shutting down`);
-    return new Promise<string | void>((resolve, reject) => {
+    return new Promise<string | void>(resolve => {
       client.command(['shutdown-server'], resolve);
     });
   }

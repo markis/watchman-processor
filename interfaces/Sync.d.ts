@@ -13,4 +13,9 @@ export interface Sync {
    * @memberOf Sync
    */
   syncFiles(subConfig: SubConfig, files: string[]): Promise<void>;
+
+  /**
+   * Kill any spawned processes that might still be running
+   */
+  end(): void;
 }

@@ -88,7 +88,7 @@ describe('Config', () => {
 
   it('should construct on a non-windows machine', () => {
     Object.defineProperty(process, 'platform', { value: 'fakeOS' });
-    const configMgr = new ConfigManager(undefined, undefined, null);
+    const configMgr = new ConfigManager();
 
     assert.isObject(configMgr, 'configMgr is an object');
   });
