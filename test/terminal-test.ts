@@ -135,6 +135,16 @@ describe('Terminal', () => {
 
   });
 
+  it('Expect terminal.setState to execute wih an error state', () => {
+
+    // Setup
+    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk);
+
+    // Execute
+    terminal.setState(config.subscriptions.example1, 'error', 'Fake Error Status');
+
+  });
+
   it('Expect terminal.start to start', () => {
 
     // Setup

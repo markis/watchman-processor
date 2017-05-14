@@ -6,10 +6,11 @@ import 'ts-helpers';
 import ConfigManager from '../src/config';
 
 describe('Config', () => {
-  function noop() {
-    // do nothing
+  function noopWrite(str: string) {
+    // next line is just here to escape the no unused parameter option
+    str = str + '';
   }
-  noop();
+  noopWrite('');
 
   it('should construct the config without options', () => {
     const configMgr = new ConfigManager();
@@ -20,7 +21,7 @@ describe('Config', () => {
   it('should throw error on not getting config file', (done) => {
     const requireStub = stub();
     requireStub.throws();
-    const configMgr = new ConfigManager(undefined, requireStub);
+    const configMgr = new ConfigManager(undefined, requireStub as any, noopWrite);
 
     configMgr.getConfig();
 
@@ -32,7 +33,7 @@ describe('Config', () => {
       subscriptions: { test: {} },
     };
     const fakeRequire = () => fakeConf;
-    const configMgr = new ConfigManager(undefined, fakeRequire);
+    const configMgr = new ConfigManager(undefined, fakeRequire as any);
 
     configMgr.getConfig();
 

@@ -7,7 +7,6 @@ export default class SyncImpl implements Sync {
   private rsyncCmd: string;
   private maxFileLength: number;
   private shell: string;
-  private processes: Set<ChildProcess>;
 
   constructor(
     @inject('Config')
@@ -16,11 +15,11 @@ export default class SyncImpl implements Sync {
     private terminal: Terminal,
     @inject('spawn')
     private spawn: Spawn,
+    private processes = new Set<ChildProcess>(),
   ) {
     this.rsyncCmd = this.config && this.config.rsyncCmd || 'rsync';
     this.maxFileLength = this.config && this.config.maxFileLength || 100;
     this.shell = '/bin/sh';
-    this.processes = new Set<ChildProcess>();
   }
 
   public syncFiles(subConfig: SubConfig, filesNames?: string[]): Promise<void> {
@@ -70,6 +69,10 @@ export default class SyncImpl implements Sync {
       const child = spawn(shell, ['-c', cmdAndArgs]);
       const errBuffer: string[] = [];
       this.processes.add(child);
+      const done = (code: number) => {
+        code > 0 ? reject(errBuffer.join('\n')) : resolve();
+        this.processes.delete(child);
+      };
 
       child.stderr.on('data', (data: string) => {
         errBuffer.push(data);
@@ -78,14 +81,8 @@ export default class SyncImpl implements Sync {
       child.stdout.on('data', (data: string) => {
         terminal.debug(data);
       });
-      child.on('exit', code => {
-        code > 0 ? reject(errBuffer.join('\n')) : resolve();
-        this.processes.delete(child);
-      });
-      child.on('close', code => {
-        code > 0 ? reject(errBuffer.join('\n')) : resolve();
-        this.processes.delete(child);
-      });
+      child.on('exit', done);
+      child.on('close', done);
       child.on('error', (err) => {
         reject(err);
         this.processes.delete(child);
