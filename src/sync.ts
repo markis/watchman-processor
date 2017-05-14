@@ -7,6 +7,7 @@ export default class SyncImpl implements Sync {
   private rsyncCmd: string;
   private maxFileLength: number;
   private shell: string;
+  private processes: Set<ChildProcess>;
 
   constructor(
     @inject('Config')
@@ -15,11 +16,11 @@ export default class SyncImpl implements Sync {
     private terminal: Terminal,
     @inject('spawn')
     private spawn: Spawn,
-    private processes = new Set<ChildProcess>(),
   ) {
     this.rsyncCmd = this.config && this.config.rsyncCmd || 'rsync';
     this.maxFileLength = this.config && this.config.maxFileLength || 100;
     this.shell = '/bin/sh';
+    this.processes = new Set<ChildProcess>();
   }
 
   public syncFiles(subConfig: SubConfig, filesNames?: string[]): Promise<void> {

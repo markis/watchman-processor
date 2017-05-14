@@ -95,7 +95,9 @@ describe('Sync', () => {
     const killStub = stub();
     const processes: any = new Set([{ kill: killStub }]);
     const spawn = stub().returns({on: stub(), stderr: {on: stub()}, stdout: {on: stub()}});
-    const sync = new Sync(config, terminal, spawn, processes);
+    const sync = new Sync(config, terminal, spawn);
+    /* tslint:disable-next-line:no-string-literal */
+    sync['processes'] = processes;
 
     // Execute
     sync.end();
