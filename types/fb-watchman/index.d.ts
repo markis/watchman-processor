@@ -1,36 +1,36 @@
 
 declare module 'fb-watchman' {
   export class ClientPrototype {
-    domain: any;
-    addListener(type: any, listener: any): any;
-    cancelCommands(why: any): void;
-    capabilityCheck(capabilities: any, onCapabilityCheck: (error: string) => void): void;
-    command(params: any[], onCommand: (error: string) => void): void;
-    connect(): void;
-    emit(type: any, ...args: any[]): any;
-    end(): void;
-    eventNames(): any;
-    getMaxListeners(): any;
-    listenerCount(type: any): any;
-    listeners(type: any): any;
-    on(subscription: string, onSubscription: (resp: SubscriptionResponse) => void): void;
-    once(type: any, listener: any): any;
-    prependListener(type: any, listener: any): any;
-    prependOnceListener(type: any, listener: any): any;
-    removeAllListeners(type: any, ...args: any[]): any;
-    removeListener(type: any, listener: any): any;
-    sendNextCommand(): void;
-    setMaxListeners(n: any): any;
+    public domain: any;
+    public addListener(type: any, listener: any): any;
+    public cancelCommands(why: any): void;
+    public capabilityCheck(capabilities: any, onCapabilityCheck: (error: string) => void): void;
+    public command(params: any[], onCommand: (error: string) => void): void;
+    public connect(): void;
+    public emit(type: any, ...args: any[]): any;
+    public end(): void;
+    public eventNames(): any;
+    public getMaxListeners(): any;
+    public listenerCount(type: any): any;
+    public listeners(type: any): any;
+    public on(subscription: string, onSubscription: (resp: SubscriptionResponse) => void): void;
+    public once(type: any, listener: any): any;
+    public prependListener(type: any, listener: any): any;
+    public prependOnceListener(type: any, listener: any): any;
+    public removeAllListeners(type: any, ...args: any[]): any;
+    public removeListener(type: any, listener: any): any;
+    public sendNextCommand(): void;
+    public setMaxListeners(n: any): any;
   }
 
   export class Client extends ClientPrototype {
-    constructor(options?: any);
-    cancelCommands(why: any): void;
-    capabilityCheck(capabilities: any, onCapabilityCheck: (error: string) => void): void;
-    command(params: any[], onCommand: (error: string) => void): void;
-    connect(): void;
-    end(): void;
-    sendNextCommand(): void;
+    public constructor(options?: any);
+    public cancelCommands(why: any): void;
+    public capabilityCheck(capabilities: any, onCapabilityCheck: (error: string) => void): void;
+    public command(params: any[], onCommand: (error: string) => void): void;
+    public connect(): void;
+    public end(): void;
+    public sendNextCommand(): void;
   }
 
   export interface SubscriptionResponse {
