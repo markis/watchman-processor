@@ -1,8 +1,7 @@
 import * as chalk from 'chalk';
 import * as proc from 'child_process';
-import * as watchman from 'fb-watchman';
+import { Client } from 'fb-watchman';
 import { Container } from 'inversify';
-import * as emoji from 'node-emoji';
 import 'reflect-metadata';
 import * as interfaces from '../interfaces';
 import ConfigManager from './config';
@@ -11,7 +10,7 @@ import TerminalImpl, { StdErrWriteImpl, StdOutWriteImpl } from './terminal';
 import WatchmanSyncImpl from './watchman';
 
 const configManager = new ConfigManager({}, require, StdOutWriteImpl);
-let watchmanSync: interfaces.WatchmanSync;
+let watchmanSync: interfaces.WatchmanSync | null = null;
 
 if (process.argv[2] === 'init') {
   configManager.createConfig();
@@ -24,7 +23,9 @@ if (process.argv[2] === 'init') {
     StdErrWriteImpl(error.message + '\n');
     if (error.name !== 'init') {
       StdErrWriteImpl(error.name);
-      StdErrWriteImpl(error.stack);
+      if (error.stack) {
+        StdErrWriteImpl(error.stack);
+      }
     }
   } else if (config) {
     setupKernel(container);
@@ -37,11 +38,10 @@ function setupKernel(container: Container): Container {
   if (config) {
     container.bind<interfaces.Spawn>('spawn').toConstantValue(proc.spawn);
     container.bind<NodeRequire>('require').toConstantValue(require);
-    container.bind<WatchmanClient>('WatchmanClient').toConstantValue(new watchman.Client());
+    container.bind<Client>('WatchmanClient').toConstantValue(new Client());
     container.bind<interfaces.Config>('Config').toConstantValue(config);
     container.bind<interfaces.Write>('stdErrWrite').toConstantValue(StdErrWriteImpl);
     container.bind<interfaces.Write>('stdOutWrite').toConstantValue(StdOutWriteImpl);
-    container.bind<Emoji>('Emoji').toConstantValue(emoji);
     container.bind('Chalk').toConstantValue(chalk);
     container.bind<interfaces.Terminal>('Terminal').to(TerminalImpl);
     container.bind<interfaces.Sync>('Sync').to(SyncImpl);

@@ -1,24 +1,26 @@
+import { ChildProcess } from 'child_process';
 import { inject, injectable } from 'inversify';
 import { Config, Spawn, SubConfig, Sync, Terminal } from '../interfaces';
 
 @injectable()
 export default class SyncImpl implements Sync {
-  private terminal: Terminal;
   private rsyncCmd: string;
   private maxFileLength: number;
-  private spawn: Spawn;
   private shell: string;
+  private processes: Set<ChildProcess>;
 
   constructor(
-    @inject('Config') config: Config,
-    @inject('Terminal') terminal: Terminal,
-    @inject('spawn') spawn: Spawn,
+    @inject('Config')
+    private config: Config,
+    @inject('Terminal')
+    private terminal: Terminal,
+    @inject('spawn')
+    private spawn: Spawn,
   ) {
-    this.terminal = terminal;
-    this.rsyncCmd = config && config.rsyncCmd || 'rsync';
-    this.maxFileLength = config && config.maxFileLength || 100;
-    this.spawn = spawn;
+    this.rsyncCmd = this.config && this.config.rsyncCmd || 'rsync';
+    this.maxFileLength = this.config && this.config.maxFileLength || 100;
     this.shell = '/bin/sh';
+    this.processes = new Set<ChildProcess>();
   }
 
   public syncFiles(subConfig: SubConfig, filesNames?: string[]): Promise<void> {
@@ -36,44 +38,58 @@ export default class SyncImpl implements Sync {
     }
   }
 
+  public end() {
+    this.processes.forEach(proc => {
+      proc.kill();
+    });
+  }
+
   private _syncAllFiles(subConfig: SubConfig): Promise<void> {
-    const src = subConfig.source;
-    const dest = subConfig.destination;
-    const ignoreFolders = subConfig.ignoreFolders;
+    const { destination, ignoreFolders, source } = subConfig;
     const excludes = (`--exclude '${ignoreFolders.join(`' --exclude '`)}'`).split(' ');
-    const args = [].concat(['-avz', '--delete'], excludes, [src, dest]);
+    const args = ['-avz', '--delete'].concat(excludes, [source, destination]);
 
     return this._exec(args);
   }
 
   private _syncSpecificFiles(subConfig: SubConfig, files: string[]): Promise<void> {
     files = getUniqueFileFolders(files).concat(files);
-
-    const src = subConfig.source;
-    const dest = subConfig.destination;
+    const { destination, source } = subConfig;
     const includes = (`--include '${files.join(`' --include '`)}'`).split(' ');
-    const args = [].concat(['-avz', '--delete'], includes, ['--exclude', `'*'`, src, dest]);
+    const args = ['-avz', '--delete'].concat(includes, ['--exclude', `'*'`, source, destination]);
 
     return this._exec(args);
   }
 
   private _exec(args: string[]): Promise<void> {
-    const spawn = this.spawn;
-    const rsyncCmd = this.rsyncCmd;
-    const terminal = this.terminal;
-    const shell = this.shell;
+    const { spawn, rsyncCmd, terminal, shell } = this;
     const cmdAndArgs = rsyncCmd + ' ' + args.join(' ');
+    terminal.debug(cmdAndArgs);
 
     return new Promise<void>((resolve, reject) => {
-      terminal.debug(cmdAndArgs);
-
       const child = spawn(shell, ['-c', cmdAndArgs]);
-      child.stdout.on('data', (data: string) => terminal.debug(data));
-      child.stdout.on('end', resolve);
-      child.on('exit', resolve);
-      child.on('close', resolve);
-    }).catch(reason => {
-      this.terminal.error(reason);
+      const errBuffer: string[] = [];
+      this.processes.add(child);
+
+      child.stderr.on('data', (data: string) => {
+        errBuffer.push(data);
+        terminal.debug(data);
+      });
+      child.stdout.on('data', (data: string) => {
+        terminal.debug(data);
+      });
+      child.on('exit', code => {
+        code > 0 ? reject(errBuffer.join('\n')) : resolve();
+        this.processes.delete(child);
+      });
+      child.on('close', code => {
+        code > 0 ? reject(errBuffer.join('\n')) : resolve();
+        this.processes.delete(child);
+      });
+      child.on('error', (err) => {
+        reject(err);
+        this.processes.delete(child);
+      });
     });
   }
 }

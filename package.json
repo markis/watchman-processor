@@ -1,7 +1,7 @@
 {
   "name": "watchman-processor",
   "version": "2.0.14",
-  "description": "Processor for the fb-watchman service",
+  "description": "File synchronizer with a simple dashboard",
   "keywords": [
     "watchman",
     "rsync",
@@ -30,7 +30,6 @@
     "fb-watchman": "^2.0.0",
     "in-publish": "^2.0.0",
     "inversify": "^4.0.0",
-    "node-emoji": "^1.5.1",
     "reflect-metadata": "^0.1.10",
     "tslib": "^1.6.0"
   },
@@ -66,10 +65,6 @@
     "test": "npm run lint && npm run coverage:remap",
     "test:unit": "mocha mocha built/test/**/*-test.js"
   },
-  "pre-commit": [
-    "lint",
-    "coverage"
-  ],
   "repository": "https://github.com/markis/watchman-processor.git",
   "license": "MIT"
 }

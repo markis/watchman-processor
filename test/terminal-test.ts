@@ -66,7 +66,7 @@ describe('Terminal', () => {
 
   it('Expect terminal.error to execute stdErrWrite', () => {
     // Setup
-    const terminal = new Terminal(config, noop, stdErrWrite, mockChalk, null);
+    const terminal = new Terminal(config, noop, stdErrWrite, mockChalk);
 
     // Execute
     terminal.error('err');
@@ -76,7 +76,7 @@ describe('Terminal', () => {
 
   it('Expect terminal.debug to execute stdOutWrite', () => {
     // Setup
-    const terminal = new Terminal({ debug: true }, stdOutWrite, noop, mockChalk, null);
+    const terminal = new Terminal({ debug: true }, stdOutWrite, noop, mockChalk);
 
     // Execute
     terminal.debug('err');
@@ -87,16 +87,16 @@ describe('Terminal', () => {
   it('Expect terminal.debug to handle nulls', () => {
 
     // Setup
-    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk, mockEmoji);
+    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk);
 
     // Execute
-    terminal.debug(null);
+    terminal.debug('');
 
   });
 
   it('Expect terminal.render to render', () => {
     // Setup
-    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk, mockEmoji);
+    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk);
 
     // Execute
     terminal.render();
@@ -107,7 +107,7 @@ describe('Terminal', () => {
   it('Expect terminal.render to render without emojis', () => {
     // Setup
     config.emoji = false;
-    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk, mockEmoji);
+    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk);
 
     // Execute
     terminal.render();
@@ -118,7 +118,7 @@ describe('Terminal', () => {
   it('Expect terminal.render to do nothing when debug is turned on', () => {
 
     // Setup
-    const terminal = new Terminal({ debug: true }, stdOutWrite, noop, mockChalk, mockEmoji);
+    const terminal = new Terminal({ debug: true }, stdOutWrite, noop, mockChalk);
 
     // Execute
     terminal.render();
@@ -129,7 +129,7 @@ describe('Terminal', () => {
   it('Expect terminal.setState to execute', () => {
 
     // Setup
-    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk, mockEmoji);
+    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk);
 
     // Execute
     terminal.setState(config.subscriptions.example1, 'good');
@@ -140,7 +140,7 @@ describe('Terminal', () => {
 
     // Setup
     const startConfig = { debug: false };
-    const terminal = new Terminal(startConfig, stdOutWrite, noop, mockChalk, mockEmoji);
+    const terminal = new Terminal(startConfig, stdOutWrite, noop, mockChalk);
 
     // Execute with debug on
     startConfig.debug = false;
@@ -155,7 +155,7 @@ describe('Terminal', () => {
   it('Expect terminal.error to handle non-strings', () => {
 
     // Setup
-    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk, mockEmoji);
+    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk);
 
     // Execute
     terminal.error(new Error());

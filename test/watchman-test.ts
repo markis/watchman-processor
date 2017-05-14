@@ -1,4 +1,5 @@
 import * as chai from 'chai';
+import { Client } from 'fb-watchman';
 import 'reflect-metadata';
 import * as sinon from 'sinon';
 import 'ts-helpers';
@@ -10,6 +11,7 @@ import Watchman from '../src/watchman';
 const mockTerminal = sinon.mock(Terminal);
 const terminal: Terminal = mockTerminal as any;
 const mockSync = {
+  end: sinon.stub(),
   syncFiles: sinon.stub(),
 };
 const sync: Sync = mockSync as any;
@@ -20,7 +22,7 @@ const mockWatchmanClient = {
   on: sinon.stub(),
   syncFiles: sinon.stub(),
 };
-const watchmanClient: WatchmanClient = mockWatchmanClient as any;
+const watchmanClient: Client = mockWatchmanClient as any;
 const config: Config = {
   subscriptions: {
     example1: {
