@@ -57,6 +57,6 @@ export interface Config {
    * @memberOf Config
    */
   subscriptions: {
-    [index: string]: SubConfig
+    [index: string]: SubConfig;
   };
 }
