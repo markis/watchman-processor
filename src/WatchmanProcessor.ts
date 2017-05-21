@@ -1,17 +1,18 @@
 import { Client, SubscriptionResponse, SubscriptionResponseFile } from 'fb-watchman';
 import { inject, injectable } from 'inversify';
-import { Config, SubConfig, Sync, Terminal, WatchmanExpression, WatchmanSync } from '../interfaces';
+import { Config, SubConfig, Sync, Terminal, WatchmanExpression, WatchmanProcessor } from '../interfaces';
+import { Bindings } from './ioc.bindings';
 
 @injectable()
-export default class WatchmanSyncImpl implements WatchmanSync {
+export class WatchmanProcessorImpl implements WatchmanProcessor {
   constructor(
-    @inject('Config')
+    @inject(Bindings.Config)
     private config: Config,
-    @inject('WatchmanClient')
+    @inject(Bindings.WatchmanClient)
     private client: Client,
-    @inject('Terminal')
+    @inject(Bindings.Terminal)
     private terminal: Terminal,
-    @inject('Sync')
+    @inject(Bindings.Sync)
     private sync: Sync,
   ) { }
 
@@ -31,11 +32,11 @@ export default class WatchmanSyncImpl implements WatchmanSync {
     const subscriptions = config.subscriptions;
     const promises: Array<Promise<string | void>> = [];
 
-    sync.end();
     for (const name of Object.keys(subscriptions)) {
       const sub = subscriptions[name];
       promises.push(this.unsubscribe(sub.source, name));
     }
+    sync.end();
     return Promise.all(promises)
       .then(() => {
         if (config.controlWatchman) {

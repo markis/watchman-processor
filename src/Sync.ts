@@ -1,25 +1,20 @@
 import { ChildProcess } from 'child_process';
 import { inject, injectable } from 'inversify';
 import { Config, Spawn, SubConfig, Sync, Terminal } from '../interfaces';
+import { Bindings } from './ioc.bindings';
 
 @injectable()
-export default class SyncImpl implements Sync {
-  private rsyncCmd: string;
-  private maxFileLength: number;
-  private shell: string;
-  private processes: Set<ChildProcess>;
+export class SyncImpl implements Sync {
+  private readonly processes: Set<ChildProcess>;
 
   constructor(
-    @inject('Config')
-    private config: Config,
-    @inject('Terminal')
-    private terminal: Terminal,
-    @inject('spawn')
-    private spawn: Spawn,
+    @inject(Bindings.Config)
+    private readonly config: Config,
+    @inject(Bindings.Terminal)
+    private readonly terminal: Terminal,
+    @inject(Bindings.Spawn)
+    private readonly spawn: Spawn,
   ) {
-    this.rsyncCmd = this.config && this.config.rsyncCmd || 'rsync';
-    this.maxFileLength = this.config && this.config.maxFileLength || 100;
-    this.shell = '/bin/sh';
     this.processes = new Set<ChildProcess>();
   }
 
@@ -31,7 +26,7 @@ export default class SyncImpl implements Sync {
 
     // if there are too many files, it might just be better to let rsync figure out what
     // needs to be synced
-    if (files.length > 0 && files.length < this.maxFileLength) {
+    if (files.length > 0 && files.length < this.config.maxFileLength) {
       return this._syncSpecificFiles(subConfig, files);
     } else {
       return this._syncAllFiles(subConfig);
@@ -62,34 +57,40 @@ export default class SyncImpl implements Sync {
   }
 
   private _exec(args: string[]): Promise<void> {
-    const { spawn, rsyncCmd, terminal, shell } = this;
-    const cmdAndArgs = rsyncCmd + ' ' + args.join(' ');
+    const { spawn, config, terminal } = this;
+    const cmdAndArgs = config.rsyncCmd + ' ' + args.join(' ');
     terminal.debug(cmdAndArgs);
 
     return new Promise<void>((resolve, reject) => {
-      const child = spawn(shell, ['-c', cmdAndArgs]);
+      const child = spawn(config.shell, ['-c', cmdAndArgs]);
       const errBuffer: string[] = [];
       this.processes.add(child);
       const done = (code: number) => {
-        code > 0 ? reject(errBuffer.join('\n')) : resolve();
         this.processes.delete(child);
+        code > 0 ? reject(errBuffer.join('\n')) : resolve();
       };
 
-      child.stderr.on('data', (data: string) => {
+      child.stderr.on('data', (data: Buffer | string) => {
+        data = toString(data);
         errBuffer.push(data);
         terminal.debug(data);
       });
-      child.stdout.on('data', (data: string) => {
-        terminal.debug(data);
+      child.stdout.on('data', (data: Buffer | string) => {
+        terminal.debug(toString(data));
       });
       child.on('exit', done);
       child.on('close', done);
       child.on('error', (err) => {
-        reject(err);
         this.processes.delete(child);
+        reject(err);
       });
     });
   }
+}
+
+function toString(data: Buffer | string) {
+  /* istanbul ignore next */
+  return data instanceof Buffer ? data.toString('utf8') : data;
 }
 
 /**

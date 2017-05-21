@@ -1,9 +1,8 @@
 import { assert } from 'chai';
+import { unlink as deleteFile } from 'fs';
 import { resolve } from 'path';
-import 'reflect-metadata';
 import { stub } from 'sinon';
-import 'ts-helpers';
-import ConfigManager from '../src/config';
+import { ConfigManagerImpl as ConfigManager } from '../src/ConfigManager';
 
 describe('Config', () => {
   function noopWrite(str: string) {
@@ -28,18 +27,6 @@ describe('Config', () => {
     done();
   });
 
-  it('should handle initilizing ignoreFolders', (done) => {
-    const fakeConf = {
-      subscriptions: { test: {} },
-    };
-    const fakeRequire = () => fakeConf;
-    const configMgr = new ConfigManager(undefined, fakeRequire as any);
-
-    configMgr.getConfig();
-
-    done();
-  });
-
   it('should handle dealing with non existant files', (done) => {
     const configMgr = new ConfigManager({ confFile: 'non-existant.js' });
 
@@ -49,12 +36,16 @@ describe('Config', () => {
   });
 
   it('should throw error on not getting config file', (done) => {
+    const tempFile = resolve(__dirname, 'example/watchman-processor.config.js.tmp');
+
     const configMgr = new ConfigManager({
-      confFile: resolve(__dirname, 'example-watchman-processor.config.js.tmp'),
+      confFile: tempFile,
       exampleConfFile: resolve(__dirname, 'example/watchman-processor.config.js'),
     });
 
-    configMgr.createConfig().then(done);
+    configMgr.createConfig().then(() => {
+      deleteFile(tempFile, done);
+    });
   });
 
   it('should initialize the example config file', () => {

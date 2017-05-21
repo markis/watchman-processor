@@ -7,7 +7,7 @@ export interface Config {
    * @type {boolean}
    * @memberOf Config
    */
-  debug?: boolean;
+  debug: boolean;
 
   /**
    * if your terminal window can support emojis
@@ -15,7 +15,7 @@ export interface Config {
    * @type {boolean}
    * @memberOf Config
    */
-  emoji?: boolean;
+  emoji: boolean;
 
   /**
    * if you want watchman to completely control the watchman process
@@ -24,7 +24,7 @@ export interface Config {
    * @type {boolean}
    * @memberOf Config
    */
-  controlWatchman?: boolean;
+  controlWatchman: boolean;
 
   /**
    * this limits the number files to pass to rsync.
@@ -32,7 +32,7 @@ export interface Config {
    * @type {number}
    * @memberOf Config
    */
-  maxFileLength?: number;
+  maxFileLength: number;
 
   /**
    *  default: 'rsync' -- override to whatever rsync command is installed or located
@@ -40,7 +40,15 @@ export interface Config {
    * @type {string}
    * @memberOf Config
    */
-  rsyncCmd?: string;
+  rsyncCmd: string;
+
+  /**
+   *  default: '/bin/sh' -- shell for executing rsync
+   *
+   * @type {string}
+   * @memberOf Config
+   */
+  shell: string;
 
   /**
    * These are specified subscriptions, they are listed by name
@@ -48,5 +56,7 @@ export interface Config {
    * @type {*}
    * @memberOf Config
    */
-  subscriptions?: Map<string, SubConfig> | any;
+  subscriptions: {
+    [index: string]: SubConfig
+  };
 }

@@ -1,6 +1,4 @@
 import { Client } from './Client';
-import { SubscriptionResponse } from './SubscriptionResponse';
+import { SubscriptionResponse, SubscriptionResponseFile } from './SubscriptionResponse';
 
-declare module 'fb-watchman' {
-  export { Client, SubscriptionResponse };
-}
+export { Client, SubscriptionResponse, SubscriptionResponseFile };

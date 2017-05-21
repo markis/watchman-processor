@@ -1,24 +1,30 @@
 import { inject, injectable } from 'inversify';
-import { Config, SubConfig, Terminal, Write } from '../interfaces';
+import { Config, States, SubConfig, Terminal, Write } from '../interfaces';
+import { Bindings } from './ioc.bindings';
+
+const fgBlack = '\x1b[30m';
+
+const bgRed = '\x1b[41m';
+const bgGreen = '\x1b[42m';
+const bgYellow = '\x1b[43m';
+const bgWhite = '\x1b[47m';
 
 @injectable()
-export default class TerminalImpl implements Terminal {
+export class TerminalImpl implements Terminal {
   constructor(
-    @inject('Config')
-    private config: Config,
-    @inject('stdOutWrite')
-    private writeFunc: Write,
-    @inject('stdErrWrite')
-    private errorFunc: Write,
-    @inject('Chalk')
-    private chalk: any,
+    @inject(Bindings.Config)
+    private readonly config: Config,
+    @inject(Bindings.Log)
+    private readonly writeFunc: Write,
+    @inject(Bindings.Error)
+    private readonly errorFunc: Write,
   ) { }
 
   public error(err: string | Error) {
     const msg = err.toString();
-    this.errorFunc(this.chalk.red(msg));
+    this.errorFunc(`${msg}`);
     if (typeof err !== 'string') {
-      this.errorFunc(this.chalk.red(err.stack));
+      this.errorFunc(`${err.stack}`);
     }
   }
 
@@ -33,18 +39,23 @@ export default class TerminalImpl implements Terminal {
     }
   }
 
-  public setState(configEntry: SubConfig, state: string, statusMessage?: string) {
+  public setState(configEntry: SubConfig, state: States, statusMessage?: string) {
     configEntry.state = state;
     configEntry.statusMessage = statusMessage;
     this.render();
   }
 
   public render() {
+    /* istanbul ignore if */
     if (!this || !this.config || this.config.debug) {
       return;
     }
+    /* istanbul ignore if */
+    if (!this.config.subscriptions) {
+      return;
+    }
+
     this._clear();
-    const chalk = this.chalk;
     const subscriptions = Object.keys(this.config.subscriptions);
     const statusBuffer: string[] = [];
     const log = this._log.bind(this);
@@ -58,16 +69,17 @@ export default class TerminalImpl implements Terminal {
       }
 
       if (state === 'good') {
-        log(emoji('👍 ') + ' ' + name + ' ', chalk.bgGreen);
+        log(emoji('👍 ') + ' ' + name + ' ', bgGreen);
       } else if (state === 'running') {
-        log(emoji('🏃 ') + ' ' + name + ' ', chalk.bgYellow);
+        log(emoji('🏃 ') + ' ' + name + ' ', bgYellow);
       } else if (state === 'error') {
-        log(emoji('💀 ') + ' ' + name + ' ', chalk.bgRed);
+        log(emoji('💀 ') + ' ' + name + ' ', bgRed);
       } else {
-        log(emoji('⚡️ ') + ' ' + name + ' ', chalk.bgWhite);
+        log(emoji('⚡️ ') + ' ' + name + ' ', bgWhite);
       }
     }
-    log('\n', chalk.bgWhite);
+    log('\n', bgWhite);
+    this._reset();
     this.error(statusBuffer.join('\n'));
   }
 
@@ -79,26 +91,12 @@ export default class TerminalImpl implements Terminal {
     this.writeFunc('\x1b[H\x1b[J');
   }
 
-  private _log(msg: string, chalkColor: any) {
-    msg = chalkColor.black(msg);
-    this.writeFunc(msg);
+  private _reset() {
+    this.writeFunc('\x1b[0m');
   }
-}
 
-/**
- * Wraps process.stderr.write, so that we can mock this method in tests
- *
- * @param {string} msg
- */
-export function StdErrWriteImpl(msg: string) {
-  process.stderr.write(msg);
-}
-
-/**
- * Wraps process.stdout.write, so that we mock this method in tests
- *
- * @param {string} msg
- */
-export function StdOutWriteImpl(msg: string) {
-  process.stdout.write(msg);
+  private _log(msg: string, backgroundColor: string) {
+    this.writeFunc(`${backgroundColor}${fgBlack}${msg}`);
+    this._reset();
+  }
 }

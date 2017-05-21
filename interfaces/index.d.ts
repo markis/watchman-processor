@@ -5,6 +5,5 @@ export * from './Spawn';
 export * from './SubConfig';
 export * from './Sync';
 export * from './Terminal';
-export * from './WatchmanExpression';
-export * from './WatchmanSync';
+export * from './WatchmanProcessor';
 export * from './Write';

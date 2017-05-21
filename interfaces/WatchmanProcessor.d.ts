@@ -1,4 +1,6 @@
-export interface WatchmanSync {
+export type WatchmanExpression = Array<string | Array<string | Array<string>>>;
+
+export interface WatchmanProcessor {
   /**
    * Get this party started!  This is the start of everything.
    * This is what communicates directly with fb-watchman and then passes data to sync/terminal.

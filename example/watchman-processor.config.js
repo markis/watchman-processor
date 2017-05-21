@@ -4,10 +4,11 @@ var HOME_FOLDER = process.env[(process.platform === 'win32') ? 'USERPROFILE' : '
 const IGNORE_FOLDERS = ['.git', 'node_modules'];
 
 module.exports = {
-  debug: false,           // changes the output to show debug information, cmd and stdout output
-  emoji: true,            // if your terminal window can support emojis
-  controlWatchman: true,  // this will tell watchman-processor to shutdown watchman, when quitting
+  debug: false,           // default: false -- changes the output to show debug information, cmd and stdout output
+  emoji: true,            // default: true -- if your terminal window can support emojis
+  controlWatchman: true,  // default: true -- this will tell watchman-processor to shutdown watchman, when quitting
   rsyncCmd: 'rsync',      // default: 'rsync' -- override to whatever rsync command is installed or located
+  maxFileLength: 100,     // default: 100 -- this is the number of files to attempt to send to rsync at a time
   subscriptions: {
     example1: {
       type: 'rsync',      // set the subscription to rsync files from a 'source' folder to 'destination' folder

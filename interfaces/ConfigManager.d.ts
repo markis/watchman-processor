@@ -7,12 +7,12 @@ export interface ConfigManager {
    * @returns {Config}
    * @memberOf ConfigManager
    */
-  getConfig(): Config;
+  getConfig(): Config | Error;
 
   /**
    * This will create config file in the default location with the example data
    *
    * @memberOf ConfigManager
    */
-  createConfig(): void;
+  createConfig(): Promise<void>;
 }

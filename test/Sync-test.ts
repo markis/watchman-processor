@@ -1,16 +1,15 @@
 import { assert } from 'chai';
-import 'reflect-metadata';
 import { stub } from 'sinon';
-import 'ts-helpers';
 import { Config } from '../interfaces';
-import Sync from '../src/sync';
-import Terminal from '../src/terminal';
+import { SyncImpl as Sync } from '../src/Sync';
+import { TerminalImpl as Terminal } from '../src/Terminal';
 
 function noop() {
   // do nothing
 }
 const terminal: Terminal = { debug: noop, error: noop } as any;
 const config: Config = {
+  maxFileLength: 100,
   subscriptions: {
     example1: {
       destination: 'user@server:/tmp/example1/',
@@ -19,7 +18,7 @@ const config: Config = {
       type: 'rsync',
     },
   },
-};
+} as any;
 const example1 = config.subscriptions.example1;
 
 describe('Sync', () => {
@@ -31,7 +30,7 @@ describe('Sync', () => {
       'example1/js/1.js',
       'example1/js/2.js',
     ];
-    const onData = stub().callsArgWith(1, '');
+    const onData = stub().callsArgWith(1, Buffer.from('test', 'utf8'));
     const onExit = stub();
     const spawn = stub().returns({on: onExit, stderr: {on: onData}, stdout: {on: onData}});
     const sync = new Sync(config, terminal, spawn);
@@ -93,11 +92,10 @@ describe('Sync', () => {
 
     // Setup
     const killStub = stub();
-    const processes: any = new Set([{ kill: killStub }]);
     const spawn = stub().returns({on: stub(), stderr: {on: stub()}, stdout: {on: stub()}});
     const sync = new Sync(config, terminal, spawn);
     /* tslint:disable-next-line:no-string-literal */
-    sync['processes'] = processes;
+    sync['processes'].add({ kill: killStub } as any);
 
     // Execute
     sync.end();
