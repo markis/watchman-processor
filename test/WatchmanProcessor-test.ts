@@ -4,9 +4,9 @@ import 'reflect-metadata';
 import * as sinon from 'sinon';
 import 'ts-helpers';
 import { Config } from '../interfaces';
-import Sync from '../src/sync';
-import Terminal from '../src/terminal';
-import Watchman from '../src/watchman';
+import { SyncImpl as Sync } from '../src/Sync';
+import { TerminalImpl as Terminal } from '../src/Terminal';
+import { WatchmanProcessorImpl as Watchman } from '../src/WatchmanProcessor';
 
 const mockTerminal = sinon.mock(Terminal);
 const terminal: Terminal = mockTerminal as any;
@@ -32,7 +32,7 @@ const config: Config = {
       type: 'rsync',
     },
   },
-};
+} as any;
 
 describe('Watchman', () => {
 
@@ -100,7 +100,7 @@ describe('Watchman', () => {
 
   it('should end and shutdown', () => {
     mockWatchmanClient.end = sinon.stub();
-    const newConfig = { controlWatchman: true, subscriptions: {} };
+    const newConfig = { controlWatchman: true, subscriptions: {} } as any;
     const watchman = new Watchman(newConfig, watchmanClient, terminal, sync);
     watchman.end();
   });

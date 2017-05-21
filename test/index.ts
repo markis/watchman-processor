@@ -1,4 +1,4 @@
-import './config-test.ts';
-import './sync-test';
-import './terminal-test';
-import './watchman-test';
+import './ConfigManager-test';
+import './Sync-test';
+import './Terminal-test';
+import './WatchmanProcessor-test';

@@ -4,7 +4,7 @@
     "target": "es5",
     "lib": [ "es6" ],
     "outDir": "built/",
-    "declaration": true,
+    "baseUrl": "types",
     "moduleResolution": "node",
     "sourceMap": true,
     "importHelpers": true,
@@ -12,11 +12,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "strictNullChecks": true,
-    "experimentalDecorators": true,
-    "typeRoots": [
-      "node_modules/@types",
-      "types"
-    ]
+    "experimentalDecorators": true
   },
   "exclude": [
     "node_modules",

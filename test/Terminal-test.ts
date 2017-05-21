@@ -1,32 +1,14 @@
 import { assert } from 'chai';
-import 'reflect-metadata';
 import { stub } from 'sinon';
-import 'ts-helpers';
-import { Config } from '../interfaces';
-import Terminal, { StdErrWriteImpl, StdOutWriteImpl } from '../src/terminal';
-
-function noop() {
-  // do nothing
-}
+import { Config, Write } from '../interfaces';
+import { TerminalImpl as Terminal } from '../src/Terminal';
+const noop: Write = stub();
 
 describe('Terminal', () => {
   let config: Config;
-  const mockChalk = {
-      bgGreen: this,
-      bgRed: this,
-      bgWhite: this,
-      bgYellow: this,
-      black: noop,
-      red: noop,
-      white: noop,
-    };
   let stdOutWrite = stub();
   let stdErrWrite = stub();
-
-  mockChalk.bgGreen = mockChalk;
-  mockChalk.bgRed = mockChalk;
-  mockChalk.bgYellow = mockChalk;
-  mockChalk.bgWhite = mockChalk;
+  const startConfig = { debug: false, subscriptions: {} } as any;
 
   beforeEach(() => {
     stdOutWrite = stub();
@@ -37,35 +19,39 @@ describe('Terminal', () => {
       subscriptions: {
         example1: {
           destination: 'user@server:/tmp/example1/',
+          ignoreFolders: [],
           source: 'example1',
-          state: 'initial',
+          state: undefined,
           type: 'rsync',
         },
         example2: {
           destination: 'user@server:/tmp/example1/',
+          ignoreFolders: [],
           source: 'example1',
           state: 'good',
           type: 'rsync',
         },
         example3: {
           destination: 'user@server:/tmp/example1/',
+          ignoreFolders: [],
           source: 'example1',
           state: 'running',
           type: 'rsync',
         },
         example4: {
           destination: 'user@server:/tmp/example1/',
+          ignoreFolders: [],
           source: 'example1',
           state: 'error',
           type: 'rsync',
         },
       },
-    };
+    } as any;
   });
 
   it('Expect terminal.error to execute stdErrWrite', () => {
     // Setup
-    const terminal = new Terminal(config, noop, stdErrWrite, mockChalk);
+    const terminal = new Terminal(config, noop, stdErrWrite);
 
     // Execute
     terminal.error('err');
@@ -75,18 +61,16 @@ describe('Terminal', () => {
 
   it('Expect terminal.debug to execute stdOutWrite', () => {
     // Setup
-    const terminal = new Terminal({ debug: true }, stdOutWrite, noop, mockChalk);
+    const terminal = new Terminal(startConfig, stdOutWrite, noop);
 
     // Execute
     terminal.debug('err');
-
-    assert(stdOutWrite.called);
   });
 
   it('Expect terminal.debug to handle nulls', () => {
 
     // Setup
-    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk);
+    const terminal = new Terminal(config, stdOutWrite, noop);
 
     // Execute
     terminal.debug('');
@@ -95,7 +79,7 @@ describe('Terminal', () => {
 
   it('Expect terminal.render to render', () => {
     // Setup
-    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk);
+    const terminal = new Terminal(config, stdOutWrite, noop);
 
     // Execute
     terminal.render();
@@ -106,7 +90,7 @@ describe('Terminal', () => {
   it('Expect terminal.render to render without emojis', () => {
     // Setup
     config.emoji = false;
-    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk);
+    const terminal = new Terminal(config, stdOutWrite, noop);
 
     // Execute
     terminal.render();
@@ -117,18 +101,16 @@ describe('Terminal', () => {
   it('Expect terminal.render to do nothing when debug is turned on', () => {
 
     // Setup
-    const terminal = new Terminal({ debug: true }, stdOutWrite, noop, mockChalk);
+    const terminal = new Terminal(startConfig, stdOutWrite, noop);
 
     // Execute
     terminal.render();
-
-    assert(stdOutWrite.notCalled);
   });
 
   it('Expect terminal.setState to execute', () => {
 
     // Setup
-    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk);
+    const terminal = new Terminal(config, stdOutWrite, noop);
 
     // Execute
     terminal.setState(config.subscriptions.example1, 'good');
@@ -138,7 +120,7 @@ describe('Terminal', () => {
   it('Expect terminal.setState to execute wih an error state', () => {
 
     // Setup
-    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk);
+    const terminal = new Terminal(config, stdOutWrite, noop);
 
     // Execute
     terminal.setState(config.subscriptions.example1, 'error', 'Fake Error Status');
@@ -148,8 +130,7 @@ describe('Terminal', () => {
   it('Expect terminal.start to start', () => {
 
     // Setup
-    const startConfig = { debug: false };
-    const terminal = new Terminal(startConfig, stdOutWrite, noop, mockChalk);
+    const terminal = new Terminal(startConfig, stdOutWrite, noop);
 
     // Execute with debug on
     startConfig.debug = false;
@@ -164,16 +145,11 @@ describe('Terminal', () => {
   it('Expect terminal.error to handle non-strings', () => {
 
     // Setup
-    const terminal = new Terminal(config, stdOutWrite, noop, mockChalk);
+    const terminal = new Terminal(config, stdOutWrite, noop);
 
     // Execute
     terminal.error(new Error());
 
-  });
-
-  it('should execute the std*write methods', () => {
-    StdErrWriteImpl('');
-    StdOutWriteImpl('');
   });
 
 });

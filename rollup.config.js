@@ -10,13 +10,11 @@ module.exports = {
   context: 'this',
   external: [
     'chai',
-    'chalk',
     'child_process',
     'fb-watchman',
     'fs',
     'inversify',
     'path',
-    'node-emoji',
     'sinon',
     'reflect-metadata',
     'ts-helpers',

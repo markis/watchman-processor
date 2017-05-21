@@ -1,4 +1,6 @@
-import { WatchmanExpression } from './WatchmanExpression';
+import { WatchmanExpression } from './WatchmanProcessor';
+
+export type States = 'good' | 'error' | 'running';
 
 export interface SubConfig {
   /**
@@ -43,7 +45,7 @@ export interface SubConfig {
    * @type {string}
    * @memberOf SubConfig
    */
-  state?: string;
+  state?: States;
   /**
    * Error messages get relected here.  Should mostly get left empty.
    *
