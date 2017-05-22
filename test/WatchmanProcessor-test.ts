@@ -38,7 +38,6 @@ describe('Watchman', () => {
 
   beforeEach(() => {
     // mock all the defaults before
-    terminal.start = sinon.stub();
     terminal.render = sinon.stub();
     terminal.error = sinon.stub();
     terminal.debug = sinon.stub();

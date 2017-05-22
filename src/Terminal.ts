@@ -28,10 +28,6 @@ export class TerminalImpl implements Terminal {
     }
   }
 
-  public start() {
-    this.debug('starting');
-  }
-
   public debug(msg: string) {
     if (this.config.debug && typeof msg === 'string' && msg.length > 0) {
       msg = msg.trim();
