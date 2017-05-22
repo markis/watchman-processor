@@ -17,14 +17,11 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
   ) { }
 
   public start(): void {
-    const capabilities = {
-      optional: [] as string[],
-      required: ['relative_root'] as string[],
-    };
-    const onCapabilityCheck = this.onCapabilityCheck.bind(this);
+    const { client, terminal } = this;
 
-    this.terminal.start();
-    this.client.capabilityCheck(capabilities, onCapabilityCheck);
+    terminal.debug('watchman: initialize');
+    const onCapabilityCheck = this.onCapabilityCheck.bind(this);
+    client.capabilityCheck({}, onCapabilityCheck);
   }
 
   public end(): Promise<void> {
@@ -78,20 +75,6 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
     client.on('subscription', onSubscription);
   }
 
-  private syncFiles(subConfig: SubConfig, files: SubscriptionResponseFile[]) {
-    const terminal = this.terminal;
-    terminal.setState(subConfig, 'running');
-
-    const fileNames = (files || []).map(file => file.name);
-    this.sync.syncFiles(subConfig, fileNames)
-      .then(() => {
-        terminal.setState(subConfig, 'good');
-      })
-      .catch(err => {
-        terminal.setState(subConfig, 'error', err);
-      });
-  }
-
   private onSubscription(resp: SubscriptionResponse): void {
     const config = this.config;
     const subscription = resp && resp.subscription;
@@ -101,7 +84,21 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
     this.syncFiles(subConfig, files);
   }
 
-  private subscribe(folder: string, name: string, expression: WatchmanExpression): Promise<string | void> {
+  private syncFiles(subConfig: SubConfig, files: SubscriptionResponseFile[]): void {
+    const {sync, terminal } = this;
+    terminal.setState(subConfig, 'running');
+
+    const fileNames = (files || []).map(file => file.name);
+    sync.syncFiles(subConfig, fileNames)
+      .then(() => {
+        terminal.setState(subConfig, 'good');
+      })
+      .catch(err => {
+        terminal.setState(subConfig, 'error', err);
+      });
+  }
+
+  private subscribe(folder: string, name: string, expression: WatchmanExpression): Promise<void> {
     const terminal = this.terminal;
     const client = this.client;
     const sub = {
@@ -110,8 +107,8 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
       relative_root: '',
     };
 
-    terminal.debug(`starting: ${name}`);
-    return new Promise<string | void>((resolve, reject) => {
+    terminal.debug(`subscribe: ${name}`);
+    return new Promise<void>((resolve, reject) => {
       client.command(['subscribe', folder, name, sub],
         (error: string) => {
           error ? reject('failed to start: ' + error) : resolve();
@@ -123,7 +120,7 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
     const terminal = this.terminal;
     const client = this.client;
 
-    terminal.debug(`stopping: ${name}`);
+    terminal.debug(`unsubscribe: ${name}`);
     return new Promise<string | void>(resolve => {
       client.command(['unsubscribe', folder, name], resolve);
     });
@@ -133,7 +130,7 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
     const terminal = this.terminal;
     const client = this.client;
 
-    terminal.debug(`completely shutting down`);
+    terminal.debug(`watchman: shutdown`);
     return new Promise<string | void>(resolve => {
       client.command(['shutdown-server'], resolve);
     });

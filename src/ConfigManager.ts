@@ -38,7 +38,7 @@ export class ConfigManagerImpl implements ConfigManager {
   ) {
     const HOME_FOLDER = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
     this.options = Object.assign({
-      confFile: resolve(HOME_FOLDER, '/.watchman-processor.config.js'),
+      confFile: resolve(HOME_FOLDER + '/.watchman-processor.config.js'),
       exampleConfFile: resolve(__dirname + '/example/watchman-processor.config.js'),
     }, options);
   }

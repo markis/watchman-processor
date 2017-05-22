@@ -2,12 +2,6 @@ import { SubConfig } from './SubConfig';
 
 export interface Terminal {
   /**
-   * This let's the terminal know that the application is starting.  So do any setup necessary.
-   *
-   * @memberOf Terminal
-   */
-  start(): void;
-  /**
    * Display the user an error message
    *
    * @param {(string | Error)} err

@@ -127,18 +127,18 @@ describe('Terminal', () => {
 
   });
 
-  it('Expect terminal.start to start', () => {
+  it('Expect terminal.debug to write', () => {
 
     // Setup
     const terminal = new Terminal(startConfig, stdOutWrite, noop);
 
     // Execute with debug on
     startConfig.debug = false;
-    terminal.start();
+    terminal.debug('should not write');
 
     // Execute with debug on
     startConfig.debug = true;
-    terminal.start();
+    terminal.debug('should write');
 
   });
 

@@ -34,9 +34,15 @@ export class SyncImpl implements Sync {
   }
 
   public end() {
-    this.processes.forEach(proc => {
-      proc.kill();
-    });
+    const { processes, terminal } = this;
+
+    /* istanbul ignore else */
+    if (processes.size > 0) {
+      terminal.debug(`sync: kill rsync`);
+      processes.forEach(proc => {
+        proc.kill();
+      });
+    }
   }
 
   private _syncAllFiles(subConfig: SubConfig): Promise<void> {
@@ -88,6 +94,9 @@ export class SyncImpl implements Sync {
   }
 }
 
+/**
+ * Convert Buffer to string
+ */
 function toString(data: Buffer | string) {
   /* istanbul ignore next */
   return data instanceof Buffer ? data.toString('utf8') : data;
