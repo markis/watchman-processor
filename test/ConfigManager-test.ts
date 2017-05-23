@@ -40,9 +40,8 @@ describe('ConfigManager', () => {
   it('should create a configuration file', (done) => {
     const tempFile = resolve(__dirname, 'example/watchman-processor.config.js.tmp');
     const configMgr = container.get<ConfigManager>(Bindings.ConfigManager);
-    configMgr.createConfig(tempFile);
 
-    configMgr.createConfig()
+    configMgr.createConfig(tempFile)
       .then(() => {
         assert.isTrue(existsSync(tempFile));
         deleteFile(tempFile, () => {
@@ -67,22 +66,5 @@ describe('ConfigManager', () => {
     const config2 = configMgr.getConfig();
 
     assert.strictEqual(config, config2);
-  });
-
-  it('should construct on a windows machine', () => {
-    setArgs('-c', 'example/watchman-processor.config.js');
-    Object.defineProperty(process, 'platform', { value: 'win32' });
-    const configMgr = container.get<ConfigManager>(Bindings.ConfigManager);
-    const config = configMgr.getConfig();
-
-    assert.isObject(config);
-  });
-
-  it('should construct on a non-windows machine', () => {
-    Object.defineProperty(process, 'platform', { value: 'fakeOS' });
-    const configMgr = container.get<ConfigManager>(Bindings.ConfigManager);
-    const config = configMgr.getConfig();
-
-    assert.isObject(config);
   });
 });

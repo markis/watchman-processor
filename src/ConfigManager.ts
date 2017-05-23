@@ -81,9 +81,9 @@ export class ConfigManagerImpl implements ConfigManager {
   }
 
   public createConfig(
-    /* istanbul ignore else */
+    /* istanbul ignore next */
     confFile: string = this.options.confFile,
-    /* istanbul ignore else */
+    /* istanbul ignore next */
     exampleConfFile: string = this.options.exampleConfFile,
   ): Promise<void> {
     const { options, process } = this;
