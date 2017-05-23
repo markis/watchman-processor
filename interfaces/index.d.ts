@@ -1,3 +1,4 @@
+export * from './Cli';
 export * from './Config';
 export * from './ConfigManager';
 export * from './ConfigManagerOptions';

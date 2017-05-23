@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { Config, States, SubConfig, Terminal, Write } from '../interfaces';
+import { Config, States, SubConfig, Terminal } from '../interfaces';
 import { Bindings } from './ioc.bindings';
 
 const fgBlack = '\x1b[30m';
@@ -14,24 +14,22 @@ export class TerminalImpl implements Terminal {
   constructor(
     @inject(Bindings.Config)
     private readonly config: Config,
-    @inject(Bindings.Log)
-    private readonly writeFunc: Write,
-    @inject(Bindings.Error)
-    private readonly errorFunc: Write,
+    @inject(Bindings.Process)
+    private readonly process: NodeJS.Process,
   ) { }
 
   public error(err: string | Error) {
     const msg = err.toString();
-    this.errorFunc(`${msg}`);
+    this.process.stderr.write(`${msg}`);
     if (typeof err !== 'string') {
-      this.errorFunc(`${err.stack}`);
+      this.process.stderr.write(`${err.stack}`);
     }
   }
 
   public debug(msg: string) {
     if (this.config.debug && typeof msg === 'string' && msg.length > 0) {
       msg = msg.trim();
-      this.writeFunc(msg + '\n');
+      this.process.stdout.write(msg + '\n');
     }
   }
 
@@ -80,19 +78,20 @@ export class TerminalImpl implements Terminal {
   }
 
   private _emoji(str: string) {
+    /* istanbul ignore next */
     return this.config.emoji ? str : '';
   }
 
   private _clear() {
-    this.writeFunc('\x1b[H\x1b[J');
+    this.process.stdout.write('\x1b[H\x1b[J');
   }
 
   private _reset() {
-    this.writeFunc('\x1b[0m');
+    this.process.stdout.write('\x1b[0m');
   }
 
   private _log(msg: string, backgroundColor: string) {
-    this.writeFunc(`${backgroundColor}${fgBlack}${msg}`);
+    this.process.stdout.write(`${backgroundColor}${fgBlack}${msg}`);
     this._reset();
   }
 }

@@ -1,87 +1,88 @@
 import { assert } from 'chai';
-import { unlink as deleteFile } from 'fs';
+import { existsSync, unlink as deleteFile } from 'fs';
 import { resolve } from 'path';
 import { stub } from 'sinon';
-import { ConfigManagerImpl as ConfigManager } from '../src/ConfigManager';
+import { ConfigManager } from '../interfaces';
+import { Bindings } from '../src/ioc.bindings';
+import { container, setArgs } from './ioc-test';
 
-describe('Config', () => {
-  function noopWrite(str: string) {
-    // next line is just here to escape the no unused parameter option
-    str = str + '';
-  }
-  noopWrite('');
+describe('ConfigManager', () => {
+  beforeEach(() => {
+    container.snapshot();
+  });
 
-  it('should construct the config without options', () => {
-    const configMgr = new ConfigManager();
+  afterEach(() => {
+    container.restore();
+  });
+
+  it('should construct the example config', () => {
+    const configMgr = container.get(Bindings.ConfigManager);
 
     assert.isObject(configMgr, 'configMgr is an object');
   });
 
-  it('should throw error on not getting config file', (done) => {
-    const requireStub = stub();
-    requireStub.throws();
-    const configMgr = new ConfigManager(undefined, requireStub as any, noopWrite);
+  it('should return an error on not getting config file', () => {
+    container.rebind(Bindings.Require).toConstantValue(stub().throws());
 
-    configMgr.getConfig();
+    const configMgr = container.get<ConfigManager>(Bindings.ConfigManager);
 
-    done();
+    assert.instanceOf(configMgr.getConfig(), Error);
   });
 
-  it('should handle dealing with non existant files', (done) => {
-    const configMgr = new ConfigManager({ confFile: 'non-existant.js' });
+  it('should return an error when given an non-existant files', () => {
+    setArgs('-c', 'non-existant.js');
 
-    configMgr.getConfig();
+    const configMgr = container.get<ConfigManager>(Bindings.ConfigManager);
 
-    done();
+    assert.instanceOf(configMgr.getConfig(), Error);
   });
 
-  it('should throw error on not getting config file', (done) => {
+  it('should create a configuration file', (done) => {
     const tempFile = resolve(__dirname, 'example/watchman-processor.config.js.tmp');
+    const configMgr = container.get<ConfigManager>(Bindings.ConfigManager);
+    configMgr.createConfig(tempFile);
 
-    const configMgr = new ConfigManager({
-      confFile: tempFile,
-      exampleConfFile: resolve(__dirname, 'example/watchman-processor.config.js'),
-    });
-
-    configMgr.createConfig().then(() => {
-      deleteFile(tempFile, done);
-    });
+    configMgr.createConfig()
+      .then(() => {
+        assert.isTrue(existsSync(tempFile));
+        deleteFile(tempFile, () => {
+          done();
+        });
+      });
   });
 
   it('should initialize the example config file', () => {
-    const configMgr = new ConfigManager({
-      confFile: resolve(__dirname, 'example/watchman-processor.config.js'),
-      exampleConfFile: resolve(__dirname, 'example/watchman-processor.config.js'),
-    });
+    setArgs('-c', 'example/watchman-processor.config.js');
+    const configMgr = container.get<ConfigManager>(Bindings.ConfigManager);
+    const config = configMgr.getConfig();
 
-    configMgr.getConfig();
-
-    assert.isObject(configMgr, 'configMgr is an object');
+    assert.isObject(config);
   });
 
-  it('second getConfig calls will get a cached version', () => {
-    const configMgr = new ConfigManager({
-      confFile: resolve(__dirname, 'example/watchman-processor.config.js'),
-      exampleConfFile: resolve(__dirname, 'example/watchman-processor.config.js'),
-    });
+  it('should cache config between getConfig calls', () => {
+    setArgs('-c', 'example/watchman-processor.config.js');
+    const configMgr = container.get<ConfigManager>(Bindings.ConfigManager);
 
-    configMgr.getConfig();
-    configMgr.getConfig();
+    const config = configMgr.getConfig();
+    const config2 = configMgr.getConfig();
 
-    assert.isObject(configMgr, 'configMgr is an object');
+    assert.strictEqual(config, config2);
   });
 
   it('should construct on a windows machine', () => {
+    setArgs('-c', 'example/watchman-processor.config.js');
     Object.defineProperty(process, 'platform', { value: 'win32' });
-    const configMgr = new ConfigManager();
+    const configMgr = container.get<ConfigManager>(Bindings.ConfigManager);
+    const config = configMgr.getConfig();
 
-    assert.isObject(configMgr, 'configMgr is an object');
+    assert.isObject(config);
   });
 
   it('should construct on a non-windows machine', () => {
     Object.defineProperty(process, 'platform', { value: 'fakeOS' });
-    const configMgr = new ConfigManager();
+    const configMgr = container.get<ConfigManager>(Bindings.ConfigManager);
+    const config = configMgr.getConfig();
 
-    assert.isObject(configMgr, 'configMgr is an object');
+    assert.isObject(config);
   });
 });

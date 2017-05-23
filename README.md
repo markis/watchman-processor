@@ -3,7 +3,7 @@
 
 [![Code Climate](https://codeclimate.com/github/markis/watchman-processor/badges/gpa.svg)](https://codeclimate.com/github/markis/watchman-processor)
 [![Build Status](https://travis-ci.org/markis/watchman-processor.svg?branch=master)](https://travis-ci.org/markis/watchman-processor)
-[![Coverage Status](https://coveralls.io/repos/github/markis/watchman-processor/badge.svg?branch=master)](https://coveralls.io/github/markis/watchman-processor?branch=master) 
+[![Coverage Status](https://coveralls.io/repos/github/markis/watchman-processor/badge.svg?branch=master)](https://coveralls.io/github/markis/watchman-processor?branch=master)
 [![Known Vulnerabilities](https://snyk.io/test/github/markis/watchman-processor/badge.svg)](https://snyk.io/test/github/markis/watchman-processor)
 [![Greenkeeper badge](https://badges.greenkeeper.io/markis/watchman-processor.svg)](https://greenkeeper.io/)
 
@@ -33,7 +33,7 @@ npm install watchman-processor -g
 Create configuration file
 
 ```bash
-watchman-processor init
+watchman-processor --init
 ```
 
 Setup configuration file

@@ -1,8 +1,8 @@
 export const Bindings = {
+  Cli: Symbol('Cli'),
   Config: Symbol('Config'),
   ConfigManager: Symbol('ConfigManager'),
-  Error: Symbol('stdOutWrite'),
-  Log: Symbol('stdErrWrite'),
+  Process: Symbol('Process'),
   Require: Symbol('require'),
   Spawn: Symbol('spawn'),
   Sync: Symbol('Sync'),
