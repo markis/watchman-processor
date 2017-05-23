@@ -1,21 +1,27 @@
 import 'reflect-metadata';
 
-import { configManager, watchmanProcessor } from './ioc.config';
-import { Utils } from './Utils';
+import { Cli, ConfigManager, WatchmanProcessor } from '../interfaces';
+import { Bindings } from './ioc.bindings';
+import { container } from './ioc.config';
 
+const cli = container.get<Cli>(Bindings.Cli);
+const configManager = container.get<ConfigManager>(Bindings.ConfigManager);
+const watchmanProcessor = container.get<WatchmanProcessor>(Bindings.WatchmanProcessor);
+
+const args = cli.getArguments();
 let processor = watchmanProcessor;
 
-if (process.argv[2] === 'init') {
+if (args.init) {
   configManager.createConfig();
 } else {
   const config = configManager.getConfig();
   if (config instanceof Error) {
     processor = null as any;
-    Utils.error(config.message + '\n');
+    process.stderr.write(config.message + '\n');
     if (config.name !== 'init') {
-      Utils.error(config.name);
+      process.stderr.write(config.name);
       if (config.stack) {
-        Utils.error(config.stack);
+        process.stderr.write(config.stack);
       }
     }
   }

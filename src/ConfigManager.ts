@@ -1,11 +1,11 @@
 import { createReadStream, createWriteStream, existsSync } from 'fs';
-import { injectable } from 'inversify';
+import { inject, injectable } from 'inversify';
 import { resolve } from 'path';
-import { Config, ConfigManager, ConfigManagerOptions, Write } from '../interfaces';
+import { Cli, Config, ConfigManager, ConfigManagerOptions } from '../interfaces';
+import { Bindings } from './ioc.bindings';
 
-const BUILTIN_REQURE = require;
 const INIT_MSG = 'The watchman-processor configuration does not exist. \n\n' +
-                 'Run "watchman-processor init" to create an example configuration file.\n';
+                 'Run "watchman-processor --init" to create an example configuration file.\n';
 
 const DEFAULT_CONFIG = {
   controlWatchman: true,
@@ -32,15 +32,21 @@ export class ConfigManagerImpl implements ConfigManager {
   private options: ConfigManagerOptionsInternal;
 
   constructor(
-    options: ConfigManagerOptions = {},
-    private readonly require: NodeRequire = BUILTIN_REQURE,
-    private readonly write: Write = noop,
+    @inject(Bindings.Cli)
+    private readonly cli: Cli,
+    @inject(Bindings.Require)
+    private readonly require: NodeRequire,
+    @inject(Bindings.Process)
+    private readonly process: NodeJS.Process,
   ) {
-    const HOME_FOLDER = process.env[(process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
+    /* istanbul ignore next */
+    const homeFolder = this.process.env[(this.process.platform === 'win32') ? 'USERPROFILE' : 'HOME'];
+    const args = this.cli.getArguments();
+
     this.options = Object.assign({
-      confFile: resolve(HOME_FOLDER + '/.watchman-processor.config.js'),
+      confFile: args.config || resolve(homeFolder + '/.watchman-processor.config.js'),
       exampleConfFile: resolve(__dirname + '/example/watchman-processor.config.js'),
-    }, options);
+    });
   }
 
   public getConfig(): Config | Error {
@@ -57,14 +63,14 @@ export class ConfigManagerImpl implements ConfigManager {
       }
       const userConfig = require(configFile) as Config;
       const config: Config = this.cachedConfig = Object.assign({}, DEFAULT_CONFIG, userConfig);
-      const subscriptions = Object.keys(config.subscriptions);
 
       /* istanbul ignore if */
       if (!config.subscriptions) {
         throw new Error('No subscriptions defined');
       }
 
-      // ensure ignoreFolders has a value
+      // set the default settings for subscription configs
+      const subscriptions = Object.keys(config.subscriptions);
       for (const name of subscriptions) {
         config.subscriptions[name] = Object.assign({}, DEFAULT_SUBSCRIPTION, config.subscriptions[name]);
       }
@@ -74,24 +80,25 @@ export class ConfigManagerImpl implements ConfigManager {
     }
   }
 
-  public createConfig(): Promise<void> {
-    const { options, write } = this;
+  public createConfig(
+    /* istanbul ignore else */
+    confFile: string = this.options.confFile,
+    /* istanbul ignore else */
+    exampleConfFile: string = this.options.exampleConfFile,
+  ): Promise<void> {
+    const { options, process } = this;
 
     return new Promise<void>((resolve, reject) => {
-      const reader = createReadStream(options.exampleConfFile);
-      const writer = createWriteStream(options.confFile);
+      const reader = createReadStream(exampleConfFile);
+      const writer = createWriteStream(confFile);
 
       reader.on('error', reject);
       writer.on('error', reject);
       writer.on('close', () => {
-        write('Done.  "' + options.confFile + '" created.\n');
+        process.stdout.write('Done.  "' + options.confFile + '" created.\n');
         resolve();
       });
       reader.pipe(writer);
     });
   }
-}
-
-function noop() {
-  // do nothing
 }
