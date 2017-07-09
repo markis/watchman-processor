@@ -3,6 +3,8 @@ import { inject, injectable } from 'inversify';
 import { Config, Spawn, SubConfig, Sync, Terminal } from '../interfaces';
 import { Bindings } from './ioc.bindings';
 
+const windowsDriveRegex = /([a-zA-Z]):\\/;
+
 @injectable()
 export class SyncImpl implements Sync {
   private readonly processes: Set<ChildProcess>;
@@ -47,8 +49,9 @@ export class SyncImpl implements Sync {
 
   private _syncAllFiles(subConfig: SubConfig): Promise<void> {
     const { destination, ignoreFolders, source } = subConfig;
+    const normalizedSource = this.osNormalizePath(source);
     const excludes = (`--exclude '${ignoreFolders.join(`' --exclude '`)}'`).split(' ');
-    const args = ['-avz', '--delete'].concat(excludes, [source, destination]);
+    const args = ['-avz', '--delete'].concat(excludes, [normalizedSource, destination]);
 
     return this._exec(args);
   }
@@ -56,8 +59,9 @@ export class SyncImpl implements Sync {
   private _syncSpecificFiles(subConfig: SubConfig, files: string[]): Promise<void> {
     files = getUniqueFileFolders(files).concat(files);
     const { destination, source } = subConfig;
+    const normalizedSource = this.osNormalizePath(source);
     const includes = (`--include '${files.join(`' --include '`)}'`).split(' ');
-    const args = ['-avz', '--delete'].concat(includes, ['--exclude', `'*'`, source, destination]);
+    const args = ['-avz', '--delete'].concat(includes, ['--exclude', `'*'`, normalizedSource, destination]);
 
     return this._exec(args);
   }
@@ -92,6 +96,17 @@ export class SyncImpl implements Sync {
       });
     });
   }
+
+  private osNormalizePath(path: string): string {
+    if (windowsDriveRegex.test(path)) {
+      path = path.replace(windowsDriveRegex, '/mnt/$1/');
+      path = path.replace(/\\/, '/');
+      this.terminal.debug(path);
+      path = path.endsWith('/') ? path : path += '/';
+    }
+    return path;
+  }
+
 }
 
 /**
@@ -116,7 +131,7 @@ function getUniqueFileFolders(files: string[]): string[] {
   const seen: Map<string, void> = new Map();
 
   for (const file of files) {
-    const folderParts = file.split('/');
+    const folderParts = file.split(/\/|\\/);
     let folderPartsSum = '';
     for (const folderPart of folderParts) {
       if (folderPartsSum.length > 0) {
