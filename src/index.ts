@@ -9,7 +9,7 @@ const configManager = container.get<ConfigManager>(Bindings.ConfigManager);
 const watchmanProcessor = container.get<WatchmanProcessor>(Bindings.WatchmanProcessor);
 
 const args = cli.getArguments();
-let processor = watchmanProcessor;
+let processor;
 
 if (args.init) {
   configManager.createConfig();
@@ -24,6 +24,8 @@ if (args.init) {
         process.stderr.write(config.stack);
       }
     }
+  } else {
+    processor = watchmanProcessor;
   }
 }
 

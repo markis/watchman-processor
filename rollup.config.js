@@ -4,7 +4,6 @@ module.exports = {
   entry: './src/index.ts',
   dest: 'index.js',
   format: 'cjs',
-  moduleId: 'watchman-processor',
   moduleName: 'watchmanProcessor',
   sourceMap: true,
   context: 'this',
