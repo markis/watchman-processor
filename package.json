@@ -46,7 +46,7 @@
     "remap-istanbul": "^0.9.5",
     "rollup": "^0.45.2",
     "rollup-plugin-typescript": "^0.8.1",
-    "sinon": "^3.0.0",
+    "sinon": "^4.0.0",
     "ts-helpers": "^1.1.2",
     "tslint": "^5.0.0",
     "typescript": "^2.2.1"
