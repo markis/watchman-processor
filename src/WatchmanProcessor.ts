@@ -1,5 +1,6 @@
 import { Client, SubscriptionResponse, SubscriptionResponseFile } from 'fb-watchman';
 import { inject, injectable } from 'inversify';
+import { resolve as resolvePath } from 'path';
 import { Config, SubConfig, Sync, Terminal, WatchmanExpression, WatchmanProcessor } from '../interfaces';
 import { Bindings } from './ioc.bindings';
 
@@ -65,7 +66,7 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
         expression.push(['not', ['dirname', folder]]);
       }
 
-      promises.push(this.subscribe(sub.source, name, expression));
+      promises.push(this.subscribe(resolvePath(sub.source), name, expression));
     }
     const render = terminal.render.bind(terminal);
     const errHandler = terminal.error.bind(terminal);
