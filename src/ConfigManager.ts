@@ -88,7 +88,7 @@ export class ConfigManagerImpl implements ConfigManager {
   ): Promise<void> {
     const { options, process } = this;
 
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<void>((done, reject) => {
       const reader = createReadStream(exampleConfFile);
       const writer = createWriteStream(confFile);
 
@@ -96,7 +96,7 @@ export class ConfigManagerImpl implements ConfigManager {
       writer.on('error', reject);
       writer.on('close', () => {
         process.stdout.write('Done.  "' + options.confFile + '" created.\n');
-        resolve();
+        done();
       });
       reader.pipe(writer);
     });

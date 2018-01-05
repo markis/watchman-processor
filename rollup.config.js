@@ -1,12 +1,13 @@
 const typescript = require('rollup-plugin-typescript');
 
 module.exports = {
-  entry: './src/index.ts',
-  dest: 'index.js',
-  format: 'cjs',
-  moduleId: 'watchman-processor',
-  moduleName: 'watchmanProcessor',
-  sourceMap: true,
+  input: './src/index.ts',
+  output: {
+    name: 'watchmanProcessor',
+    sourcemap: true,
+    format: 'cjs',
+    file: 'index.js',
+  },
   context: 'this',
   external: [
     'chai',
