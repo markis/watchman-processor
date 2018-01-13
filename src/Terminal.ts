@@ -41,19 +41,13 @@ export class TerminalImpl implements Terminal {
 
   public render() {
     /* istanbul ignore if */
-    if (!this || !this.config || this.config.debug) {
-      return;
-    }
-    /* istanbul ignore if */
-    if (!this.config.subscriptions) {
+    if (this._quiet()) {
       return;
     }
 
     this._clear();
     const subscriptions = Object.keys(this.config.subscriptions);
     const statusBuffer: string[] = [];
-    const log = this._log.bind(this);
-    const emoji = this._emoji.bind(this);
 
     for (const name of subscriptions) {
       const subscription = this.config.subscriptions[name];
@@ -62,19 +56,25 @@ export class TerminalImpl implements Terminal {
         statusBuffer.push(statusMessage);
       }
 
-      if (state === 'good') {
-        log(emoji('👍 ') + ' ' + name + ' ', bgGreen);
-      } else if (state === 'running') {
-        log(emoji('🏃 ') + ' ' + name + ' ', bgYellow);
-      } else if (state === 'error') {
-        log(emoji('💀 ') + ' ' + name + ' ', bgRed);
-      } else {
-        log(emoji('⚡️ ') + ' ' + name + ' ', bgWhite);
-      }
+      this._renderState(name, state);
     }
-    log('\n', bgWhite);
+    this._log('\n', bgWhite);
     this._reset();
     this.error(statusBuffer.join('\n'));
+  }
+
+  private _renderState(name: string, state?: States): void {
+    const log = this._log.bind(this);
+    const emoji = this._emoji.bind(this);
+    if (state === 'good') {
+      log(emoji('👍 ') + ' ' + name + ' ', bgGreen);
+    } else if (state === 'running') {
+      log(emoji('🏃 ') + ' ' + name + ' ', bgYellow);
+    } else if (state === 'error') {
+      log(emoji('💀 ') + ' ' + name + ' ', bgRed);
+    } else {
+      log(emoji('⚡️ ') + ' ' + name + ' ', bgWhite);
+    }
   }
 
   private _emoji(str: string) {
@@ -93,5 +93,14 @@ export class TerminalImpl implements Terminal {
   private _log(msg: string, backgroundColor: string) {
     this.process.stdout.write(`${backgroundColor}${fgBlack}${msg}`);
     this._reset();
+  }
+
+  private _quiet() {
+    return (
+      !this
+      || !this.config
+      || this.config.debug
+      || !this.config.subscriptions
+    );
   }
 }
