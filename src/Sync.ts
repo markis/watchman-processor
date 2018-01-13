@@ -3,6 +3,10 @@ import { inject, injectable } from 'inversify';
 import { Config, Spawn, SubConfig, Sync, Terminal } from '../interfaces';
 import { Bindings } from './ioc.bindings';
 
+type Reject = (reason?: any) => void;
+type Resolve = () => void;
+type SeenMap = Map<string, void>;
+
 @injectable()
 export class SyncImpl implements Sync {
   private readonly processes: Set<ChildProcess>;
@@ -24,8 +28,8 @@ export class SyncImpl implements Sync {
     // remove files that are in the ignore folders
     const files = (filesNames || []).filter(file => !exists(ignoreFolders, file));
 
-    // if there are too many files, it might just be better to let rsync figure out what
-    // needs to be synced
+    // if there are too many files,
+    // it might just be better to let rsync figure out what needs to be synced
     if (files.length > 0 && files.length < this.config.maxFileLength) {
       return this._syncSpecificFiles(subConfig, files);
     } else {
@@ -71,26 +75,53 @@ export class SyncImpl implements Sync {
       const child = spawn(config.shell, ['-c', cmdAndArgs]);
       const errBuffer: string[] = [];
       this.processes.add(child);
-      const done = (code: number) => {
-        this.processes.delete(child);
-        code > 0 ? reject(errBuffer.join('\n')) : resolve();
-      };
 
-      child.stderr.on('data', (data: Buffer | string) => {
-        data = toString(data);
-        errBuffer.push(data);
-        terminal.debug(data);
-      });
-      child.stdout.on('data', (data: Buffer | string) => {
-        terminal.debug(toString(data));
-      });
+      const done = this._execDoneHandler(errBuffer, child, resolve, reject);
       child.on('exit', done);
       child.on('close', done);
-      child.on('error', (err) => {
-        this.processes.delete(child);
-        reject(err);
-      });
+      child.stderr.on('data', this._execErrDataHandler(errBuffer, terminal));
+      child.stdout.on('data', this._execDataHandler(terminal));
+      child.on('error', this._execErrorHandler(child, reject));
     });
+  }
+
+  private _execDataHandler(terminal: Terminal) {
+    return (data: Buffer | string) => {
+      terminal.debug(toString(data));
+    };
+  }
+
+  private _execErrDataHandler(
+    errBuffer: string[],
+    terminal: Terminal,
+  ) {
+    return (data: Buffer | string) => {
+      data = toString(data);
+      errBuffer.push(data);
+      terminal.debug(data);
+    };
+  }
+
+  private _execDoneHandler(
+    errBuffer: string[],
+    child: ChildProcess,
+    resolve: Resolve,
+    reject: Reject,
+  ) {
+    return (code: number) => {
+      this.processes.delete(child);
+      code > 0 ? reject(errBuffer.join('\n')) : resolve();
+    };
+  }
+
+  private _execErrorHandler(
+    child: ChildProcess,
+    reject: Reject,
+  ) {
+    return (err: Error) => {
+      this.processes.delete(child);
+      reject(err);
+    };
   }
 }
 
@@ -107,26 +138,29 @@ function toString(data: Buffer | string) {
  *  Example:
  *    Given: ['example/js/1.js', 'example/js/2/.js']
  *    Will Return: ['example/', 'example/js/', 'example/js/1.js', 'example/js/2/.js']
- *
- * @param {string[]} files
- * @returns {string[]}
  */
 function getUniqueFileFolders(files: string[]): string[] {
   const folders: string[] = [];
-  const seen: Map<string, void> = new Map();
+  const seen: SeenMap = new Map();
 
   for (const file of files) {
-    const folderParts = file.split('/');
-    let folderPartsSum = '';
-    for (const folderPart of folderParts) {
-      if (folderPartsSum.length > 0) {
-        folderPartsSum += '/';
-      }
-      folderPartsSum += folderPart;
-      if (!seen.has(folderPartsSum)) {
-        seen.set(folderPartsSum, undefined);
-        folders.push(folderPartsSum);
-      }
+    const folderParts = getFolderParts(file.split('/'), seen);
+    folders.push(...folderParts);
+  }
+  return folders;
+}
+
+function getFolderParts(folderParts: string[], seen: SeenMap): string[] {
+  const folders = [];
+  let folderPartsSum = '';
+  for (const folderPart of folderParts) {
+    if (folderPartsSum.length > 0) {
+      folderPartsSum += '/';
+    }
+    folderPartsSum += folderPart;
+    if (!seen.has(folderPartsSum)) {
+      seen.set(folderPartsSum, undefined);
+      folders.push(folderPartsSum);
     }
   }
   return folders;
@@ -134,10 +168,6 @@ function getUniqueFileFolders(files: string[]): string[] {
 
 /*
  * Return whether a value starts with a searchString in the given values array
- *
- * @param {string[]} values
- * @param {string} searchString
- * @returns {boolean}
  */
 function exists(values: string[], stringToSearch: string): boolean {
   for (const value of values) {
@@ -150,10 +180,6 @@ function exists(values: string[], stringToSearch: string): boolean {
 
 /**
  * Return whether a string starts with another string
- *
- * @param {string} value
- * @param {string} search
- * @returns {boolean}
  */
 function startsWith(value: string, searchString: string): boolean {
   return value.substr(0, searchString.length) === searchString;
