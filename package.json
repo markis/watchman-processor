@@ -1,6 +1,6 @@
 {
   "name": "watchman-processor",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "description": "File synchronizer with a simple dashboard",
   "keywords": [
     "watchman",
