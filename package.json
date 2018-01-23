@@ -32,7 +32,7 @@
     "tslib": "1.8.1"
   },
   "devDependencies": {
-    "@types/chai": "4.1.0",
+    "@types/chai": "4.1.2",
     "@types/mocha": "2.2.46",
     "@types/node": "9.3.0",
     "@types/sinon": "4.1.3",
