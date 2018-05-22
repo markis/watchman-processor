@@ -50,18 +50,22 @@ export class SyncImpl implements Sync {
   }
 
   private _syncAllFiles(subConfig: SubConfig): Promise<void> {
+    const { config } = this;
     const { destination, ignoreFolders, source } = subConfig;
     const excludes = (`--exclude '${ignoreFolders.join(`' --exclude '`)}'`).split(' ');
-    const args = ['-avz', '--delete'].concat(excludes, [source, destination]);
+    const deleteArg = config.delete ? ['--delete'] : [];
+    const args = ['-avz'].concat(deleteArg, excludes, [source, destination]);
 
     return this._exec(args);
   }
 
   private _syncSpecificFiles(subConfig: SubConfig, files: string[]): Promise<void> {
     files = getUniqueFileFolders(files).concat(files);
+    const { config } = this;
     const { destination, source } = subConfig;
     const includes = (`--include '${files.join(`' --include '`)}'`).split(' ');
-    const args = ['-avz', '--delete'].concat(includes, ['--exclude', `'*'`, source, destination]);
+    const deleteArg = config.delete ? ['--delete'] : [];
+    const args = ['-avz'].concat(deleteArg, includes, ['--exclude', `'*'`, source, destination]);
 
     return this._exec(args);
   }
