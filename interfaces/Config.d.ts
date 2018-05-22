@@ -10,6 +10,14 @@ export interface Config {
   debug: boolean;
 
   /**
+   * delete extraneous files from destination
+   *
+   * @type {boolean}
+   * @memberOf Config
+   */
+  delete: boolean;
+
+  /**
    * if your terminal window can support emojis
    *
    * @type {boolean}

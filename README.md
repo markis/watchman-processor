@@ -53,6 +53,7 @@ const IGNORE_FOLDERS = ['.git', 'node_modules'];
 
 module.exports = {
   debug: false,           // changes the output to show debug information, cmd and stdout output
+  delete: true,           // delete extraneous files from destination
   emoji: true,            // if your terminal window can support emojis
   controlWatchman: true,  // this will tell watchman-processor to shutdown watchman, when quitting
   rsyncCmd: 'rsync',      // default: 'rsync' -- override to whatever rsync command is installed or located
