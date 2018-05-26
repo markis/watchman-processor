@@ -53,7 +53,7 @@ export class SyncImpl implements Sync {
     const { config } = this;
     const { destination, ignoreFolders, source } = subConfig;
     const excludes = (`--exclude '${ignoreFolders.join(`' --exclude '`)}'`).split(' ');
-    const deleteArg = config.delete ? ['--delete'] : [];
+    const deleteArg = config.syncDelete ? ['--delete'] : [];
     const args = ['-avz'].concat(deleteArg, excludes, [source, destination]);
 
     return this._exec(args);
@@ -64,7 +64,7 @@ export class SyncImpl implements Sync {
     const { config } = this;
     const { destination, source } = subConfig;
     const includes = (`--include '${files.join(`' --include '`)}'`).split(' ');
-    const deleteArg = config.delete ? ['--delete'] : [];
+    const deleteArg = config.syncDelete ? ['--delete'] : [];
     const args = ['-avz'].concat(deleteArg, includes, ['--exclude', `'*'`, source, destination]);
 
     return this._exec(args);
