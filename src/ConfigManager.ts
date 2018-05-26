@@ -10,11 +10,11 @@ const INIT_MSG = 'The watchman-processor configuration does not exist. \n\n' +
 const DEFAULT_CONFIG = {
   controlWatchman: true,
   debug: false,
-  delete: true,
   emoji: true,
   maxFileLength: 100,
   rsyncCmd: 'rsync',
   shell: '/bin/sh',
+  syncDelete: true,
 };
 
 const DEFAULT_SUBSCRIPTION = {

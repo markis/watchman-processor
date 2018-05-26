@@ -15,7 +15,7 @@ export interface Config {
    * @type {boolean}
    * @memberOf Config
    */
-  delete: boolean;
+  syncDelete: boolean;
 
   /**
    * if your terminal window can support emojis
