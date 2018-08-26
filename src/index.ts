@@ -30,6 +30,7 @@ if (args.init) {
 }
 
 export default {
+  config: configManager.getConfig(),
   processor,
   terminal,
 };

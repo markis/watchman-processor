@@ -74,7 +74,7 @@ describe('Watchman', () => {
     chai.assert.deepEqual(emitter.emit.getCall(1).args, ['render']);
     chai.assert.deepEqual(emitter.emit.getCall(2).args, ['debug', { msg: 'subscribe: example1' }]);
     chai.assert.deepEqual(emitter.emit.getCall(3).args, ['setState',
-      { subscription: 'example1', configEntry: config.subscriptions.example1, state: 'running' }]);
+      { configEntry: config.subscriptions.example1, state: 'running', subscription: 'example1' }]);
     chai.assert.isObject(watchman, 'watchman is an object');
   });
 
