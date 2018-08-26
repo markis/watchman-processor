@@ -2,6 +2,7 @@ export const Bindings = {
   Cli: Symbol('Cli'),
   Config: Symbol('Config'),
   ConfigManager: Symbol('ConfigManager'),
+  Emitter: Symbol('Emitter'),
   Process: Symbol('Process'),
   Require: Symbol('require'),
   Spawn: Symbol('spawn'),

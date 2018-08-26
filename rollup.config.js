@@ -12,6 +12,7 @@ module.exports = {
   external: [
     'chai',
     'child_process',
+    'events',
     'fb-watchman',
     'fs',
     'inversify',

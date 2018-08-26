@@ -1,7 +1,8 @@
+import { EventEmitter } from 'events';
 import { Client, SubscriptionResponse, SubscriptionResponseFile } from 'fb-watchman';
 import { inject, injectable } from 'inversify';
 import { resolve as resolvePath } from 'path';
-import { Config, SubConfig, Sync, Terminal, WatchmanExpression, WatchmanProcessor } from '../interfaces';
+import { Config, SubConfig, Sync, WatchmanExpression, WatchmanProcessor } from '../interfaces';
 import { Bindings } from './ioc.bindings';
 
 @injectable()
@@ -11,16 +12,16 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
     private config: Config,
     @inject(Bindings.WatchmanClient)
     private client: Client,
-    @inject(Bindings.Terminal)
-    private terminal: Terminal,
+    @inject(Bindings.Emitter)
+    private emitter: EventEmitter,
     @inject(Bindings.Sync)
     private sync: Sync,
   ) { }
 
   public start(): void {
-    const { client, terminal } = this;
+    const { client, emitter } = this;
 
-    terminal.debug('watchman: initialize');
+    emitter.emit('debug', {msg: 'watchman: initialize'});
     const onCapabilityCheck = this.onCapabilityCheck.bind(this);
     client.capabilityCheck({}, onCapabilityCheck);
   }
@@ -46,12 +47,12 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
   }
 
   private onCapabilityCheck(error?: string | Error): void {
-    const terminal = this.terminal;
+    const emitter = this.emitter;
     if (error) {
-      terminal.error(error);
+      emitter.emit('error', {err: error });
       return;
     }
-    terminal.render();
+    emitter.emit('render');
 
     const client = this.client;
     const onSubscription = this.onSubscription.bind(this);
@@ -68,8 +69,8 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
 
       promises.push(this.subscribe(resolvePath(sub.source), name, expression));
     }
-    const render = terminal.render.bind(terminal);
-    const errHandler = terminal.error.bind(terminal);
+    const render = emitter.emit.bind(emitter, 'rednder');
+    const errHandler = emitter.emit.bind(emitter, 'error');
     Promise.all(promises).then(render).catch(errHandler);
 
     // subscription is fired regardless of which subscriber fired it
@@ -86,21 +87,21 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
   }
 
   private syncFiles(subConfig: SubConfig, files: SubscriptionResponseFile[]): void {
-    const {sync, terminal } = this;
-    terminal.setState(subConfig, 'running');
+    const {sync, emitter } = this;
+    emitter.emit('setState', {configEntry: subConfig, state: 'running' });
 
     const fileNames = (files || []).map(file => file.name);
     sync.syncFiles(subConfig, fileNames)
       .then(() => {
-        terminal.setState(subConfig, 'good');
+        emitter.emit('setState', {configEntry: subConfig, state: 'good' });
       })
       .catch(err => {
-        terminal.setState(subConfig, 'error', err);
+        emitter.emit('setState', {configEntry: subConfig, state: 'error', statusMessage: err});
       });
   }
 
   private subscribe(folder: string, name: string, expression: WatchmanExpression): Promise<void> {
-    const terminal = this.terminal;
+    const emitter = this.emitter;
     const client = this.client;
     const sub = {
       expression,
@@ -108,7 +109,7 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
       relative_root: '',
     };
 
-    terminal.debug(`subscribe: ${name}`);
+    emitter.emit('debug', {msg: `subscribe: ${name}` });
     return new Promise<void>((resolve, reject) => {
       client.command(['subscribe', folder, name, sub],
         (error: string) => {
@@ -118,20 +119,20 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
   }
 
   private unsubscribe(folder: string, name: string): Promise<string | void> {
-    const terminal = this.terminal;
+    const emitter = this.emitter;
     const client = this.client;
 
-    terminal.debug(`unsubscribe: ${name}`);
+    emitter.emit('debug', {msg: `unsubscribe: ${name}` });
     return new Promise<string | void>(resolve => {
       client.command(['unsubscribe', folder, name], resolve);
     });
   }
 
   private shutdown(): Promise<string | void> {
-    const terminal = this.terminal;
+    const emitter = this.emitter;
     const client = this.client;
 
-    terminal.debug(`watchman: shutdown`);
+    emitter.emit('debug', {msg: `watchman: shutdown` });
     return new Promise<string | void>(resolve => {
       client.command(['shutdown-server'], resolve);
     });
