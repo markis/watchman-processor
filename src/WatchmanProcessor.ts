@@ -69,7 +69,7 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
 
       promises.push(this.subscribe(resolvePath(sub.source), name, expression));
     }
-    const render = emitter.emit.bind(emitter, 'rednder');
+    const render = emitter.emit.bind(emitter, 'render');
     const errHandler = emitter.emit.bind(emitter, 'error');
     Promise.all(promises).then(render).catch(errHandler);
 
@@ -113,7 +113,7 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
     return new Promise<void>((resolve, reject) => {
       client.command(['subscribe', folder, name, sub],
         (error: string) => {
-          error ? reject('failed to start: ' + error) : resolve();
+          error ? reject({err: 'failed to start: ' + error, subscription: name}) : resolve();
         });
     });
   }
