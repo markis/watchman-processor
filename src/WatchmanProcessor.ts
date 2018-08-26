@@ -83,20 +83,20 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
     const files = resp.files;
 
     const subConfig = config.subscriptions[subscription];
-    this.syncFiles(subConfig, files);
+    this.syncFiles(subConfig, files, subscription);
   }
 
-  private syncFiles(subConfig: SubConfig, files: SubscriptionResponseFile[]): void {
+  private syncFiles(subConfig: SubConfig, files: SubscriptionResponseFile[], subscription: string): void {
     const {sync, emitter } = this;
-    emitter.emit('setState', {configEntry: subConfig, state: 'running' });
+    emitter.emit('setState', {subscription, configEntry: subConfig, state: 'running' });
 
     const fileNames = (files || []).map(file => file.name);
     sync.syncFiles(subConfig, fileNames)
       .then(() => {
-        emitter.emit('setState', {configEntry: subConfig, state: 'good' });
+        emitter.emit('setState', {subscription, configEntry: subConfig, state: 'good' });
       })
       .catch(err => {
-        emitter.emit('setState', {configEntry: subConfig, state: 'error', statusMessage: err});
+        emitter.emit('setState', {subscription, configEntry: subConfig, state: 'error', statusMessage: err});
       });
   }
 
