@@ -7,6 +7,7 @@ import 'ts-helpers';
 import { Config } from '../interfaces';
 import { SyncImpl as Sync } from '../src/Sync';
 import { WatchmanProcessorImpl as Watchman } from '../src/WatchmanProcessor';
+import { WatchmanProcessorEvent } from '../src/WatchmanProcessorEvent';
 
 const mockEventEmitter = sinon.mock(EventEmitter);
 const emitter = mockEventEmitter as any;
@@ -54,13 +55,15 @@ describe('Watchman', () => {
   });
 
   it('should log errors from watchman.capabilityCheck', () => {
-    mockWatchmanClient.capabilityCheck.callsArgWith(1, 'error');
+    mockWatchmanClient.capabilityCheck.callsArgWith(1, WatchmanProcessorEvent.Error);
 
     const watchman = new Watchman(config, watchmanClient, emitter, sync);
     watchman.start();
 
-    chai.assert.deepEqual(emitter.emit.getCall(0).args, ['debug', { msg: 'watchman: initialize' }]);
-    chai.assert.deepEqual(emitter.emit.getCall(1).args, ['error', { err: 'error' }]);
+    chai.assert.deepEqual(
+      emitter.emit.getCall(0).args,
+      [WatchmanProcessorEvent.Debug, { msg: 'watchman: initialize' }]);
+    chai.assert.deepEqual(emitter.emit.getCall(1).args, [WatchmanProcessorEvent.Error, { err: 'error' }]);
     chai.assert.isObject(watchman, 'watchman is an object');
   });
 
@@ -70,10 +73,12 @@ describe('Watchman', () => {
     const watchman = new Watchman(config, watchmanClient, emitter, sync);
     watchman.start();
 
-    chai.assert.deepEqual(emitter.emit.getCall(0).args, ['debug', { msg: 'watchman: initialize' }]);
-    chai.assert.deepEqual(emitter.emit.getCall(1).args, ['render']);
-    chai.assert.deepEqual(emitter.emit.getCall(2).args, ['debug', { msg: 'subscribe: example1' }]);
-    chai.assert.deepEqual(emitter.emit.getCall(3).args, ['setState',
+    chai.assert.deepEqual(
+      emitter.emit.getCall(0).args,
+      [WatchmanProcessorEvent.Debug, { msg: 'watchman: initialize' }]);
+    chai.assert.deepEqual(emitter.emit.getCall(1).args, [WatchmanProcessorEvent.Render]);
+    chai.assert.deepEqual(emitter.emit.getCall(2).args, [WatchmanProcessorEvent.Debug, { msg: 'subscribe: example1' }]);
+    chai.assert.deepEqual(emitter.emit.getCall(3).args, [WatchmanProcessorEvent.SetState,
       { configEntry: config.subscriptions.example1, state: 'running', subscription: 'example1' }]);
     chai.assert.isObject(watchman, 'watchman is an object');
   });
@@ -100,7 +105,9 @@ describe('Watchman', () => {
     const watchman = new Watchman(config, watchmanClient, emitter, sync);
     watchman.end();
 
-    chai.assert.deepEqual(emitter.emit.getCall(0).args, ['debug', { msg: 'unsubscribe: example1' }]);
+    chai.assert.deepEqual(
+      emitter.emit.getCall(0).args,
+      [WatchmanProcessorEvent.Debug, { msg: 'unsubscribe: example1' }]);
   });
 
   it('should end and shutdown', () => {

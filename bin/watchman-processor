@@ -5,18 +5,19 @@ process.title = 'watchman-processor';
 var index = require('../index');
 var watchman = index.processor;
 var terminal = index.terminal;
+var WatchmanProcessorEvent = index.WatchmanProcessorEvent;
 
 if (watchman && typeof watchman.start === 'function') {
-  watchman.emitter.on('error', function (params) {
+  watchman.emitter.on(WatchmanProcessorEvent.Error, function (params) {
    terminal.error(params.err);
   });
-  watchman.emitter.on('debug', function (params) {
+  watchman.emitter.on(WatchmanProcessorEvent.Debug, function (params) {
    terminal.debug(params.msg);
   });
-  watchman.emitter.on('setState', function (params) {
+  watchman.emitter.on(WatchmanProcessorEvent.SetState, function (params) {
    terminal.setState(params.configEntry, params.state, params.statusMessage);
   });
-  watchman.emitter.on('render', terminal.render.bind(terminal));
+  watchman.emitter.on(WatchmanProcessorEvent.Render, terminal.render.bind(terminal));
   watchman.start()
 }
 process.on('SIGINT', function() {

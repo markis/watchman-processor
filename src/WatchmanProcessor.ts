@@ -4,6 +4,7 @@ import { inject, injectable } from 'inversify';
 import { resolve as resolvePath } from 'path';
 import { Config, SubConfig, Sync, WatchmanExpression, WatchmanProcessor } from '../interfaces';
 import { Bindings } from './ioc.bindings';
+import { WatchmanProcessorEvent } from './WatchmanProcessorEvent';
 
 @injectable()
 export class WatchmanProcessorImpl implements WatchmanProcessor {
@@ -21,7 +22,7 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
   public start(): void {
     const { client, emitter } = this;
 
-    emitter.emit('debug', {msg: 'watchman: initialize'});
+    emitter.emit(WatchmanProcessorEvent.Debug, {msg: 'watchman: initialize'});
     const onCapabilityCheck = this.onCapabilityCheck.bind(this);
     client.capabilityCheck({}, onCapabilityCheck);
   }
@@ -49,10 +50,10 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
   private onCapabilityCheck(error?: string | Error): void {
     const emitter = this.emitter;
     if (error) {
-      emitter.emit('error', {err: error });
+      emitter.emit(WatchmanProcessorEvent.Error, {err: error });
       return;
     }
-    emitter.emit('render');
+    emitter.emit(WatchmanProcessorEvent.Render);
 
     const client = this.client;
     const onSubscription = this.onSubscription.bind(this);
@@ -69,8 +70,8 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
 
       promises.push(this.subscribe(resolvePath(sub.source), name, expression));
     }
-    const render = emitter.emit.bind(emitter, 'render');
-    const errHandler = emitter.emit.bind(emitter, 'error');
+    const render = emitter.emit.bind(emitter, WatchmanProcessorEvent.Render);
+    const errHandler = emitter.emit.bind(emitter, WatchmanProcessorEvent.Error);
     Promise.all(promises).then(render).catch(errHandler);
 
     // subscription is fired regardless of which subscriber fired it
@@ -88,15 +89,17 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
 
   private syncFiles(subConfig: SubConfig, files: SubscriptionResponseFile[], subscription: string): void {
     const {sync, emitter } = this;
-    emitter.emit('setState', {subscription, configEntry: subConfig, state: 'running' });
+    emitter.emit(WatchmanProcessorEvent.SetState, {subscription, configEntry: subConfig, state: 'running' });
 
     const fileNames = (files || []).map(file => file.name);
     sync.syncFiles(subConfig, fileNames)
       .then(() => {
-        emitter.emit('setState', {subscription, configEntry: subConfig, state: 'good' });
+        emitter.emit(WatchmanProcessorEvent.SetState, {subscription, configEntry: subConfig, state: 'good' });
       })
       .catch(err => {
-        emitter.emit('setState', {subscription, configEntry: subConfig, state: 'error', statusMessage: err});
+        emitter.emit(
+          WatchmanProcessorEvent.SetState,
+          {subscription, configEntry: subConfig, state: WatchmanProcessorEvent.Error, statusMessage: err});
       });
   }
 
@@ -109,7 +112,7 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
       relative_root: '',
     };
 
-    emitter.emit('debug', {msg: `subscribe: ${name}` });
+    emitter.emit(WatchmanProcessorEvent.Debug, {msg: `subscribe: ${name}` });
     return new Promise<void>((resolve, reject) => {
       client.command(['subscribe', folder, name, sub],
         (error: string) => {
@@ -122,7 +125,7 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
     const emitter = this.emitter;
     const client = this.client;
 
-    emitter.emit('debug', {msg: `unsubscribe: ${name}` });
+    emitter.emit(WatchmanProcessorEvent.Debug, {msg: `unsubscribe: ${name}` });
     return new Promise<string | void>(resolve => {
       client.command(['unsubscribe', folder, name], resolve);
     });
@@ -132,7 +135,7 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
     const emitter = this.emitter;
     const client = this.client;
 
-    emitter.emit('debug', {msg: `watchman: shutdown` });
+    emitter.emit(WatchmanProcessorEvent.Debug, {msg: `watchman: shutdown` });
     return new Promise<string | void>(resolve => {
       client.command(['shutdown-server'], resolve);
     });

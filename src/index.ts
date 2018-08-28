@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import { Cli, ConfigManager, Terminal, WatchmanProcessor } from '../interfaces';
 import { Bindings } from './ioc.bindings';
 import { container } from './ioc.config';
+import { WatchmanProcessorEvent } from './WatchmanProcessorEvent';
 
 const cli = container.get<Cli>(Bindings.Cli);
 const configManager = container.get<ConfigManager>(Bindings.ConfigManager);
@@ -30,6 +31,7 @@ if (args.init) {
 }
 
 export default {
+  WatchmanProcessorEvent,
   config: configManager.getConfig(),
   processor,
   terminal,
