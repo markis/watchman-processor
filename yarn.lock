@@ -667,9 +667,9 @@ reflect-metadata@0.1.12:
   version "0.1.12"
   resolved "https://registry.yarnpkg.com/reflect-metadata/-/reflect-metadata-0.1.12.tgz#311bf0c6b63cd782f228a81abe146a2bfa9c56f2"
 
-remap-istanbul@0.11.1:
-  version "0.11.1"
-  resolved "https://registry.yarnpkg.com/remap-istanbul/-/remap-istanbul-0.11.1.tgz#4ad9a06450d3556559bef6195418e05bd4ef6d61"
+remap-istanbul@0.12.0:
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/remap-istanbul/-/remap-istanbul-0.12.0.tgz#7215642017d01a8c4a51bdb41be35297ec71fc4e"
   dependencies:
     amdefine "^1.0.0"
     istanbul "0.4.5"
