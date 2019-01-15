@@ -28,7 +28,7 @@
   "dependencies": {
     "fb-watchman": "2.0.0",
     "inversify": "4.13.0",
-    "reflect-metadata": "0.1.12",
+    "reflect-metadata": "0.1.13",
     "tslib": "1.9.1"
   },
   "devDependencies": {
