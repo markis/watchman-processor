@@ -2,12 +2,10 @@ language: node_js
 
 node_js:
   - "node"
-  - "4"
-  - "5"
   - "6"
-  - "7"
   - "8"
-  - "9"
+  - "10"
+  - "12"
 
 cache:
   directories:
@@ -19,14 +17,13 @@ before_install:
 
 install:
   - npm install
-  - npm install if-ver -g
-  - if-ver -ge 6 && npm install codacy-coverage coveralls istanbul remap-istanbul -g || if-ver -lt 6
+  - npm install codacy-coverage coveralls istanbul remap-istanbul -g
 
 script:
   - npm test
 
 after_success:
-  - "(if-ver -ge 6 && npm run coverage) || if-ver -lt 6"
-  - "(if-ver -ge 6 && remap-istanbul --type lcovonly -i coverage/coverage.json -o coverage/remapped-lcov.info) || if-ver -lt 6"
-  - "(if-ver -ge 6 && cat coverage/remapped-lcov.info | codacy-coverage) || if-ver -lt 6"
-  - "(if-ver -ge 6 && cat coverage/remapped-lcov.info | coveralls) || if-ver -lt 6"
+  - "npm run coverage"
+  - "remap-istanbul --type lcovonly -i coverage/coverage.json -o coverage/remapped-lcov.info"
+  - "cat coverage/remapped-lcov.info | codacy-coverage"
+  - "cat coverage/remapped-lcov.info | coveralls"
