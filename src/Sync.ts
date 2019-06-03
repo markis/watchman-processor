@@ -83,8 +83,12 @@ export class SyncImpl implements Sync {
       const done = this._execDoneHandler(errBuffer, child, resolve, reject);
       child.on('exit', done);
       child.on('close', done);
-      child.stderr.on('data', this._execErrDataHandler(errBuffer, terminal));
-      child.stdout.on('data', this._execDataHandler(terminal));
+      if (child.stderr) {
+        child.stderr.on('data', this._execErrDataHandler(errBuffer, terminal));
+      }
+      if (child.stdout) {
+        child.stdout.on('data', this._execDataHandler(terminal));
+      }
       child.on('error', this._execErrorHandler(child, reject));
     });
   }
