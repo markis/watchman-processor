@@ -13,7 +13,6 @@ let processor = watchmanProcessor;
 
 if (args.init) {
   configManager.createConfig();
-  process.abort();
 } else {
   const config = configManager.getConfig();
   if (config instanceof Error) {
