@@ -35,7 +35,7 @@
     "@types/chai": "4.1.7",
     "@types/mocha": "5.2.7",
     "@types/node": "12.6.3",
-    "@types/sinon": "7.0.13",
+    "@types/sinon": "7.5.0",
     "chai": "4.2.0",
     "if-ver": "1.1.0",
     "in-publish": "2.0.0",
