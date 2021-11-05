@@ -43,7 +43,7 @@ describe('Watchman', () => {
     terminal.debug = sinon.stub();
     terminal.setState = sinon.stub();
 
-    mockSync.syncFiles = sinon.stub().returns(new Promise(resolve => resolve()));
+    mockSync.syncFiles = sinon.stub().returns(new Promise<void>(resolve => resolve()));
     mockWatchmanClient.capabilityCheck = sinon.stub().callsArg(1);
     mockWatchmanClient.on = sinon.stub().callsArgWith(1, {files: [{name: 'example.js'}], subscription: 'example1'});
     mockWatchmanClient.command = sinon.stub().callsArg(1);

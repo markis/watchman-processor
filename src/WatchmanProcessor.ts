@@ -28,7 +28,7 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
   public end(): Promise<void> {
     const { client, config, sync } = this;
     const subscriptions = config.subscriptions;
-    const promises: Array<Promise<string | void>> = [];
+    const promises: Promise<string | void>[] = [];
 
     for (const name of Object.keys(subscriptions)) {
       const sub = subscriptions[name];
@@ -55,7 +55,7 @@ export class WatchmanProcessorImpl implements WatchmanProcessor {
 
     const client = this.client;
     const onSubscription = this.onSubscription.bind(this);
-    const promises: Array<Promise<string | void>> = [];
+    const promises: Promise<string | void>[] = [];
     const subscriptions = Object.keys(this.config.subscriptions);
 
     for (const name of subscriptions) {
