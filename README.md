@@ -5,7 +5,6 @@
 [![Build Status](https://travis-ci.org/markis/watchman-processor.svg?branch=master)](https://travis-ci.org/markis/watchman-processor)
 [![Coverage Status](https://coveralls.io/repos/github/markis/watchman-processor/badge.svg?branch=master)](https://coveralls.io/github/markis/watchman-processor?branch=master)
 [![Known Vulnerabilities](https://snyk.io/test/github/markis/watchman-processor/badge.svg)](https://snyk.io/test/github/markis/watchman-processor)
-[![Greenkeeper badge](https://badges.greenkeeper.io/markis/watchman-processor.svg)](https://greenkeeper.io/)
 
 File synchronizer with a simplistic dashboard for Facebook's watchman file watching service
 
