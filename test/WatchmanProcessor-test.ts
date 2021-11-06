@@ -1,15 +1,16 @@
 import * as chai from 'chai';
+import { EventEmitter } from 'events';
 import { Client } from 'fb-watchman';
 import 'reflect-metadata';
 import * as sinon from 'sinon';
 import 'ts-helpers';
 import { Config } from '../interfaces';
 import { SyncImpl as Sync } from '../src/Sync';
-import { TerminalImpl as Terminal } from '../src/Terminal';
 import { WatchmanProcessorImpl as Watchman } from '../src/WatchmanProcessor';
+import { WatchmanProcessorEvent } from '../src/WatchmanProcessorEvent';
 
-const mockTerminal = sinon.mock(Terminal);
-const terminal: Terminal = mockTerminal as any;
+const mockEventEmitter = sinon.mock(EventEmitter);
+const emitter = mockEventEmitter as any;
 const mockSync = {
   end: sinon.stub(),
   syncFiles: sinon.stub(),
@@ -38,10 +39,7 @@ describe('Watchman', () => {
 
   beforeEach(() => {
     // mock all the defaults before
-    terminal.render = sinon.stub();
-    terminal.error = sinon.stub();
-    terminal.debug = sinon.stub();
-    terminal.setState = sinon.stub();
+    emitter.emit = sinon.spy();
 
     mockSync.syncFiles = sinon.stub().returns(new Promise<void>(resolve => resolve()));
     mockWatchmanClient.capabilityCheck = sinon.stub().callsArg(1);
@@ -50,34 +48,45 @@ describe('Watchman', () => {
   });
 
   it('should start watchman', () => {
-    const watchman = new Watchman(config, watchmanClient, terminal, sync);
+    const watchman = new Watchman(config, watchmanClient, emitter, sync);
     watchman.start();
 
     chai.assert.isObject(watchman, 'watchman is an object');
   });
 
   it('should log errors from watchman.capabilityCheck', () => {
-    mockWatchmanClient.capabilityCheck.callsArgWith(1, 'error');
+    mockWatchmanClient.capabilityCheck.callsArgWith(1, WatchmanProcessorEvent.Error);
 
-    const watchman = new Watchman(config, watchmanClient, terminal, sync);
+    const watchman = new Watchman(config, watchmanClient, emitter, sync);
     watchman.start();
 
+    chai.assert.deepEqual(
+      emitter.emit.getCall(0).args,
+      [WatchmanProcessorEvent.Debug, { msg: 'watchman: initialize' }]);
+    chai.assert.deepEqual(emitter.emit.getCall(1).args, [WatchmanProcessorEvent.Error, { err: 'error' }]);
     chai.assert.isObject(watchman, 'watchman is an object');
   });
 
   it('should log errors from watchman.command', () => {
     mockWatchmanClient.command.callsArgWith(1, 'error');
 
-    const watchman = new Watchman(config, watchmanClient, terminal, sync);
+    const watchman = new Watchman(config, watchmanClient, emitter, sync);
     watchman.start();
 
+    chai.assert.deepEqual(
+      emitter.emit.getCall(0).args,
+      [WatchmanProcessorEvent.Debug, { msg: 'watchman: initialize' }]);
+    chai.assert.deepEqual(emitter.emit.getCall(1).args, [WatchmanProcessorEvent.Render]);
+    chai.assert.deepEqual(emitter.emit.getCall(2).args, [WatchmanProcessorEvent.Debug, { msg: 'subscribe: example1' }]);
+    chai.assert.deepEqual(emitter.emit.getCall(3).args, [WatchmanProcessorEvent.SetState,
+      { configEntry: config.subscriptions.example1, state: 'running', subscription: 'example1' }]);
     chai.assert.isObject(watchman, 'watchman is an object');
   });
 
   it('should log errors from sync.syncFiles', () => {
     mockSync.syncFiles.returns(new Promise(() => { throw new Error('error'); }));
 
-    const watchman = new Watchman(config, watchmanClient, terminal, sync);
+    const watchman = new Watchman(config, watchmanClient, emitter, sync);
     watchman.start();
 
     chai.assert.isObject(watchman, 'watchman is an object');
@@ -85,7 +94,7 @@ describe('Watchman', () => {
 
   it('should attempt to sync files', () => {
     mockWatchmanClient.on = sinon.stub().callsArgWith(1, {subscription: 'example1'});
-    const watchman = new Watchman(config, watchmanClient, terminal, sync);
+    const watchman = new Watchman(config, watchmanClient, emitter, sync);
     watchman.start();
 
     chai.assert.isObject(watchman, 'watchman is an object');
@@ -93,14 +102,18 @@ describe('Watchman', () => {
 
   it('should end', () => {
     mockWatchmanClient.end = sinon.stub();
-    const watchman = new Watchman(config, watchmanClient, terminal, sync);
+    const watchman = new Watchman(config, watchmanClient, emitter, sync);
     watchman.end();
+
+    chai.assert.deepEqual(
+      emitter.emit.getCall(0).args,
+      [WatchmanProcessorEvent.Debug, { msg: 'unsubscribe: example1' }]);
   });
 
   it('should end and shutdown', () => {
     mockWatchmanClient.end = sinon.stub();
     const newConfig = { controlWatchman: true, subscriptions: {} } as any;
-    const watchman = new Watchman(newConfig, watchmanClient, terminal, sync);
+    const watchman = new Watchman(newConfig, watchmanClient, emitter, sync);
     watchman.end();
   });
 
