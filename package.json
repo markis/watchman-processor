@@ -26,7 +26,7 @@
     "README.md"
   ],
   "dependencies": {
-    "fb-watchman": "^2.0.1",
+    "fb-watchman": "^2.0.2",
     "inversify": "^5.1.1",
     "reflect-metadata": "^0.1.13",
     "tslib": "^2.3.1"
